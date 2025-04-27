@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, X } from 'lucide-react';
+import { MessageSquare, Send, X, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -32,6 +32,21 @@ const quickReplies: QuickReply[] = [
     id: 'pricing',
     text: 'Tarifs',
     answer: 'Nous proposons plusieurs formules adaptées à vos besoins : Starter (à partir de 19€/mois), Pro (à partir de 49€/mois) et Enterprise (solution personnalisée). Chaque formule inclut un nombre différent de documents générables mensuellement et des fonctionnalités spécifiques.'
+  },
+  {
+    id: 'evacuation',
+    text: 'Plans d\'évacuation',
+    answer: 'Nos plans d\'évacuation sont conformes à la norme NF ISO 23601. Ils sont générés automatiquement à partir de votre plan et incluent tous les éléments obligatoires : issues de secours, équipements de sécurité incendie, point de rassemblement, et consignes de sécurité personnalisées.'
+  },
+  {
+    id: 'document-security',
+    text: 'Documents de sécurité',
+    answer: 'Les documents de sécurité obligatoires varient selon votre structure. Pour un ERP, vous devez disposer d\'un registre de sécurité, de plans d\'évacuation, et des consignes de sécurité. Pour un événement, un dossier de sécurité incluant DPS et analyse des risques est généralement requis.'
+  },
+  {
+    id: 'legal-updates',
+    text: 'Mises à jour réglementaires',
+    answer: 'Notre équipe juridique surveille constamment les évolutions réglementaires. Tous nos abonnés sont automatiquement informés des changements qui les concernent, et leurs documents sont mis à jour pour rester conformes à la législation en vigueur.'
   }
 ];
 
@@ -126,6 +141,27 @@ const Chatbot = () => {
         text: quickReplies.find(reply => reply.id === 'services')!.answer,
         timestamp: new Date()
       };
+    } else if (lowerCaseInput.includes('plan') || lowerCaseInput.includes('évacuation')) {
+      return {
+        id: `bot-${Date.now()}`,
+        sender: 'bot',
+        text: quickReplies.find(reply => reply.id === 'evacuation')!.answer,
+        timestamp: new Date()
+      };
+    } else if (lowerCaseInput.includes('document') || lowerCaseInput.includes('sécurité') || lowerCaseInput.includes('obligatoire')) {
+      return {
+        id: `bot-${Date.now()}`,
+        sender: 'bot',
+        text: quickReplies.find(reply => reply.id === 'document-security')!.answer,
+        timestamp: new Date()
+      };
+    } else if (lowerCaseInput.includes('mise à jour') || lowerCaseInput.includes('légal') || lowerCaseInput.includes('juridique')) {
+      return {
+        id: `bot-${Date.now()}`,
+        sender: 'bot',
+        text: quickReplies.find(reply => reply.id === 'legal-updates')!.answer,
+        timestamp: new Date()
+      };
     } else if (lowerCaseInput.includes('contact') || lowerCaseInput.includes('parler') || lowerCaseInput.includes('conseiller')) {
       return {
         id: `bot-${Date.now()}`,
@@ -133,11 +169,18 @@ const Chatbot = () => {
         text: 'Si vous souhaitez parler à un conseiller, vous pouvez nous contacter par téléphone au +33 1 23 45 67 89 ou utiliser notre formulaire de contact. Souhaitez-vous être redirigé vers notre page de contact ?',
         timestamp: new Date()
       };
+    } else if (lowerCaseInput.includes('légifrance') || lowerCaseInput.includes('api') || lowerCaseInput.includes('réglementaire')) {
+      return {
+        id: `bot-${Date.now()}`,
+        sender: 'bot',
+        text: 'Nous travaillons actuellement sur l\'intégration de l\'API Légifrance pour vous fournir des réponses réglementaires précises et à jour. Cette fonctionnalité sera disponible prochainement. En attendant, n\'hésitez pas à consulter notre page FAQ ou à contacter directement notre équipe juridique.',
+        timestamp: new Date()
+      };
     } else {
       return {
         id: `bot-${Date.now()}`,
         sender: 'bot',
-        text: 'Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir l\'une des options ci-dessous ?\n\nVous pouvez également contacter notre équipe via le formulaire de contact.',
+        text: 'Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir l\'une des options ci-dessous ?\n\nVous pouvez également consulter notre FAQ complète ou contacter notre équipe via le formulaire de contact.',
         timestamp: new Date()
       };
     }
@@ -171,6 +214,11 @@ const Chatbot = () => {
   const redirectToContact = () => {
     setIsOpen(false);
     toast.info("Vous allez être redirigé vers la page de contact");
+  };
+
+  const redirectToFaq = () => {
+    setIsOpen(false);
+    toast.info("Vous allez être redirigé vers la FAQ");
   };
   
   return (
@@ -244,7 +292,7 @@ const Chatbot = () => {
         {/* Quick Replies */}
         {messages.length > 0 && (
           <div className="p-2 border-t border-gray-200 flex flex-wrap gap-2 bg-gray-50">
-            {quickReplies.map((reply) => (
+            {quickReplies.slice(0, 3).map((reply) => (
               <button
                 key={reply.id}
                 onClick={() => handleQuickReply(reply)}
@@ -253,6 +301,13 @@ const Chatbot = () => {
                 {reply.text}
               </button>
             ))}
+            <Link
+              to="/faq"
+              onClick={redirectToFaq}
+              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 truncate transition-colors"
+            >
+              Voir la FAQ
+            </Link>
             <Link
               to="/contact"
               onClick={redirectToContact}
@@ -284,6 +339,12 @@ const Chatbot = () => {
           >
             <Send className="h-5 w-5" />
           </button>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="p-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center">
+          <AlertTriangle className="h-3 w-3 mr-1 text-gray-400" />
+          Les informations fournies ne remplacent pas l'avis d'un expert.
         </div>
       </div>
     </>
