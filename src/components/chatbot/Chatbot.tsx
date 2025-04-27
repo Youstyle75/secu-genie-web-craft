@@ -1,54 +1,12 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, X, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MessageSquare, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-
-type Message = {
-  id: string;
-  sender: 'bot' | 'user';
-  text: string;
-  timestamp: Date;
-};
-
-type QuickReply = {
-  id: string;
-  text: string;
-  answer: string;
-};
-
-const quickReplies: QuickReply[] = [
-  {
-    id: 'services',
-    text: 'Quels services proposez-vous ?',
-    answer: 'Nous proposons des solutions de création et de gestion de documents de sécurité pour les événements et ERP : plans d\'évacuation, registres de sécurité, analyses de risque et consignes personnalisées. Tous nos documents sont conformes à la réglementation en vigueur.'
-  },
-  {
-    id: 'regulation',
-    text: 'Réglementation ERP',
-    answer: 'Les ERP sont soumis au règlement de sécurité contre l\'incendie du 25 juin 1980 modifié. La réglementation varie selon le type et la catégorie d\'ERP. Nos solutions vous aident à rester conforme à ces exigences légales et à générer les documents nécessaires.'
-  },
-  {
-    id: 'pricing',
-    text: 'Tarifs',
-    answer: 'Nous proposons plusieurs formules adaptées à vos besoins : Starter (à partir de 19€/mois), Pro (à partir de 49€/mois) et Enterprise (solution personnalisée). Chaque formule inclut un nombre différent de documents générables mensuellement et des fonctionnalités spécifiques.'
-  },
-  {
-    id: 'evacuation',
-    text: 'Plans d\'évacuation',
-    answer: 'Nos plans d\'évacuation sont conformes à la norme NF ISO 23601. Ils sont générés automatiquement à partir de votre plan et incluent tous les éléments obligatoires : issues de secours, équipements de sécurité incendie, point de rassemblement, et consignes de sécurité personnalisées.'
-  },
-  {
-    id: 'document-security',
-    text: 'Documents de sécurité',
-    answer: 'Les documents de sécurité obligatoires varient selon votre structure. Pour un ERP, vous devez disposer d\'un registre de sécurité, de plans d\'évacuation, et des consignes de sécurité. Pour un événement, un dossier de sécurité incluant DPS et analyse des risques est généralement requis.'
-  },
-  {
-    id: 'legal-updates',
-    text: 'Mises à jour réglementaires',
-    answer: 'Notre équipe juridique surveille constamment les évolutions réglementaires. Tous nos abonnés sont automatiquement informés des changements qui les concernent, et leurs documents sont mis à jour pour rester conformes à la législation en vigueur.'
-  }
-];
+import { Message, QuickReply } from './types';
+import { quickReplies } from './constants';
+import ChatMessage from './ChatMessage';
+import QuickReplies from './QuickReplies';
+import ChatInput from './ChatInput';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -93,6 +51,38 @@ const Chatbot = () => {
       scrollToBottom();
     }
   }, [messages, isOpen]);
+
+  const generateBotResponse = (userInput: string): Message => {
+    const lowerCaseInput = userInput.toLowerCase();
+    let answer = '';
+
+    if (lowerCaseInput.includes('tarif') || lowerCaseInput.includes('prix') || lowerCaseInput.includes('coût')) {
+      answer = quickReplies.find(reply => reply.id === 'pricing')!.answer;
+    } else if (lowerCaseInput.includes('règlement') || lowerCaseInput.includes('erp') || lowerCaseInput.includes('norme')) {
+      answer = quickReplies.find(reply => reply.id === 'regulation')!.answer;
+    } else if (lowerCaseInput.includes('service') || lowerCaseInput.includes('offre') || lowerCaseInput.includes('propose')) {
+      answer = quickReplies.find(reply => reply.id === 'services')!.answer;
+    } else if (lowerCaseInput.includes('plan') || lowerCaseInput.includes('évacuation')) {
+      answer = quickReplies.find(reply => reply.id === 'evacuation')!.answer;
+    } else if (lowerCaseInput.includes('document') || lowerCaseInput.includes('sécurité') || lowerCaseInput.includes('obligatoire')) {
+      answer = quickReplies.find(reply => reply.id === 'document-security')!.answer;
+    } else if (lowerCaseInput.includes('mise à jour') || lowerCaseInput.includes('légal') || lowerCaseInput.includes('juridique')) {
+      answer = quickReplies.find(reply => reply.id === 'legal-updates')!.answer;
+    } else if (lowerCaseInput.includes('contact') || lowerCaseInput.includes('parler') || lowerCaseInput.includes('conseiller')) {
+      answer = 'Si vous souhaitez parler à un conseiller, vous pouvez nous contacter par téléphone au +33 1 23 45 67 89 ou utiliser notre formulaire de contact. Souhaitez-vous être redirigé vers notre page de contact ?';
+    } else if (lowerCaseInput.includes('légifrance') || lowerCaseInput.includes('api') || lowerCaseInput.includes('réglementaire')) {
+      answer = 'Nous travaillons actuellement sur l\'intégration de l\'API Légifrance pour vous fournir des réponses réglementaires précises et à jour. Cette fonctionnalité sera disponible prochainement. En attendant, n\'hésitez pas à consulter notre page FAQ ou à contacter directement notre équipe juridique.';
+    } else {
+      answer = 'Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir l\'une des options ci-dessous ?\n\nVous pouvez également consulter notre FAQ complète ou contacter notre équipe via le formulaire de contact.';
+    }
+
+    return {
+      id: `bot-${Date.now()}`,
+      sender: 'bot',
+      text: answer,
+      timestamp: new Date()
+    };
+  };
   
   const sendMessage = () => {
     if (!inputValue.trim()) return;
@@ -108,82 +98,11 @@ const Chatbot = () => {
     setInputValue('');
     setIsTyping(true);
     
-    // Simulate bot response delay
     setTimeout(() => {
       const botResponse = generateBotResponse(inputValue);
       setMessages(prevMessages => [...prevMessages, botResponse]);
       setIsTyping(false);
     }, 1000);
-  };
-  
-  const generateBotResponse = (userInput: string): Message => {
-    const lowerCaseInput = userInput.toLowerCase();
-    
-    // Check for keywords to determine response
-    if (lowerCaseInput.includes('tarif') || lowerCaseInput.includes('prix') || lowerCaseInput.includes('coût')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'pricing')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('règlement') || lowerCaseInput.includes('erp') || lowerCaseInput.includes('norme')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'regulation')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('service') || lowerCaseInput.includes('offre') || lowerCaseInput.includes('propose')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'services')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('plan') || lowerCaseInput.includes('évacuation')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'evacuation')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('document') || lowerCaseInput.includes('sécurité') || lowerCaseInput.includes('obligatoire')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'document-security')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('mise à jour') || lowerCaseInput.includes('légal') || lowerCaseInput.includes('juridique')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: quickReplies.find(reply => reply.id === 'legal-updates')!.answer,
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('contact') || lowerCaseInput.includes('parler') || lowerCaseInput.includes('conseiller')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: 'Si vous souhaitez parler à un conseiller, vous pouvez nous contacter par téléphone au +33 1 23 45 67 89 ou utiliser notre formulaire de contact. Souhaitez-vous être redirigé vers notre page de contact ?',
-        timestamp: new Date()
-      };
-    } else if (lowerCaseInput.includes('légifrance') || lowerCaseInput.includes('api') || lowerCaseInput.includes('réglementaire')) {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: 'Nous travaillons actuellement sur l\'intégration de l\'API Légifrance pour vous fournir des réponses réglementaires précises et à jour. Cette fonctionnalité sera disponible prochainement. En attendant, n\'hésitez pas à consulter notre page FAQ ou à contacter directement notre équipe juridique.',
-        timestamp: new Date()
-      };
-    } else {
-      return {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: 'Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir l\'une des options ci-dessous ?\n\nVous pouvez également consulter notre FAQ complète ou contacter notre équipe via le formulaire de contact.',
-        timestamp: new Date()
-      };
-    }
   };
   
   const handleQuickReply = (reply: QuickReply) => {
@@ -196,7 +115,6 @@ const Chatbot = () => {
     
     setMessages(prevMessages => [...prevMessages, userMessage]);
     
-    // Simulate bot response delay
     setIsTyping(true);
     setTimeout(() => {
       const botResponse: Message = {
@@ -220,10 +138,9 @@ const Chatbot = () => {
     setIsOpen(false);
     toast.info("Vous allez être redirigé vers la FAQ");
   };
-  
+
   return (
     <>
-      {/* Chat Button */}
       <button
         onClick={toggleChat}
         className="fixed bottom-6 right-6 bg-primary hover:bg-primary-hover text-white rounded-full p-3 shadow-lg transition-colors z-50"
@@ -232,14 +149,12 @@ const Chatbot = () => {
         <MessageSquare className="h-6 w-6" />
       </button>
       
-      {/* Chat Window */}
       <div
         className={`fixed bottom-20 right-6 w-80 md:w-96 bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 ease-in-out z-50 ${
           isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={{ maxHeight: '70vh' }}
       >
-        {/* Chat Header */}
         <div className="bg-primary text-white p-4 flex justify-between items-center">
           <div className="flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
@@ -250,28 +165,9 @@ const Chatbot = () => {
           </button>
         </div>
         
-        {/* Chat Messages */}
         <div className="p-4 h-80 overflow-y-auto bg-gray-50">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`mb-4 ${
-                message.sender === 'user' ? 'text-right' : ''
-              }`}
-            >
-              <div
-                className={`inline-block rounded-lg px-4 py-2 max-w-[80%] ${
-                  message.sender === 'user'
-                    ? 'bg-primary text-white'
-                    : 'bg-white border border-gray-200 text-gray-700'
-                }`}
-              >
-                <p style={{ whiteSpace: 'pre-line' }}>{message.text}</p>
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
-            </div>
+            <ChatMessage key={message.id} message={message} />
           ))}
           
           {isTyping && (
@@ -289,59 +185,22 @@ const Chatbot = () => {
           <div ref={messagesEndRef}></div>
         </div>
         
-        {/* Quick Replies */}
         {messages.length > 0 && (
-          <div className="p-2 border-t border-gray-200 flex flex-wrap gap-2 bg-gray-50">
-            {quickReplies.slice(0, 3).map((reply) => (
-              <button
-                key={reply.id}
-                onClick={() => handleQuickReply(reply)}
-                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 truncate transition-colors"
-              >
-                {reply.text}
-              </button>
-            ))}
-            <Link
-              to="/faq"
-              onClick={redirectToFaq}
-              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 truncate transition-colors"
-            >
-              Voir la FAQ
-            </Link>
-            <Link
-              to="/contact"
-              onClick={redirectToContact}
-              className="px-3 py-1 bg-accent text-white hover:bg-accent-hover rounded-full text-sm truncate transition-colors"
-            >
-              Contacter un conseiller
-            </Link>
-          </div>
+          <QuickReplies 
+            replies={quickReplies}
+            onReplyClick={handleQuickReply}
+            onRedirectContact={redirectToContact}
+            onRedirectFaq={redirectToFaq}
+          />
         )}
         
-        {/* Chat Input */}
-        <div className="p-2 border-t border-gray-200 flex">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Écrivez votre message ici..."
-            className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!inputValue.trim()}
-            className={`px-4 py-2 rounded-r-md ${
-              inputValue.trim()
-                ? 'bg-primary hover:bg-primary-hover text-white'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            } transition-colors`}
-          >
-            <Send className="h-5 w-5" />
-          </button>
-        </div>
+        <ChatInput
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          onSend={sendMessage}
+        />
 
-        {/* Disclaimer */}
         <div className="p-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center">
           <AlertTriangle className="h-3 w-3 mr-1 text-gray-400" />
           Les informations fournies ne remplacent pas l'avis d'un expert.
