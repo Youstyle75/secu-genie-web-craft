@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type FaqItem = {
   question: string;
