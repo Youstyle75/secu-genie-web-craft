@@ -2,13 +2,13 @@
 import { useReducer, useRef, useEffect } from 'react';
 import { MessageSquare, X, AlertTriangle, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { QuickReply } from './types';
-import { quickReplies } from './constants';
-import ChatMessage from './ChatMessage';
-import QuickReplies from './QuickReplies';
-import ChatInput from './ChatInput';
 import { chatbotReducer, initialState } from './chatbotReducer';
 import { useReglementaryBot } from '../../hooks/useReglementaryBot';
+import ChatMessages from './ChatMessages';
+import ChatHeader from './ChatHeader';
+import ChatFooter from './ChatFooter';
+import QuickReplies from './QuickReplies';
+import ChatInput from './ChatInput';
 
 const Chatbot = () => {
   const [state, dispatch] = useReducer(chatbotReducer, initialState);
@@ -70,10 +70,10 @@ const Chatbot = () => {
     }
   };
   
-  const handleQuickReply = async (reply: QuickReply) => {
+  const handleQuickReply = async (reply) => {
     const userMessage = {
       id: `user-${Date.now()}`,
-      sender: 'user' as const,
+      sender: 'user',
       text: reply.text,
       timestamp: new Date()
     };
@@ -84,7 +84,7 @@ const Chatbot = () => {
     setTimeout(() => {
       const botResponse = {
         id: `bot-${Date.now()}`,
-        sender: 'bot' as const,
+        sender: 'bot',
         text: reply.answer,
         timestamp: new Date()
       };
@@ -95,12 +95,14 @@ const Chatbot = () => {
   };
   
   const redirectToContact = () => {
-    setIsOpen(false);
+    // Fix: Use toggleChat or similar logic instead of setIsOpen
+    toggleChat(); // Close chat before redirect
     toast.info("Vous allez être redirigé vers la page de contact");
   };
 
   const redirectToFaq = () => {
-    setIsOpen(false);
+    // Fix: Use toggleChat or similar logic instead of setIsOpen
+    toggleChat(); // Close chat before redirect
     toast.info("Vous allez être redirigé vers la FAQ");
   };
 
@@ -131,48 +133,16 @@ const Chatbot = () => {
         }`}
         style={{ maxHeight: '70vh' }}
       >
-        <div className="bg-primary text-white p-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <MessageSquare className="h-5 w-5 mr-2" />
-            <h3 className="font-medium">SecuBot - Assistant Réglementaire</h3>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={clearChat} 
-              className="text-white hover:bg-primary-hover rounded p-1"
-              title="Effacer la conversation"
-            >
-              <HelpCircle className="h-5 w-5" />
-            </button>
-            <button 
-              onClick={toggleChat} 
-              className="text-white hover:bg-primary-hover rounded p-1"
-              title="Fermer le chat"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+        <ChatHeader 
+          toggleChat={toggleChat}
+          clearChat={clearChat}
+        />
         
-        <div className="p-4 h-80 overflow-y-auto bg-gray-50">
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
-          
-          {isTyping && (
-            <div className="mb-4">
-              <div className="inline-block rounded-lg px-4 py-2 bg-white border border-gray-200">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef}></div>
-        </div>
+        <ChatMessages 
+          messages={messages} 
+          isTyping={isTyping} 
+          messagesEndRef={messagesEndRef} 
+        />
         
         {messages.length > 0 && (
           <QuickReplies 
@@ -190,10 +160,7 @@ const Chatbot = () => {
           onSend={sendMessage}
         />
 
-        <div className="p-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center">
-          <AlertTriangle className="h-3 w-3 mr-1 text-gray-400" />
-          Les informations fournies sont basées sur la réglementation mais ne remplacent pas l'avis d'un expert.
-        </div>
+        <ChatFooter />
       </div>
     </>
   );
