@@ -1,5 +1,6 @@
 
 import { Message } from './types';
+import ReglementaryReferences from './ReglementaryReferences';
 
 interface ChatMessageProps {
   message: Message;
@@ -20,6 +21,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         }`}
       >
         <p style={{ whiteSpace: 'pre-line' }}>{message.text}</p>
+        {message.references && <ReglementaryReferences references={message.references} />}
       </div>
       <div className="text-xs text-gray-500 mt-1">
         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

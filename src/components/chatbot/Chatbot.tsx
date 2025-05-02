@@ -1,39 +1,27 @@
 
-import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, AlertTriangle } from 'lucide-react';
+import { useReducer, useRef, useEffect } from 'react';
+import { MessageSquare, X, AlertTriangle, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { Message, QuickReply } from './types';
+import { QuickReply } from './types';
 import { quickReplies } from './constants';
 import ChatMessage from './ChatMessage';
 import QuickReplies from './QuickReplies';
 import ChatInput from './ChatInput';
+import { chatbotReducer, initialState } from './chatbotReducer';
+import { useReglementaryBot } from '../../hooks/useReglementaryBot';
 
 const Chatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [state, dispatch] = useReducer(chatbotReducer, initialState);
+  const { isOpen, messages, inputValue, isTyping } = state;
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Initial greeting when chat is opened
-  const initialMessage: Message = {
-    id: 'welcome',
-    sender: 'bot',
-    text: 'Bonjour ! Je suis l\'assistant virtuel de SecuGenie. Comment puis-je vous aider aujourd\'hui ?',
-    timestamp: new Date()
-  };
+  const { processUserQuery, isProcessing, error, isReady } = useReglementaryBot();
   
   const toggleChat = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen && messages.length === 0) {
-      setTimeout(() => {
-        setMessages([initialMessage]);
-      }, 300);
-    }
+    dispatch({ type: 'TOGGLE_CHAT' });
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    dispatch({ type: 'SET_INPUT_VALUE', payload: e.target.value });
   };
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -52,80 +40,57 @@ const Chatbot = () => {
     }
   }, [messages, isOpen]);
 
-  const generateBotResponse = (userInput: string): Message => {
-    const lowerCaseInput = userInput.toLowerCase();
-    let answer = '';
-
-    if (lowerCaseInput.includes('tarif') || lowerCaseInput.includes('prix') || lowerCaseInput.includes('coût')) {
-      answer = quickReplies.find(reply => reply.id === 'pricing')!.answer;
-    } else if (lowerCaseInput.includes('règlement') || lowerCaseInput.includes('erp') || lowerCaseInput.includes('norme')) {
-      answer = quickReplies.find(reply => reply.id === 'regulation')!.answer;
-    } else if (lowerCaseInput.includes('service') || lowerCaseInput.includes('offre') || lowerCaseInput.includes('propose')) {
-      answer = quickReplies.find(reply => reply.id === 'services')!.answer;
-    } else if (lowerCaseInput.includes('plan') || lowerCaseInput.includes('évacuation')) {
-      answer = quickReplies.find(reply => reply.id === 'evacuation')!.answer;
-    } else if (lowerCaseInput.includes('document') || lowerCaseInput.includes('sécurité') || lowerCaseInput.includes('obligatoire')) {
-      answer = quickReplies.find(reply => reply.id === 'document-security')!.answer;
-    } else if (lowerCaseInput.includes('mise à jour') || lowerCaseInput.includes('légal') || lowerCaseInput.includes('juridique')) {
-      answer = quickReplies.find(reply => reply.id === 'legal-updates')!.answer;
-    } else if (lowerCaseInput.includes('contact') || lowerCaseInput.includes('parler') || lowerCaseInput.includes('conseiller')) {
-      answer = 'Si vous souhaitez parler à un conseiller, vous pouvez nous contacter par téléphone au +33 1 23 45 67 89 ou utiliser notre formulaire de contact. Souhaitez-vous être redirigé vers notre page de contact ?';
-    } else if (lowerCaseInput.includes('légifrance') || lowerCaseInput.includes('api') || lowerCaseInput.includes('réglementaire')) {
-      answer = 'Nous travaillons actuellement sur l\'intégration de l\'API Légifrance pour vous fournir des réponses réglementaires précises et à jour. Cette fonctionnalité sera disponible prochainement. En attendant, n\'hésitez pas à consulter notre page FAQ ou à contacter directement notre équipe juridique.';
-    } else {
-      answer = 'Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir l\'une des options ci-dessous ?\n\nVous pouvez également consulter notre FAQ complète ou contacter notre équipe via le formulaire de contact.';
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
     }
-
-    return {
-      id: `bot-${Date.now()}`,
-      sender: 'bot',
-      text: answer,
-      timestamp: new Date()
-    };
-  };
+  }, [error]);
   
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!inputValue.trim()) return;
     
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      text: inputValue,
-      timestamp: new Date()
-    };
+    dispatch({ type: 'ADD_USER_MESSAGE', payload: inputValue });
+    dispatch({ type: 'SET_TYPING', payload: true });
     
-    setMessages(prevMessages => [...prevMessages, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
-    
-    setTimeout(() => {
-      const botResponse = generateBotResponse(inputValue);
-      setMessages(prevMessages => [...prevMessages, botResponse]);
-      setIsTyping(false);
-    }, 1000);
+    try {
+      const botResponse = await processUserQuery(inputValue, state.context);
+      dispatch({ type: 'ADD_BOT_MESSAGE', payload: botResponse });
+      
+      // Si la requête concerne un sujet spécifique, ajoutons-le au contexte
+      if (inputValue.toLowerCase().includes('erp') || inputValue.toLowerCase().includes('établissement')) {
+        dispatch({ type: 'ADD_CONTEXT', payload: 'ERP' });
+      } else if (inputValue.toLowerCase().includes('évènement') || inputValue.toLowerCase().includes('manifestation')) {
+        dispatch({ type: 'ADD_CONTEXT', payload: 'SECURITE_EVENEMENTIELLE' });
+      }
+    } catch (err) {
+      console.error('Erreur lors du traitement du message:', err);
+      toast.error("Désolé, une erreur s'est produite lors du traitement de votre demande.");
+    } finally {
+      dispatch({ type: 'SET_TYPING', payload: false });
+    }
   };
   
-  const handleQuickReply = (reply: QuickReply) => {
-    const userMessage: Message = {
+  const handleQuickReply = async (reply: QuickReply) => {
+    const userMessage = {
       id: `user-${Date.now()}`,
-      sender: 'user',
+      sender: 'user' as const,
       text: reply.text,
       timestamp: new Date()
     };
     
-    setMessages(prevMessages => [...prevMessages, userMessage]);
+    dispatch({ type: 'ADD_BOT_MESSAGE', payload: userMessage });
+    dispatch({ type: 'SET_TYPING', payload: true });
     
-    setIsTyping(true);
     setTimeout(() => {
-      const botResponse: Message = {
+      const botResponse = {
         id: `bot-${Date.now()}`,
-        sender: 'bot',
+        sender: 'bot' as const,
         text: reply.answer,
         timestamp: new Date()
       };
       
-      setMessages(prevMessages => [...prevMessages, botResponse]);
-      setIsTyping(false);
+      dispatch({ type: 'ADD_BOT_MESSAGE', payload: botResponse });
+      dispatch({ type: 'SET_TYPING', payload: false });
     }, 1000);
   };
   
@@ -137,6 +102,17 @@ const Chatbot = () => {
   const redirectToFaq = () => {
     setIsOpen(false);
     toast.info("Vous allez être redirigé vers la FAQ");
+  };
+
+  const clearChat = () => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+    toast.info("Conversation réinitialisée");
+    
+    // Réafficher le message d'accueil
+    setTimeout(() => {
+      dispatch({ type: 'TOGGLE_CHAT' });
+      dispatch({ type: 'TOGGLE_CHAT' });
+    }, 300);
   };
 
   return (
@@ -158,11 +134,24 @@ const Chatbot = () => {
         <div className="bg-primary text-white p-4 flex justify-between items-center">
           <div className="flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
-            <h3 className="font-medium">SecuGenie Assistant</h3>
+            <h3 className="font-medium">SecuBot - Assistant Réglementaire</h3>
           </div>
-          <button onClick={toggleChat} className="text-white" aria-label="Fermer le chat">
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={clearChat} 
+              className="text-white hover:bg-primary-hover rounded p-1"
+              title="Effacer la conversation"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={toggleChat} 
+              className="text-white hover:bg-primary-hover rounded p-1"
+              title="Fermer le chat"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
         
         <div className="p-4 h-80 overflow-y-auto bg-gray-50">
@@ -203,7 +192,7 @@ const Chatbot = () => {
 
         <div className="p-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center">
           <AlertTriangle className="h-3 w-3 mr-1 text-gray-400" />
-          Les informations fournies ne remplacent pas l'avis d'un expert.
+          Les informations fournies sont basées sur la réglementation mais ne remplacent pas l'avis d'un expert.
         </div>
       </div>
     </>
