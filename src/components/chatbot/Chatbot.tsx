@@ -1,6 +1,6 @@
 
 import { useReducer, useRef, useEffect } from 'react';
-import { MessageSquare, X, AlertTriangle, HelpCircle } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { chatbotReducer, initialState } from './chatbotReducer';
 import { useReglementaryBot } from '../../hooks/useReglementaryBot';
@@ -9,6 +9,8 @@ import ChatHeader from './ChatHeader';
 import ChatFooter from './ChatFooter';
 import QuickReplies from './QuickReplies';
 import ChatInput from './ChatInput';
+import { Message } from './types';
+import { quickReplies } from './constants';
 
 const Chatbot = () => {
   const [state, dispatch] = useReducer(chatbotReducer, initialState);
@@ -71,9 +73,9 @@ const Chatbot = () => {
   };
   
   const handleQuickReply = async (reply) => {
-    const userMessage = {
+    const userMessage: Message = {
       id: `user-${Date.now()}`,
-      sender: 'user',
+      sender: 'user', // Now properly typed as 'user' literal
       text: reply.text,
       timestamp: new Date()
     };
@@ -82,9 +84,9 @@ const Chatbot = () => {
     dispatch({ type: 'SET_TYPING', payload: true });
     
     setTimeout(() => {
-      const botResponse = {
+      const botResponse: Message = {
         id: `bot-${Date.now()}`,
-        sender: 'bot',
+        sender: 'bot', // Now properly typed as 'bot' literal
         text: reply.answer,
         timestamp: new Date()
       };
@@ -95,13 +97,11 @@ const Chatbot = () => {
   };
   
   const redirectToContact = () => {
-    // Fix: Use toggleChat or similar logic instead of setIsOpen
     toggleChat(); // Close chat before redirect
     toast.info("Vous allez être redirigé vers la page de contact");
   };
 
   const redirectToFaq = () => {
-    // Fix: Use toggleChat or similar logic instead of setIsOpen
     toggleChat(); // Close chat before redirect
     toast.info("Vous allez être redirigé vers la FAQ");
   };
