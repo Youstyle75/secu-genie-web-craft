@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import GN6Document from '@/components/documents/GN6Document';
 
 const Solutions = () => {
   // State for animated elements
-  const [activeTab, setActiveTab] = useState<'documents' | 'plans' | 'reglementations'>('documents');
+  const [activeTab, setActiveTab] = useState<'documents' | 'plans' | 'reglementations' | 'prevention'>('documents');
   
   // Scroll animation for elements
   useEffect(() => {
@@ -34,7 +35,7 @@ const Solutions = () => {
   return (
     <Layout>
       {/* Hero Section with Animation */}
-      <section className="py-16 bg-gradient-to-r from-primary/10 to-accent/10 -mx-4 md:-mx-6 px-4 md:px-6 rounded-b-3xl overflow-hidden">
+      <section className="py-16 bg-gradient-to-r from-primary/5 to-accent/5 -mx-4 md:-mx-6 px-4 md:px-6 rounded-b-3xl overflow-hidden">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16">
             <div className="md:w-1/2 reveal">
@@ -107,6 +108,18 @@ const Solutions = () => {
             >
               <Map className="mr-2 h-5 w-5" />
               Plans d'Évacuation
+            </button>
+            <button 
+              onClick={() => setActiveTab('prevention')}
+              className={cn(
+                "px-6 py-3 rounded-md font-medium transition-all duration-300 flex items-center m-1",
+                activeTab === 'prevention' 
+                  ? "bg-primary text-white shadow-md" 
+                  : "bg-gray-50 hover:bg-gray-100 text-gray-700"
+              )}
+            >
+              <Shield className="mr-2 h-5 w-5" />
+              Plans de Prévention
             </button>
             <button 
               onClick={() => setActiveTab('reglementations')}
@@ -258,6 +271,85 @@ const Solutions = () => {
                 </div>
               )}
             </div>
+
+            {/* Prevention Tab */}
+            <div className={cn("transition-all duration-500", 
+              activeTab === 'prevention' ? "opacity-100 translate-y-0" : "opacity-0 absolute -translate-y-8")}>
+              {activeTab === 'prevention' && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                  <div className="reveal">
+                    <h3 className="text-2xl font-bold mb-4">Plans de Prévention</h3>
+                    <p className="text-gray-700 mb-6">
+                      Générez automatiquement vos plans de prévention pour les entreprises extérieures intervenant sur vos sites.
+                    </p>
+                    <ul className="space-y-3 mb-6">
+                      <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+                        <div className="bg-primary/10 p-2 rounded-full mr-3">
+                          <CheckCircle className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <span className="font-medium block">Conformité réglementaire</span>
+                          <span className="text-sm text-gray-600">Respect du décret du 20 février 1992</span>
+                        </div>
+                      </li>
+                      <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+                        <div className="bg-primary/10 p-2 rounded-full mr-3">
+                          <FileCheck className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <span className="font-medium block">Gestion des entreprises</span>
+                          <span className="text-sm text-gray-600">Base de données d'entreprises intervenantes</span>
+                        </div>
+                      </li>
+                      <li className="flex items-start bg-gray-50 p-3 rounded-lg">
+                        <div className="bg-primary/10 p-2 rounded-full mr-3">
+                          <Calendar className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <span className="font-medium block">Planification des interventions</span>
+                          <span className="text-sm text-gray-600">Gestion temporelle des interventions</span>
+                        </div>
+                      </li>
+                    </ul>
+                    <Link to="/demo" className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105 duration-300 inline-flex items-center">
+                      Essayer maintenant
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </div>
+                  <div className="reveal">
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                      <h4 className="font-bold mb-4 text-lg">Protocole de Prévention</h4>
+                      <div className="space-y-4">
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <h5 className="font-medium text-sm">1. Entreprise utilisatrice</h5>
+                          <p className="text-xs text-gray-500">Identité, adresse, activités principales</p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <h5 className="font-medium text-sm">2. Entreprise extérieure</h5>
+                          <p className="text-xs text-gray-500">Identité, adresse, activités principales</p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <h5 className="font-medium text-sm">3. Date et durée prévisible de l'intervention</h5>
+                          <p className="text-xs text-gray-500">Calendrier des travaux</p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <h5 className="font-medium text-sm">4. Nombre de travailleurs impliqués</h5>
+                          <p className="text-xs text-gray-500">Qualification et habilitations nécessaires</p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <h5 className="font-medium text-sm">5. Description des travaux à effectuer</h5>
+                          <p className="text-xs text-gray-500">Nature et séquencement des tâches</p>
+                        </div>
+                        <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                          <h5 className="font-medium text-sm text-primary">6. Analyse des risques</h5>
+                          <p className="text-xs text-primary/70">Identification et mesures préventives</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             
             {/* Reglementations Tab */}
             <div className={cn("transition-all duration-500", 
@@ -327,176 +419,10 @@ const Solutions = () => {
             </div>
           </div>
           
-          {/* Pricing Section with modern design */}
+          {/* GN6 Document Example */}
           <div className="mb-16 reveal">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Nos Formules</h2>
-              <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-                Solutions flexibles adaptées à tous les besoins et budgets
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
-              {/* Formule Starter */}
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-primary/20 group">
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">Starter</h3>
-                  <div className="flex items-end mb-6">
-                    <span className="text-3xl font-bold">19€</span>
-                    <span className="text-gray-600 ml-1">/mois</span>
-                  </div>
-                  <p className="text-gray-600 mb-6 h-12">
-                    Idéal pour les petits établissements et événements ponctuels.
-                  </p>
-                  <ul className="space-y-3 mb-8">
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>3 documents par mois</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>1 utilisateur</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Support par email</span>
-                    </li>
-                  </ul>
-                  <Link to="/demo" className="block w-full py-3 bg-primary hover:bg-primary-hover text-white text-center rounded-lg font-medium transition-all group-hover:shadow-md">
-                    Commencer
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Formule Pro */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-primary relative transform scale-105 md:scale-110 hover:scale-107 md:hover:scale-112 transition-all duration-300">
-                <div className="absolute top-0 right-0 left-0">
-                  <div className="bg-accent text-white text-sm font-semibold py-1 text-center transform skew-x-12 mx-auto w-48">
-                    POPULAIRE
-                  </div>
-                </div>
-                <div className="p-6 pt-10">
-                  <h3 className="text-xl font-bold mb-2 text-primary">Pro</h3>
-                  <div className="flex items-end mb-6">
-                    <span className="text-3xl font-bold">49€</span>
-                    <span className="text-gray-600 ml-1">/mois</span>
-                  </div>
-                  <p className="text-gray-600 mb-6 h-12">
-                    Pour les établissements de taille moyenne et les événements réguliers.
-                  </p>
-                  <ul className="space-y-3 mb-8">
-                    <li className="flex items-center p-2 rounded hover:bg-blue-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>10 documents par mois</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-blue-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>3 utilisateurs</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-blue-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Support prioritaire</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-blue-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Tous les formats d'export</span>
-                    </li>
-                  </ul>
-                  <Link to="/demo" className="block w-full py-3 bg-primary hover:bg-primary-hover text-white text-center rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
-                    Commencer
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Formule Enterprise */}
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-primary/20 group">
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">Enterprise</h3>
-                  <div className="flex items-end mb-6">
-                    <span className="text-3xl font-bold">Sur mesure</span>
-                  </div>
-                  <p className="text-gray-600 mb-6 h-12">
-                    Pour les grandes organisations avec des besoins spécifiques.
-                  </p>
-                  <ul className="space-y-3 mb-8">
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Documents illimités</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Utilisateurs illimités</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Support dédié</span>
-                    </li>
-                    <li className="flex items-center p-2 rounded hover:bg-gray-50">
-                      <CheckCircle className="text-primary h-5 w-5 mr-3" />
-                      <span>Intégration API</span>
-                    </li>
-                  </ul>
-                  <Link to="/contact" className="block w-full py-3 bg-gray-800 hover:bg-gray-700 text-white text-center rounded-lg font-medium transition-all group-hover:shadow-md">
-                    Nous contacter
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Testimonial with modern design */}
-          <div className="bg-gradient-to-r from-primary to-primary-hover text-white rounded-2xl p-8 mb-16 reveal shadow-xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 opacity-10">
-              <svg width="300" height="300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5 3.871 3.871 0 01-2.748-1.179z" fill="currentColor" />
-                <path d="M16.583 17.321C15.553 16.227 15 15 15 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5 3.871 3.871 0 01-2.748-1.179z" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="md:w-1/2 mb-6 md:mb-0 md:pr-8 relative z-10">
-                <blockquote className="text-xl italic">
-                  "SecuGenie a transformé notre façon de gérer la sécurité. Nous avons réduit notre temps de préparation des documents de 80% tout en étant certains d'être parfaitement conformes aux réglementations."
-                </blockquote>
-                <div className="mt-6 flex items-center">
-                  <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
-                    <span className="font-bold text-2xl">TD</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold">Thomas Durand</p>
-                    <p className="text-white/80">Responsable Sécurité, Centre Commercial Grand Est</p>
-                  </div>
-                </div>
-              </div>
-              <div className="md:w-1/2 md:pl-8 md:border-l border-white/30 relative z-10">
-                <h3 className="text-xl font-bold mb-6">Résultats obtenus</h3>
-                <div className="space-y-6">
-                  <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm transform hover:scale-105 transition-transform">
-                    <div className="flex items-center">
-                      <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
-                        <span className="text-xl font-bold">80%</span>
-                      </div>
-                      <span>de gain de temps sur la préparation des documents</span>
-                    </div>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm transform hover:scale-105 transition-transform">
-                    <div className="flex items-center">
-                      <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
-                        <span className="text-xl font-bold">100%</span>
-                      </div>
-                      <span>de conformité réglementaire</span>
-                    </div>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm transform hover:scale-105 transition-transform">
-                    <div className="flex items-center">
-                      <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
-                        <span className="text-xl font-bold">30%</span>
-                      </div>
-                      <span>de réduction des coûts liés à la sécurité</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <h2 className="text-3xl font-bold mb-8 text-center">Exemple de Document GN6</h2>
+            <GN6Document />
           </div>
           
           {/* CTA */}

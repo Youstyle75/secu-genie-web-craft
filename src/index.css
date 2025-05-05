@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
@@ -43,11 +43,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-opensans;
+    @apply bg-background text-foreground font-[Inter];
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-bold;
+    @apply font-[Inter] font-bold;
   }
 
   .reveal {
@@ -92,3 +92,16 @@
   @apply transition-all duration-300 transform hover:-translate-y-2 hover:shadow-lg;
 }
 
+/* Form styling for better appearance */
+input, textarea, select {
+  @apply border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary;
+}
+
+/* Button styling to match Relume.io */
+.btn-primary {
+  @apply bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors;
+}
+
+.btn-outline {
+  @apply border border-gray-300 px-4 py-2 rounded-md hover:border-primary hover:text-primary transition-colors;
+}

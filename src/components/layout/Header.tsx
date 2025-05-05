@@ -9,7 +9,6 @@ const navItems = [
   { name: 'Nos Solutions', path: '/solutions' },
   { name: 'À Propos', path: '/about' },
   { name: 'Contact', path: '/contact' },
-  { name: 'Démonstration', path: '/demo' },
 ];
 
 const Header = () => {
@@ -28,7 +27,7 @@ const Header = () => {
   return (
     <header className={cn(
       'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-      scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+      scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-4'
     )}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-center">
@@ -39,19 +38,19 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-6">
+          <nav className="hidden md:flex space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className="font-montserrat text-gray-700 hover:text-primary transition-colors"
+                className="font-medium text-gray-700 hover:text-primary transition-colors"
               >
                 {item.name}
               </Link>
             ))}
             <Link
               to="/demo"
-              className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors"
+              className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-md transition-colors"
             >
               Essayer Gratuitement
             </Link>
@@ -73,7 +72,7 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className="block font-montserrat text-gray-700 hover:text-primary transition-colors py-2"
+                className="block text-gray-700 hover:text-primary transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
@@ -81,7 +80,7 @@ const Header = () => {
             ))}
             <Link
               to="/demo"
-              className="block bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md transition-colors text-center mt-4"
+              className="block bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md transition-colors text-center mt-4"
               onClick={() => setMobileMenuOpen(false)}
             >
               Essayer Gratuitement

@@ -26,18 +26,18 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#0056b3',
+					DEFAULT: '#0050FF',
 					foreground: '#ffffff',
-					hover: '#004494',
+					hover: '#003ECC',
 				},
 				secondary: {
 					DEFAULT: '#f8f9fa',
 					foreground: '#333333',
 				},
 				accent: {
-					DEFAULT: '#ff6b35',
+					DEFAULT: '#FF5757',
 					foreground: '#ffffff',
-					hover: '#e55a29',
+					hover: '#E04545',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -106,6 +106,7 @@ export default {
 				'pulse-light': 'pulse-light 2s ease-in-out infinite'
 			},
 			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
 				montserrat: ['Montserrat', 'sans-serif'],
 				opensans: ['Open Sans', 'sans-serif'],
 			},
