@@ -5,10 +5,12 @@ import Layout from '@/components/layout/Layout';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import GN6Document from '@/components/documents/GN6Document';
+import GN6Wizard from '@/components/documents/GN6Wizard';
 
 const Solutions = () => {
   // State for animated elements
-  const [activeTab, setActiveTab] = useState<'documents' | 'plans' | 'reglementations' | 'prevention'>('documents');
+  const [activeTab, setActiveTab] = useState<'documents' | 'plans' | 'reglementations' | 'prevention' | 'gn6'>('documents');
+  const [showGN6Document, setShowGN6Document] = useState(false);
   
   // Scroll animation for elements
   useEffect(() => {
@@ -133,6 +135,18 @@ const Solutions = () => {
               <BookOpen className="mr-2 h-5 w-5" />
               Veille Réglementaire
             </button>
+            <button 
+              onClick={() => setActiveTab('gn6')}
+              className={cn(
+                "px-6 py-3 rounded-md font-medium transition-all duration-300 flex items-center m-1",
+                activeTab === 'gn6' 
+                  ? "bg-primary text-white shadow-md" 
+                  : "bg-gray-50 hover:bg-gray-100 text-gray-700"
+              )}
+            >
+              <FileCheck className="mr-2 h-5 w-5" />
+              Dossier GN6
+            </button>
           </div>
           
           {/* Tabs Content */}
@@ -158,9 +172,20 @@ const Solutions = () => {
                       </li>
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
+                        <span>Assistance IA pour le remplissage</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
                         <span>Personnalisation complète</span>
                       </li>
                     </ul>
+                    <button 
+                      onClick={() => setShowGN6Document(!showGN6Document)} 
+                      className="text-primary hover:text-primary-hover font-medium flex items-center"
+                    >
+                      {showGN6Document ? 'Masquer l\'exemple' : 'Voir un exemple'}
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </button>
                   </div>
                   
                   {/* Card 2 */}
@@ -180,6 +205,10 @@ const Solutions = () => {
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
                         <span>Conformité référentiel national</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
+                        <span>Intégration RIS (Référentiel d'Indice de Secours)</span>
                       </li>
                     </ul>
                   </div>
@@ -201,6 +230,10 @@ const Solutions = () => {
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
                         <span>Validation par IA réglementaire</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
+                        <span>Conformité réglementaire assurée</span>
                       </li>
                     </ul>
                   </div>
@@ -417,13 +450,25 @@ const Solutions = () => {
                 </div>
               )}
             </div>
+            
+            {/* GN6 Wizard Tab */}
+            <div className={cn("transition-all duration-500", 
+              activeTab === 'gn6' ? "opacity-100 translate-y-0" : "opacity-0 absolute -translate-y-8")}>
+              {activeTab === 'gn6' && (
+                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 reveal">
+                  <GN6Wizard />
+                </div>
+              )}
+            </div>
           </div>
           
           {/* GN6 Document Example */}
-          <div className="mb-16 reveal">
-            <h2 className="text-3xl font-bold mb-8 text-center">Exemple de Document GN6</h2>
-            <GN6Document />
-          </div>
+          {showGN6Document && (
+            <div className="mb-16 reveal">
+              <h2 className="text-3xl font-bold mb-8 text-center">Exemple de Document GN6</h2>
+              <GN6Document />
+            </div>
+          )}
           
           {/* CTA */}
           <div className="text-center reveal">
