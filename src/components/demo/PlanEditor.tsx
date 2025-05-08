@@ -1,13 +1,12 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { fabric } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Tent, Bed, Sofa, Chair, Table, Lamp, 
-  DoorClosed, Window, StairsUp, FireExtinguisher, 
-  EmergencyExit, Signpost 
+  Tent, Bed, Sofa, ArrowUpSquare, Table, Lamp, 
+  DoorClosed, Wind, ArrowUpDown, FireExtinguisher, 
+  DoorOpen, Signpost 
 } from 'lucide-react';
 
 type EditorElement = {
@@ -37,15 +36,15 @@ const PlanEditor = () => {
   // Library elements info
   const securityElements = [
     { type: 'extinguisher', label: 'Extincteur', icon: <FireExtinguisher className="w-full h-full" />, emoji: '🧯' },
-    { type: 'exit', label: 'Sortie de Secours', icon: <EmergencyExit className="w-full h-full" />, emoji: '🚪' },
+    { type: 'exit', label: 'Sortie de Secours', icon: <DoorOpen className="w-full h-full" />, emoji: '🚪' },
     { type: 'assembly', label: 'Point de Rassemblement', icon: <Signpost className="w-full h-full" />, emoji: '👥' },
-    { type: 'firstaid', label: 'Trousse de Secours', icon: <Window className="w-full h-full" />, emoji: '🩹' },
+    { type: 'firstaid', label: 'Trousse de Secours', icon: <Wind className="w-full h-full" />, emoji: '🩹' },
   ];
   
   const eventElements = [
     { type: 'tent', label: 'Tente', icon: <Tent className="w-full h-full" />, emoji: '⛺' },
     { type: 'table', label: 'Table', icon: <Table className="w-full h-full" />, emoji: '🪑' },
-    { type: 'chair', label: 'Chaise', icon: <Chair className="w-full h-full" />, emoji: '🪑' },
+    { type: 'chair', label: 'Chaise', icon: <ArrowUpSquare className="w-full h-full" />, emoji: '🪑' },
     { type: 'stage', label: 'Scène', icon: <Signpost className="w-full h-full" />, emoji: '🎭' },
   ];
   
@@ -54,7 +53,7 @@ const PlanEditor = () => {
     { type: 'sofa', label: 'Canapé', icon: <Sofa className="w-full h-full" />, emoji: '🛋️' },
     { type: 'lamp', label: 'Lampe', icon: <Lamp className="w-full h-full" />, emoji: '💡' },
     { type: 'door', label: 'Porte', icon: <DoorClosed className="w-full h-full" />, emoji: '🚪' },
-    { type: 'stairs', label: 'Escalier', icon: <StairsUp className="w-full h-full" />, emoji: '🪜' },
+    { type: 'stairs', label: 'Escalier', icon: <ArrowUpDown className="w-full h-full" />, emoji: '🪜' },
   ];
   
   // Initialize Fabric canvas
@@ -615,7 +614,7 @@ const PlanEditor = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={1.5}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-3-3m3 3V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
                   Importer un plan
