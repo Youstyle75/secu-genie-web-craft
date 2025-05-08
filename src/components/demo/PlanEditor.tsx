@@ -3,10 +3,16 @@ import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { fabric } from 'fabric';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Tent, Bed, Sofa, Chair, Table, Lamp, 
+  DoorClosed, Window, StairsUp, FireExtinguisher, 
+  EmergencyExit, Signpost 
+} from 'lucide-react';
 
 type EditorElement = {
   id: string;
-  type: 'extinguisher' | 'exit' | 'assembly' | 'firstaid';
+  type: string;
   x: number;
   y: number;
   rotation: number;
@@ -16,20 +22,40 @@ const PlanEditor = () => {
   const [elements, setElements] = useState<EditorElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [draggedType, setDraggedType] = useState<EditorElement['type'] | null>(null);
+  const [draggedType, setDraggedType] = useState<string | null>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [importLoading, setImportLoading] = useState(false);
+  const [drawingMode, setDrawingMode] = useState(false);
+  const [brushColor, setBrushColor] = useState('#000000');
+  const [brushSize, setBrushSize] = useState(2);
+  const [activeTab, setActiveTab] = useState('security');
+  
   const editorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Library elements info
-  const libraryElements = [
-    { type: 'extinguisher', label: 'Extincteur', icon: '🧯' },
-    { type: 'exit', label: 'Sortie de Secours', icon: '🚪' },
-    { type: 'assembly', label: 'Point de Rassemblement', icon: '👥' },
-    { type: 'firstaid', label: 'Trousse de Secours', icon: '🩹' },
-  ] as const;
+  const securityElements = [
+    { type: 'extinguisher', label: 'Extincteur', icon: <FireExtinguisher className="w-full h-full" />, emoji: '🧯' },
+    { type: 'exit', label: 'Sortie de Secours', icon: <EmergencyExit className="w-full h-full" />, emoji: '🚪' },
+    { type: 'assembly', label: 'Point de Rassemblement', icon: <Signpost className="w-full h-full" />, emoji: '👥' },
+    { type: 'firstaid', label: 'Trousse de Secours', icon: <Window className="w-full h-full" />, emoji: '🩹' },
+  ];
+  
+  const eventElements = [
+    { type: 'tent', label: 'Tente', icon: <Tent className="w-full h-full" />, emoji: '⛺' },
+    { type: 'table', label: 'Table', icon: <Table className="w-full h-full" />, emoji: '🪑' },
+    { type: 'chair', label: 'Chaise', icon: <Chair className="w-full h-full" />, emoji: '🪑' },
+    { type: 'stage', label: 'Scène', icon: <Signpost className="w-full h-full" />, emoji: '🎭' },
+  ];
+  
+  const furnitureElements = [
+    { type: 'bed', label: 'Lit', icon: <Bed className="w-full h-full" />, emoji: '🛏️' },
+    { type: 'sofa', label: 'Canapé', icon: <Sofa className="w-full h-full" />, emoji: '🛋️' },
+    { type: 'lamp', label: 'Lampe', icon: <Lamp className="w-full h-full" />, emoji: '💡' },
+    { type: 'door', label: 'Porte', icon: <DoorClosed className="w-full h-full" />, emoji: '🚪' },
+    { type: 'stairs', label: 'Escalier', icon: <StairsUp className="w-full h-full" />, emoji: '🪜' },
+  ];
   
   // Initialize Fabric canvas
   useEffect(() => {
@@ -39,6 +65,7 @@ const PlanEditor = () => {
       width: 800,
       height: 500,
       backgroundColor: '#f9fafb',
+      isDrawingMode: false
     });
     
     fabricCanvas.on('selection:created', (e) => {
@@ -59,17 +86,41 @@ const PlanEditor = () => {
     };
   }, []);
   
+  // Update drawing mode when it changes
+  useEffect(() => {
+    if (!canvas) return;
+    
+    canvas.isDrawingMode = drawingMode;
+    
+    if (drawingMode) {
+      if (canvas.freeDrawingBrush) {
+        canvas.freeDrawingBrush.color = brushColor;
+        canvas.freeDrawingBrush.width = brushSize;
+      }
+    }
+  }, [drawingMode, brushColor, brushSize, canvas]);
+  
   // Handle dragging from library
-  const handleDragStart = (type: EditorElement['type']) => {
+  const handleDragStart = (type: string) => {
     setDraggedType(type);
   };
   
   // Add element to canvas
-  const addElementToCanvas = (type: EditorElement['type'], x: number, y: number) => {
+  const addElementToCanvas = (type: string, x: number, y: number) => {
     if (!canvas) return;
     
     const id = `${type}-${Date.now()}`;
-    const iconText = getElementIcon(type);
+    let library;
+    
+    if (securityElements.find(el => el.type === type)) {
+      library = securityElements;
+    } else if (eventElements.find(el => el.type === type)) {
+      library = eventElements;
+    } else if (furnitureElements.find(el => el.type === type)) {
+      library = furnitureElements;
+    }
+    
+    const iconText = library?.find(el => el.type === type)?.emoji || '❓';
     
     const text = new fabric.Text(iconText, {
       left: x,
@@ -114,13 +165,15 @@ const PlanEditor = () => {
   };
   
   // Helper to get label from type
-  const getElementLabel = (type: EditorElement['type']) => {
-    return libraryElements.find(el => el.type === type)?.label || type;
+  const getElementLabel = (type: string) => {
+    const allElements = [...securityElements, ...eventElements, ...furnitureElements];
+    return allElements.find(el => el.type === type)?.label || type;
   };
   
   // Element icons
-  const getElementIcon = (type: EditorElement['type']) => {
-    return libraryElements.find(el => el.type === type)?.icon || '❓';
+  const getElementIcon = (type: string) => {
+    const allElements = [...securityElements, ...eventElements, ...furnitureElements];
+    return allElements.find(el => el.type === type)?.emoji || '❓';
   };
   
   // Handle element removal
@@ -149,6 +202,16 @@ const PlanEditor = () => {
       activeObject.rotate((activeObject.angle || 0) + 90);
       canvas.renderAll();
       toast.info(`Élément pivoté`);
+    }
+  };
+  
+  // Drawing mode toggle
+  const toggleDrawingMode = () => {
+    setDrawingMode(!drawingMode);
+    if (!drawingMode) {
+      toast.info('Mode dessin activé');
+    } else {
+      toast.info('Mode dessin désactivé');
     }
   };
   
@@ -250,30 +313,286 @@ const PlanEditor = () => {
     }
   };
   
+  // Add a rectangle
+  const addRectangle = () => {
+    if (!canvas) return;
+    
+    const rect = new fabric.Rect({
+      left: 100,
+      top: 100,
+      fill: 'transparent',
+      stroke: '#000',
+      strokeWidth: 2,
+      width: 100,
+      height: 50
+    });
+    
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    toast.success('Rectangle ajouté');
+  };
+  
+  // Add a circle
+  const addCircle = () => {
+    if (!canvas) return;
+    
+    const circle = new fabric.Circle({
+      left: 100,
+      top: 100,
+      fill: 'transparent',
+      stroke: '#000',
+      strokeWidth: 2,
+      radius: 30
+    });
+    
+    canvas.add(circle);
+    canvas.setActiveObject(circle);
+    canvas.renderAll();
+    toast.success('Cercle ajouté');
+  };
+  
+  // Add a line
+  const addLine = () => {
+    if (!canvas) return;
+    
+    const line = new fabric.Line([50, 50, 200, 50], {
+      stroke: '#000',
+      strokeWidth: 2
+    });
+    
+    canvas.add(line);
+    canvas.setActiveObject(line);
+    canvas.renderAll();
+    toast.success('Ligne ajoutée');
+  };
+  
+  // Add text
+  const addText = () => {
+    if (!canvas) return;
+    
+    const text = new fabric.IText('Texte', {
+      left: 100,
+      top: 100,
+      fontFamily: 'Arial',
+      fontSize: 20
+    });
+    
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.renderAll();
+    toast.success('Texte ajouté');
+  };
+  
   return (
     <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
-      <h3 className="text-xl font-bold mb-4">Éditeur de Plan</h3>
+      <h3 className="text-xl font-bold mb-4">Éditeur de Plan Avancé</h3>
       
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Element Library */}
         <div className="lg:w-1/4">
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h4 className="font-semibold mb-3">Bibliothèque d'éléments</h4>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="w-full mb-4">
+                <TabsTrigger value="security" className="flex-1">Sécurité</TabsTrigger>
+                <TabsTrigger value="event" className="flex-1">Événementiel</TabsTrigger>
+                <TabsTrigger value="furniture" className="flex-1">Mobilier</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="security">
+                <h4 className="font-semibold mb-3">Éléments de sécurité</h4>
+                <div className="space-y-3">
+                  {securityElements.map(({ type, label, icon }) => (
+                    <div
+                      key={type}
+                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      draggable
+                      onDragStart={() => handleDragStart(type)}
+                    >
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="event">
+                <h4 className="font-semibold mb-3">Éléments événementiels</h4>
+                <div className="space-y-3">
+                  {eventElements.map(({ type, label, icon }) => (
+                    <div
+                      key={type}
+                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      draggable
+                      onDragStart={() => handleDragStart(type)}
+                    >
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="furniture">
+                <h4 className="font-semibold mb-3">Mobilier et équipements</h4>
+                <div className="space-y-3">
+                  {furnitureElements.map(({ type, label, icon }) => (
+                    <div
+                      key={type}
+                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      draggable
+                      onDragStart={() => handleDragStart(type)}
+                    >
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
             
-            <div className="space-y-3">
-              {libraryElements.map(({ type, label, icon }) => (
-                <div
-                  key={type}
-                  className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
-                  draggable
-                  onDragStart={() => handleDragStart(type)}
+            <div className="mt-6">
+              <h4 className="font-semibold mb-3">Outils de dessin</h4>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <Button 
+                  onClick={toggleDrawingMode}
+                  variant={drawingMode ? "default" : "outline"}
+                  size="sm"
+                  className="flex items-center justify-center gap-2"
                 >
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-2">{icon}</span>
-                    <span>{label}</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
+                  Dessin libre
+                </Button>
+                <Button
+                  onClick={addRectangle}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect width="18" height="14" x="3" y="5" rx="2" strokeWidth="2" />
+                  </svg>
+                  Rectangle
+                </Button>
+                <Button
+                  onClick={addCircle}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="12" r="8" strokeWidth="2" />
+                  </svg>
+                  Cercle
+                </Button>
+                <Button
+                  onClick={addLine}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeWidth="2" d="M4 12h16M4 12h16" />
+                  </svg>
+                  Ligne
+                </Button>
+                <Button
+                  onClick={addText}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center gap-2"
+                  title="Ajouter du texte"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M3 9h18m-18 0a2 2 0 00-2 2v6a2 2 0 002 2h18a2 2 0 002-2v-6a2 2 0 00-2-2H3zm0 0V5a2 2 0 012-2h14a2 2 0 012 2v4H3z"
+                    />
+                  </svg>
+                  Texte
+                </Button>
+              </div>
+              
+              {drawingMode && (
+                <div className="mb-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm">Couleur du pinceau</label>
+                    <div className="flex gap-2">
+                      {['#000000', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
+                        <div
+                          key={color}
+                          className={`w-6 h-6 rounded-full cursor-pointer border ${brushColor === color ? 'border-gray-600 ring-2 ring-primary' : 'border-gray-300'}`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => setBrushColor(color)}
+                          title={color}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={brushColor}
+                        onChange={(e) => setBrushColor(e.target.value)}
+                        className="w-6 h-6 cursor-pointer"
+                        title="Couleur personnalisée"
+                      />
+                    </div>
+                    
+                    <label className="text-sm">Taille du pinceau</label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="20"
+                      value={brushSize}
+                      onChange={(e) => setBrushSize(parseInt(e.target.value))}
+                      className="w-full"
+                    />
                   </div>
                 </div>
-              ))}
+              )}
             </div>
             
             <div className="mt-6">
@@ -418,9 +737,10 @@ const PlanEditor = () => {
             <h4 className="font-semibold mb-2">Instructions</h4>
             <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
               <li>Glissez-déposez des éléments depuis la bibliothèque vers le plan</li>
+              <li>Utilisez les outils de dessin pour créer des formes personnalisées</li>
+              <li>Ajoutez du texte, des lignes, des rectangles ou des cercles</li>
               <li>Importez un plan existant (PNG, JPEG ou PDF)</li>
-              <li>Cliquez sur un élément pour le sélectionner</li>
-              <li>Utilisez les boutons pour pivoter ou supprimer un élément</li>
+              <li>Cliquez sur un élément pour le sélectionner, pivoter ou supprimer</li>
               <li>Exportez votre plan une fois terminé</li>
             </ul>
           </div>
