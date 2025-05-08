@@ -42,16 +42,35 @@ serve(async (req) => {
 
     const updates = await response.json()
 
+    // Extract AI guidance metadata from content if present
+    const extractAIGuidance = (content) => {
+      const guidanceMetadata = [];
+      const regex = /<!-- IA:([^>]+) -->/g;
+      
+      let match;
+      while ((match = regex.exec(content)) !== null) {
+        guidanceMetadata.push(match[0]);
+      }
+      
+      return guidanceMetadata;
+    };
+
     // Map the data to match the ReglementaryText type structure
-    const formattedUpdates = updates.map((item: any) => ({
-      id: item.id || crypto.randomUUID(),
-      title: item.title || 'Untitled regulation',
-      content: item.content || '',
-      category: item.category || 'ERP',
-      references: item.references || [],
-      datePublication: item.datePublication || new Date().toISOString(),
-      dateLastUpdate: new Date().toISOString()
-    }))
+    const formattedUpdates = updates.map((item: any) => {
+      const content = item.content || '';
+      const aiGuidance = extractAIGuidance(content);
+      
+      return {
+        id: item.id || crypto.randomUUID(),
+        title: item.title || 'Untitled regulation',
+        content: content,
+        category: item.category || 'ERP',
+        references: item.references || [],
+        aiGuidance: aiGuidance,
+        datePublication: item.datePublication || new Date().toISOString(),
+        dateLastUpdate: new Date().toISOString()
+      };
+    });
 
     // Insert or update the regulations in the Supabase database
     const { data, error } = await supabaseClient
