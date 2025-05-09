@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -12,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #1A2A6Caa); /* Updated to primary color */
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #D81B60aa); /* Updated to accent color */
 }
 
 @keyframes logo-spin {
@@ -35,8 +36,36 @@
 
 .card {
   padding: 2em;
+  border-radius: 0.75rem; /* Matching our new border radius */
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .read-the-docs {
-  color: #888;
+  color: #4A00E0; /* Updated to secondary color */
+}
+
+/* Ajout de classes pour des éléments modernes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.5rem;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #1A2A6C, #4A00E0);
+  color: white;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #1A2A6C, #D81B60);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

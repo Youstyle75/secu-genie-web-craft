@@ -16,7 +16,7 @@ const QuickReplies = ({ replies, onReplyClick, onRedirectContact, onRedirectFaq 
         <button
           key={reply.id}
           onClick={() => onReplyClick(reply)}
-          className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 truncate transition-colors"
+          className="px-3 py-1 bg-secondary/10 hover:bg-secondary/20 rounded-full text-sm text-secondary font-medium truncate transition-colors"
         >
           {reply.text}
         </button>
@@ -24,14 +24,14 @@ const QuickReplies = ({ replies, onReplyClick, onRedirectContact, onRedirectFaq 
       <Link
         to="/faq"
         onClick={onRedirectFaq}
-        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 truncate transition-colors"
+        className="px-3 py-1 bg-primary/10 hover:bg-primary/20 rounded-full text-sm text-primary font-medium truncate transition-colors"
       >
         Voir la FAQ
       </Link>
       <Link
         to="/contact"
         onClick={onRedirectContact}
-        className="px-3 py-1 bg-accent text-white hover:bg-accent-hover rounded-full text-sm truncate transition-colors"
+        className="px-3 py-1 bg-accent text-white hover:bg-accent-hover rounded-full text-sm font-medium truncate transition-colors"
       >
         Contacter un conseiller
       </Link>

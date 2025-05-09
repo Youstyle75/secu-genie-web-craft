@@ -26,18 +26,19 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#0050FF',
+					DEFAULT: '#1A2A6C', // Bleu nuit - couleur principale
 					foreground: '#ffffff',
-					hover: '#003ECC',
+					hover: '#0D204C', // Version plus foncée pour hover
 				},
 				secondary: {
-					DEFAULT: '#f8f9fa',
-					foreground: '#333333',
+					DEFAULT: '#4A00E0', // Violet profond - couleur secondaire
+					foreground: '#ffffff',
+					hover: '#3A00B0', // Version plus foncée pour hover
 				},
 				accent: {
-					DEFAULT: '#FF5757',
+					DEFAULT: '#D81B60', // Magenta vibrant - couleur d'accentuation
 					foreground: '#ffffff',
-					hover: '#E04545',
+					hover: '#C31C7B', // Version plus foncée pour hover
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',

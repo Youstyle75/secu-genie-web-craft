@@ -7,35 +7,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 226 59% 26%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 262 100% 44%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 338 76% 48%;
+    --accent-foreground: 210 40% 98%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 226 59% 26%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   * {
@@ -43,11 +43,43 @@
   }
 
   body {
-    @apply bg-background text-foreground font-[Inter];
+    @apply bg-background text-foreground font-opensans;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-[Inter] font-bold;
+    @apply font-montserrat font-bold;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl mb-4;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl mb-3; 
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl mb-3;
+  }
+
+  h4 {
+    @apply text-lg md:text-xl lg:text-2xl mb-2;
+  }
+
+  h5 {
+    @apply text-base md:text-lg lg:text-xl mb-2;
+  }
+
+  h6 {
+    @apply text-sm md:text-base lg:text-lg mb-2;
+  }
+
+  p {
+    @apply mb-4 leading-relaxed text-base;
+  }
+
+  a {
+    @apply text-primary hover:text-primary-hover transition-colors duration-200;
   }
 
   .reveal {
@@ -87,7 +119,7 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Enhanced hover effects */
+/* Enhanced hover effects with new colors */
 .hover-card {
   @apply transition-all duration-300 transform hover:-translate-y-2 hover:shadow-lg;
 }
@@ -97,11 +129,75 @@ input, textarea, select {
   @apply border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary;
 }
 
-/* Button styling to match Relume.io */
+/* Button styling with new color scheme */
 .btn-primary {
   @apply bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-hover transition-colors;
 }
 
+.btn-secondary {
+  @apply bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary-hover transition-colors;
+}
+
+.btn-accent {
+  @apply bg-accent text-white px-4 py-2 rounded-md hover:bg-accent-hover transition-colors;
+}
+
 .btn-outline {
   @apply border border-gray-300 px-4 py-2 rounded-md hover:border-primary hover:text-primary transition-colors;
+}
+
+/* Card gradients with new color scheme */
+.card-gradient-primary {
+  @apply bg-gradient-to-br from-primary/90 to-primary/70;
+}
+
+.card-gradient-secondary {
+  @apply bg-gradient-to-br from-secondary/90 to-secondary/70;
+}
+
+.card-gradient-accent {
+  @apply bg-gradient-to-br from-accent/90 to-accent/70;
+}
+
+/* Glassmorphism effects */
+.glass {
+  @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm;
+}
+
+.glass-dark {
+  @apply bg-gray-900/80 backdrop-blur-sm border border-gray-800/50 rounded-xl shadow-sm;
+}
+
+/* Call to action elements */
+.cta-element {
+  @apply bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-hover transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+}
+
+/* Advanced interface elements */
+.dashboard-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all duration-300;
+}
+
+.info-badge {
+  @apply bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.success {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-badge.warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-badge.error {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-badge.info {
+  @apply bg-blue-100 text-blue-800;
 }

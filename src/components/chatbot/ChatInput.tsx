@@ -24,7 +24,7 @@ const ChatInput = ({ value, onChange, onKeyPress, onSend }: ChatInputProps) => {
         disabled={!value.trim()}
         className={`px-4 py-2 rounded-r-md ${
           value.trim()
-            ? 'bg-primary hover:bg-primary-hover text-white'
+            ? 'bg-accent hover:bg-accent-hover text-white'
             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
         } transition-colors`}
       >

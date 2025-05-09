@@ -16,7 +16,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
       <div
         className={`inline-block rounded-lg px-4 py-2 max-w-[80%] ${
           message.sender === 'user'
-            ? 'bg-primary text-white'
+            ? 'bg-accent text-white'
             : 'bg-white border border-gray-200 text-gray-700'
         }`}
       >

@@ -121,7 +121,7 @@ const Chatbot = () => {
     <>
       <button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 bg-primary hover:bg-primary-hover text-white rounded-full p-3 shadow-lg transition-colors z-50"
+        className="fixed bottom-6 right-6 bg-accent hover:bg-accent-hover text-white rounded-full p-3 shadow-lg transition-colors z-50"
         aria-label="Ouvrir le chat"
       >
         <MessageSquare className="h-6 w-6" />
