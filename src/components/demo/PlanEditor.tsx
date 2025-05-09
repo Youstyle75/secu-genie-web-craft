@@ -1,13 +1,16 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { fabric } from 'fabric';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Tent, Bed, Sofa, ArrowUpSquare, Table, Lamp, 
-  DoorClosed, Wind, ArrowUpDown, FireExtinguisher, 
-  DoorOpen, Signpost 
+  Eraser, Square, Circle as CircleIcon, SeparatorHorizontal,
+  Type, FileImage, Save, Trash2 
 } from 'lucide-react';
+import AIAssistantWidget from '../ai/AIAssistantWidget';
+import EraseToolModal from '../editor/EraseToolModal';
+import { getIconsByCategory, IconCategory } from '../editor/PlanIcons';
 
 type EditorElement = {
   id: string;
@@ -27,34 +30,19 @@ const PlanEditor = () => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [brushColor, setBrushColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(2);
-  const [activeTab, setActiveTab] = useState('security');
+  const [activeTab, setActiveTab] = useState<IconCategory>('security');
+  const [isEraseModalOpen, setIsEraseModalOpen] = useState(false);
   
   const editorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Library elements info
-  const securityElements = [
-    { type: 'extinguisher', label: 'Extincteur', icon: <FireExtinguisher className="w-full h-full" />, emoji: '🧯' },
-    { type: 'exit', label: 'Sortie de Secours', icon: <DoorOpen className="w-full h-full" />, emoji: '🚪' },
-    { type: 'assembly', label: 'Point de Rassemblement', icon: <Signpost className="w-full h-full" />, emoji: '👥' },
-    { type: 'firstaid', label: 'Trousse de Secours', icon: <Wind className="w-full h-full" />, emoji: '🩹' },
-  ];
-  
-  const eventElements = [
-    { type: 'tent', label: 'Tente', icon: <Tent className="w-full h-full" />, emoji: '⛺' },
-    { type: 'table', label: 'Table', icon: <Table className="w-full h-full" />, emoji: '🪑' },
-    { type: 'chair', label: 'Chaise', icon: <ArrowUpSquare className="w-full h-full" />, emoji: '🪑' },
-    { type: 'stage', label: 'Scène', icon: <Signpost className="w-full h-full" />, emoji: '🎭' },
-  ];
-  
-  const furnitureElements = [
-    { type: 'bed', label: 'Lit', icon: <Bed className="w-full h-full" />, emoji: '🛏️' },
-    { type: 'sofa', label: 'Canapé', icon: <Sofa className="w-full h-full" />, emoji: '🛋️' },
-    { type: 'lamp', label: 'Lampe', icon: <Lamp className="w-full h-full" />, emoji: '💡' },
-    { type: 'door', label: 'Porte', icon: <DoorClosed className="w-full h-full" />, emoji: '🚪' },
-    { type: 'stairs', label: 'Escalier', icon: <ArrowUpDown className="w-full h-full" />, emoji: '🪜' },
-  ];
+  // Obtenir les icônes pour chaque catégorie
+  const securityIcons = getIconsByCategory('security');
+  const eventIcons = getIconsByCategory('event');
+  const furnitureIcons = getIconsByCategory('furniture');
+  const signsIcons = getIconsByCategory('signs');
+  const emergencyIcons = getIconsByCategory('emergency');
   
   // Initialize Fabric canvas
   useEffect(() => {
@@ -109,17 +97,10 @@ const PlanEditor = () => {
     if (!canvas) return;
     
     const id = `${type}-${Date.now()}`;
-    let library;
+    const allIcons = [...securityIcons, ...eventIcons, ...furnitureIcons, ...signsIcons, ...emergencyIcons];
+    const iconDef = allIcons.find(icon => icon.type === type);
     
-    if (securityElements.find(el => el.type === type)) {
-      library = securityElements;
-    } else if (eventElements.find(el => el.type === type)) {
-      library = eventElements;
-    } else if (furnitureElements.find(el => el.type === type)) {
-      library = furnitureElements;
-    }
-    
-    const iconText = library?.find(el => el.type === type)?.emoji || '❓';
+    const iconText = iconDef?.emoji || '❓';
     
     const text = new fabric.Text(iconText, {
       left: x,
@@ -165,14 +146,8 @@ const PlanEditor = () => {
   
   // Helper to get label from type
   const getElementLabel = (type: string) => {
-    const allElements = [...securityElements, ...eventElements, ...furnitureElements];
-    return allElements.find(el => el.type === type)?.label || type;
-  };
-  
-  // Element icons
-  const getElementIcon = (type: string) => {
-    const allElements = [...securityElements, ...eventElements, ...furnitureElements];
-    return allElements.find(el => el.type === type)?.emoji || '❓';
+    const allIcons = [...securityIcons, ...eventIcons, ...furnitureIcons, ...signsIcons, ...emergencyIcons];
+    return allIcons.find(el => el.type === type)?.label || type;
   };
   
   // Handle element removal
@@ -220,14 +195,13 @@ const PlanEditor = () => {
     
     if (elements.length === 0) return;
     
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer tous les éléments du plan ?')) {
-      canvas.clear();
-      canvas.setBackgroundColor('#f9fafb', canvas.renderAll.bind(canvas));
-      setElements([]);
-      setSelectedElement(null);
-      
-      toast.success(`Plan effacé`);
-    }
+    canvas.clear();
+    canvas.setBackgroundColor('#f9fafb', canvas.renderAll.bind(canvas));
+    setElements([]);
+    setSelectedElement(null);
+    
+    toast.success(`Plan effacé`);
+    setIsEraseModalOpen(false);
   };
   
   // Save the plan
@@ -278,19 +252,16 @@ const PlanEditor = () => {
     
     try {
       if (file.type === 'application/pdf') {
-        // For PDFs, we'd normally use a PDF rendering library
-        // This is simplified for demo purposes
+        // Pour les PDFs, nous utiliserions normalement une bibliothèque de rendu PDF
         toast.info('Le support PDF est limité dans cette démo.');
-        
-        // In a real implementation, you'd convert PDF to image here
       } else {
-        // For images
+        // Pour les images
         const reader = new FileReader();
         
         reader.onload = (event) => {
           if (event.target?.result && canvas) {
             fabric.Image.fromURL(event.target.result.toString(), (img) => {
-              // Scale down if needed
+              // Redimensionner si nécessaire
               if (img.width && img.width > canvas.width) {
                 img.scaleToWidth(canvas.width * 0.9);
               }
@@ -382,26 +353,33 @@ const PlanEditor = () => {
     canvas.renderAll();
     toast.success('Texte ajouté');
   };
+
+  // Ouvrir la modal d'effacement
+  const openEraseModal = () => {
+    setIsEraseModalOpen(true);
+  };
   
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 relative">
       <h3 className="text-xl font-bold mb-4">Éditeur de Plan Avancé</h3>
       
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Element Library */}
         <div className="lg:w-1/4">
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as IconCategory)}>
               <TabsList className="w-full mb-4">
                 <TabsTrigger value="security" className="flex-1">Sécurité</TabsTrigger>
-                <TabsTrigger value="event" className="flex-1">Événementiel</TabsTrigger>
+                <TabsTrigger value="event" className="flex-1">Événement</TabsTrigger>
                 <TabsTrigger value="furniture" className="flex-1">Mobilier</TabsTrigger>
+                <TabsTrigger value="signs" className="flex-1">Signalétique</TabsTrigger>
+                <TabsTrigger value="emergency" className="flex-1">Urgence</TabsTrigger>
               </TabsList>
               
               <TabsContent value="security">
                 <h4 className="font-semibold mb-3">Éléments de sécurité</h4>
                 <div className="space-y-3">
-                  {securityElements.map(({ type, label, icon }) => (
+                  {securityIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
                       className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
@@ -420,7 +398,7 @@ const PlanEditor = () => {
               <TabsContent value="event">
                 <h4 className="font-semibold mb-3">Éléments événementiels</h4>
                 <div className="space-y-3">
-                  {eventElements.map(({ type, label, icon }) => (
+                  {eventIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
                       className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
@@ -439,7 +417,45 @@ const PlanEditor = () => {
               <TabsContent value="furniture">
                 <h4 className="font-semibold mb-3">Mobilier et équipements</h4>
                 <div className="space-y-3">
-                  {furnitureElements.map(({ type, label, icon }) => (
+                  {furnitureIcons.map(({ type, label, icon }) => (
+                    <div
+                      key={type}
+                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      draggable
+                      onDragStart={() => handleDragStart(type)}
+                    >
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="signs">
+                <h4 className="font-semibold mb-3">Signalétique</h4>
+                <div className="space-y-3">
+                  {signsIcons.map(({ type, label, icon }) => (
+                    <div
+                      key={type}
+                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      draggable
+                      onDragStart={() => handleDragStart(type)}
+                    >
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="emergency">
+                <h4 className="font-semibold mb-3">Urgence et véhicules</h4>
+                <div className="space-y-3">
+                  {emergencyIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
                       className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
@@ -482,20 +498,21 @@ const PlanEditor = () => {
                   Dessin libre
                 </Button>
                 <Button
+                  onClick={openEraseModal}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center gap-2 text-red-500 hover:bg-red-50"
+                >
+                  <Eraser className="w-4 h-4" />
+                  Effacer
+                </Button>
+                <Button
                   onClick={addRectangle}
                   variant="outline"
                   size="sm"
                   className="flex items-center justify-center gap-2"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect width="18" height="14" x="3" y="5" rx="2" strokeWidth="2" />
-                  </svg>
+                  <Square className="w-4 h-4" />
                   Rectangle
                 </Button>
                 <Button
@@ -504,15 +521,7 @@ const PlanEditor = () => {
                   size="sm"
                   className="flex items-center justify-center gap-2"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="12" cy="12" r="8" strokeWidth="2" />
-                  </svg>
+                  <CircleIcon className="w-4 h-4" />
                   Cercle
                 </Button>
                 <Button
@@ -521,15 +530,7 @@ const PlanEditor = () => {
                   size="sm"
                   className="flex items-center justify-center gap-2"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeWidth="2" d="M4 12h16M4 12h16" />
-                  </svg>
+                  <SeparatorHorizontal className="w-4 h-4" />
                   Ligne
                 </Button>
                 <Button
@@ -539,20 +540,7 @@ const PlanEditor = () => {
                   className="flex items-center justify-center gap-2"
                   title="Ajouter du texte"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3 9h18m-18 0a2 2 0 00-2 2v6a2 2 0 002 2h18a2 2 0 002-2v-6a2 2 0 00-2-2H3zm0 0V5a2 2 0 012-2h14a2 2 0 012 2v4H3z"
-                    />
-                  </svg>
+                  <Type className="w-4 h-4" />
                   Texte
                 </Button>
               </div>
@@ -603,20 +591,7 @@ const PlanEditor = () => {
                   className="w-full flex items-center justify-center gap-2"
                   disabled={importLoading}
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-3-3m3 3V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
+                  <FileImage className="w-5 h-5" />
                   Importer un plan
                 </Button>
                 <input
@@ -632,42 +607,16 @@ const PlanEditor = () => {
                   variant="outline"
                   className="w-full flex items-center justify-center gap-2"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                    />
-                  </svg>
+                  <Save className="w-5 h-5" />
                   Exporter le plan
                 </Button>
                 
                 <Button 
-                  onClick={handleClear}
+                  onClick={openEraseModal}
                   variant="outline"
                   className="w-full flex items-center justify-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
+                  <Trash2 className="w-5 h-5" />
                   Effacer le plan
                 </Button>
               </div>
@@ -740,11 +689,29 @@ const PlanEditor = () => {
               <li>Ajoutez du texte, des lignes, des rectangles ou des cercles</li>
               <li>Importez un plan existant (PNG, JPEG ou PDF)</li>
               <li>Cliquez sur un élément pour le sélectionner, pivoter ou supprimer</li>
+              <li>Utilisez l'outil "Effacer" pour supprimer des éléments facilement</li>
               <li>Exportez votre plan une fois terminé</li>
             </ul>
+            
+            <div className="mt-4 p-2 bg-primary/10 rounded-md border border-primary/20">
+              <p className="text-sm text-primary font-medium">
+                <span className="font-bold">Conseil de l'IA:</span> N'oubliez pas de positionner des issues de secours et des moyens d'extinction adaptés. La réglementation ERP exige généralement un extincteur tous les 200m².
+              </p>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Modal de suppression */}
+      <EraseToolModal 
+        isOpen={isEraseModalOpen}
+        onClose={() => setIsEraseModalOpen(false)}
+        onEraseSelected={handleRemove}
+        onEraseAll={handleClear}
+      />
+      
+      {/* Widget Assistant IA */}
+      <AIAssistantWidget context="editeur-plan" />
     </div>
   );
 };
