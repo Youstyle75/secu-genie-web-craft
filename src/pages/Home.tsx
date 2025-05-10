@@ -1,11 +1,12 @@
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MessageSquare, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const Home = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const [showChatbotHint, setShowChatbotHint] = useState(false);
 
   useEffect(() => {
     // Initialize the observer to add reveal animations
@@ -25,18 +26,29 @@ const Home = () => {
       observerRef.current?.observe(el);
     });
 
-    return () => observerRef.current?.disconnect();
+    // Show chatbot hint after a delay
+    const timer = setTimeout(() => {
+      setShowChatbotHint(true);
+    }, 3000);
+
+    return () => {
+      observerRef.current?.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
     <Layout showBreadcrumb={false}>
-      {/* Hero Section - Relume-inspired */}
+      {/* Hero Section */}
       <section className="py-24 px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+            <span className="text-primary">SecuGenie</span>
+          </h1>
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">
             Documents de sécurité <br className="hidden md:block" />
             <span className="text-accent">générés par IA</span>
-          </h1>
+          </h2>
           <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Créez des documents de sécurité réglementaires en quelques minutes, pas en jours
           </p>
@@ -58,9 +70,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Solution Cards - Relume-inspired */}
+      {/* Solution Cards */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Nos Solutions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow reveal border border-gray-100">
               <h3 className="text-2xl font-bold mb-4">Dossiers GN6</h3>
@@ -92,32 +105,10 @@ const Home = () => {
               </Link>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow reveal border border-gray-100">
-              <h3 className="text-2xl font-bold mb-4">Plans de Sécurité</h3>
-              <p className="text-gray-600 mb-6">
-                Représentation graphique des mesures et dispositifs de sécurité pour vos établissements et événements.
-              </p>
-              <Link to="/solutions" className="text-primary hover:text-primary-hover font-medium flex items-center">
-                En savoir plus <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-            
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow reveal border border-gray-100">
-              <h3 className="text-2xl font-bold mb-4">Plans de Prévention</h3>
-              <p className="text-gray-600 mb-6">
-                Documentation complète pour la prévention des risques liés à l'intervention d'entreprises extérieures.
-              </p>
-              <Link to="/solutions" className="text-primary hover:text-primary-hover font-medium flex items-center">
-                En savoir plus <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Ship Faster Section - Relume-inspired */}
+      {/* Ship Faster Section */}
       <section className="relative py-32 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-[120px] md:text-[180px] font-bold text-gray-200 opacity-50 absolute top-0 left-0 w-full text-center -mt-10">
@@ -134,7 +125,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Feature Blocks - Relume-inspired */}
+      {/* Feature Blocks */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -198,7 +189,72 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Building Blocks - Relume-inspired */}
+      {/* AI Assistant Highlight */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="reveal">
+              <h3 className="text-3xl font-bold mb-6">Assistant IA Réglementaire</h3>
+              <p className="text-lg text-gray-600 mb-6">
+                Notre chatbot intelligent spécialisé en réglementation de sécurité vous aide à naviguer les complexités législatives en temps réel.
+              </p>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center">
+                  <div className="h-6 w-6 rounded-full bg-accent/20 text-accent flex items-center justify-center mr-3">
+                    ✓
+                  </div>
+                  <span>Réponses instantanées à vos questions réglementaires</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="h-6 w-6 rounded-full bg-accent/20 text-accent flex items-center justify-center mr-3">
+                    ✓
+                  </div>
+                  <span>Références légales et articles de loi à jour</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="h-6 w-6 rounded-full bg-accent/20 text-accent flex items-center justify-center mr-3">
+                    ✓
+                  </div>
+                  <span>Disponible 24/7 pour vous accompagner</span>
+                </li>
+              </ul>
+              <button 
+                onClick={() => {
+                  document.querySelector('button[aria-label="Ouvrir le chat"]')?.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true })
+                  );
+                }}
+                className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center"
+              >
+                Poser une question <MessageSquare className="ml-2 h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="bg-gray-100 rounded-xl p-6 relative reveal">
+              <div className="bg-white rounded-lg p-5 shadow-md mb-3 ml-auto max-w-xs">
+                <p className="font-medium text-gray-800">Quelles sont les règles de sécurité pour un ERP?</p>
+              </div>
+              
+              <div className="bg-primary/10 rounded-lg p-5 shadow-sm max-w-md">
+                <div className="flex items-start gap-3">
+                  <Bot className="h-6 w-6 text-primary shrink-0 mt-1" />
+                  <div>
+                    <p className="text-gray-700">
+                      Un ERP (Établissement Recevant du Public) est soumis à des règles strictes définies principalement par le Code de la Construction et de l'Habitation et l'arrêté du 25 juin 1980. Des dispositions spécifiques s'appliquent selon le type et la catégorie de l'établissement.
+                    </p>
+                    <div className="mt-3 text-xs bg-gray-100 p-2 rounded">
+                      <p className="font-medium text-primary">Référence légale:</p>
+                      <p>Code de la construction et de l'habitation, Article L123-1</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Building Blocks */}
       <section className="py-24">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-16">
@@ -282,7 +338,7 @@ const Home = () => {
         </div>
       </section>
       
-      {/* CTA Section - Relume-inspired */}
+      {/* CTA Section */}
       <section className="py-24 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
@@ -302,6 +358,30 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Chatbot hint */}
+      {showChatbotHint && (
+        <div className="fixed bottom-24 right-8 bg-white p-4 rounded-xl shadow-lg z-40 max-w-xs animate-bounce-once reveal active">
+          <div className="flex items-start gap-3">
+            <Bot className="h-6 w-6 text-accent shrink-0" />
+            <div>
+              <p className="font-medium text-gray-800 mb-2">Une question sur la réglementation?</p>
+              <p className="text-sm text-gray-600 mb-3">Essayez notre assistant IA spécialisé en réglementation de sécurité!</p>
+              <button 
+                onClick={() => {
+                  setShowChatbotHint(false);
+                  document.querySelector('button[aria-label="Ouvrir le chat"]')?.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true })
+                  );
+                }}
+                className="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded-lg font-medium transition-all w-full"
+              >
+                Poser ma question
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
