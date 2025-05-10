@@ -1,93 +1,117 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle
+} from "@/components/ui/navigation-menu";
+import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-const navItems = [
-  { name: 'Accueil', path: '/' },
-  { name: 'Nos Solutions', path: '/solutions' },
-  { name: 'À Propos', path: '/about' },
-  { name: 'Contact', path: '/contact' },
-];
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
   
+  // Détecter le défilement pour changer l'apparence du header
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 10);
     };
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // Fermer le menu mobile lors du changement de route
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
+  const isActive = (path: string) => location.pathname === path;
+  
+  const navigationLinks = [
+    { name: 'Accueil', path: '/' },
+    { name: 'Solutions', path: '/solutions' },
+    { name: 'Tarifs', path: '/pricing' },
+    { name: 'À propos', path: '/about' },
+    { name: 'FAQ', path: '/faq' },
+    { name: 'Contact', path: '/contact' }
+  ];
+  
   return (
-    <header className={cn(
-      'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-      scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-4'
-    )}>
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-primary">
-              Secu<span className="text-accent">Genie</span>
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="font-medium text-gray-700 hover:text-primary transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
-            <Link
-              to="/demo"
-              className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-md transition-colors"
-            >
-              Essayer Gratuitement
-            </Link>
-          </nav>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden text-gray-700"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 space-y-3 animate-fade-in">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="block text-gray-700 hover:text-primary transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <Link
-              to="/demo"
-              className="block bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md transition-colors text-center mt-4"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Essayer Gratuitement
-            </Link>
-          </nav>
-        )}
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <span className="text-xl font-bold text-primary">Secu<span className="text-accent">Genie</span></span>
+        </Link>
+        
+        {/* Navigation - Desktop */}
+        <nav className="hidden md:flex items-center space-x-1">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {navigationLinks.map(link => (
+                <NavigationMenuItem key={link.path}>
+                  <Link to={link.path}>
+                    <NavigationMenuLink 
+                      className={navigationMenuTriggerStyle()}
+                      active={isActive(link.path)}
+                    >
+                      {link.name}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+              <NavigationMenuItem>
+                <Link to="/demo">
+                  <Button variant="default" size="sm">
+                    Essai gratuit
+                  </Button>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+        
+        {/* Menu hamburger - Mobile */}
+        <button 
+          className="md:hidden text-gray-600 hover:text-primary focus:outline-none"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+      
+      {/* Menu mobile déplié */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white shadow-lg">
+          <div className="container mx-auto px-4 py-4">
+            <nav className="flex flex-col space-y-4">
+              {navigationLinks.map(link => (
+                <Link 
+                  key={link.path} 
+                  to={link.path} 
+                  className={`${isActive(link.path) ? 'text-primary font-medium' : 'text-gray-700'} hover:text-primary px-2 py-1`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <Link to="/demo" className="mt-2">
+                <Button variant="default" className="w-full">
+                  Essai gratuit
+                </Button>
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

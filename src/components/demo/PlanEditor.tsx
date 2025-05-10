@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { fabric } from 'fabric';
@@ -368,12 +367,12 @@ const PlanEditor = () => {
         <div className="lg:w-1/4">
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as IconCategory)}>
-              <TabsList className="w-full mb-4">
-                <TabsTrigger value="security" className="flex-1">Sécurité</TabsTrigger>
-                <TabsTrigger value="event" className="flex-1">Événement</TabsTrigger>
-                <TabsTrigger value="furniture" className="flex-1">Mobilier</TabsTrigger>
-                <TabsTrigger value="signs" className="flex-1">Signalétique</TabsTrigger>
-                <TabsTrigger value="emergency" className="flex-1">Urgence</TabsTrigger>
+              <TabsList className="w-full mb-4 flex overflow-x-auto">
+                <TabsTrigger value="security" className="flex-shrink-0 text-xs whitespace-nowrap">Sécurité</TabsTrigger>
+                <TabsTrigger value="event" className="flex-shrink-0 text-xs whitespace-nowrap">Événement</TabsTrigger>
+                <TabsTrigger value="furniture" className="flex-shrink-0 text-xs whitespace-nowrap">Mobilier</TabsTrigger>
+                <TabsTrigger value="signs" className="flex-shrink-0 text-xs whitespace-nowrap">Signalétique</TabsTrigger>
+                <TabsTrigger value="emergency" className="flex-shrink-0 text-xs whitespace-nowrap">Urgence</TabsTrigger>
               </TabsList>
               
               <TabsContent value="security">
@@ -387,8 +386,8 @@ const PlanEditor = () => {
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
-                        <span>{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
+                        <span className="text-sm truncate">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -406,8 +405,8 @@ const PlanEditor = () => {
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
-                        <span>{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
+                        <span className="text-sm truncate">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -425,8 +424,8 @@ const PlanEditor = () => {
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
-                        <span>{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
+                        <span className="text-sm truncate">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -444,8 +443,8 @@ const PlanEditor = () => {
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
-                        <span>{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
+                        <span className="text-sm truncate">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -463,8 +462,8 @@ const PlanEditor = () => {
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 w-8 h-8">{icon}</div>
-                        <span>{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
+                        <span className="text-sm truncate">{label}</span>
                       </div>
                     </div>
                   ))}
