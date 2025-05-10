@@ -73,9 +73,9 @@ const Home = () => {
             </div>
             
             <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow reveal border border-gray-100">
-              <h3 className="text-2xl font-bold mb-4">DPS</h3>
+              <h3 className="text-2xl font-bold mb-4">Plan de Prévention</h3>
               <p className="text-gray-600 mb-6">
-                Dimensionnement et organisation des dispositifs prévisionnels de secours pour vos événements.
+                Documentation complète pour la prévention des risques liés à l'intervention d'entreprises extérieures.
               </p>
               <Link to="/solutions" className="text-primary hover:text-primary-hover font-medium flex items-center">
                 En savoir plus <ArrowRight className="ml-1 h-4 w-4" />

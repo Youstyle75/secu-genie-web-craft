@@ -156,7 +156,7 @@ const Solutions = () => {
               activeTab === 'documents' ? "opacity-100 translate-y-0" : "opacity-0 absolute -translate-y-8")}>
               {activeTab === 'documents' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {/* Card 1 */}
+                  {/* Card 1 - GN6 */}
                   <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100 reveal">
                     <div className="bg-blue-50 rounded-xl p-4 inline-block mb-4">
                       <FileText className="h-8 w-8 text-primary" />
@@ -188,32 +188,32 @@ const Solutions = () => {
                     </button>
                   </div>
                   
-                  {/* Card 2 */}
+                  {/* Card 2 - Plan de Prévention */}
                   <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100 reveal">
                     <div className="bg-blue-50 rounded-xl p-4 inline-block mb-4">
-                      <Users className="h-8 w-8 text-primary" />
+                      <Shield className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3">DPS</h3>
+                    <h3 className="text-xl font-bold mb-3">Plan de Prévention</h3>
                     <p className="text-gray-600 mb-4">
-                      Génération des Dispositifs Prévisionnels de Secours optimisés selon votre événement.
+                      Création des plans de prévention pour les interventions d'entreprises extérieures.
                     </p>
                     <ul className="space-y-2 mb-6">
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
-                        <span>Dimensionnement automatique</span>
+                        <span>Conformité décret du 20 février 1992</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
-                        <span>Conformité référentiel national</span>
+                        <span>Assistance IA pour l'analyse de risques</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle className="text-green-500 h-5 w-5 mr-2 mt-0.5" />
-                        <span>Intégration RIS (Référentiel d'Indice de Secours)</span>
+                        <span>Personnalisation aux spécificités</span>
                       </li>
                     </ul>
                   </div>
                   
-                  {/* Card 3 */}
+                  {/* Card 3 - Notice de Sécurité ERP */}
                   <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100 reveal">
                     <div className="bg-blue-50 rounded-xl p-4 inline-block mb-4">
                       <Lightbulb className="h-8 w-8 text-primary" />
