@@ -20,6 +20,18 @@ const Chatbot = () => {
   
   const toggleChat = () => {
     dispatch({ type: 'TOGGLE_CHAT' });
+    
+    // Si c'est la première ouverture, ajouter un message d'accueil
+    if (messages.length === 0) {
+      const welcomeMessage = {
+        id: `bot-welcome-${Date.now()}`,
+        sender: 'bot',
+        text: 'Bonjour, je suis votre assistant spécialisé en réglementation de sécurité. Je peux vous renseigner sur les ERP, événements, plans d\'évacuation, et plus encore. Comment puis-je vous aider aujourd\'hui?',
+        timestamp: new Date()
+      };
+      
+      dispatch({ type: 'ADD_BOT_MESSAGE', payload: welcomeMessage });
+    }
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +63,15 @@ const Chatbot = () => {
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
     
-    dispatch({ type: 'ADD_USER_MESSAGE', payload: inputValue });
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      sender: 'user',
+      text: inputValue,
+      timestamp: new Date()
+    };
+    
+    dispatch({ type: 'ADD_USER_MESSAGE', payload: userMessage });
+    dispatch({ type: 'SET_INPUT_VALUE', payload: '' });
     dispatch({ type: 'SET_TYPING', payload: true });
     
     try {
@@ -61,8 +81,12 @@ const Chatbot = () => {
       // Si la requête concerne un sujet spécifique, ajoutons-le au contexte
       if (inputValue.toLowerCase().includes('erp') || inputValue.toLowerCase().includes('établissement')) {
         dispatch({ type: 'ADD_CONTEXT', payload: 'ERP' });
-      } else if (inputValue.toLowerCase().includes('évènement') || inputValue.toLowerCase().includes('manifestation')) {
+      } else if (inputValue.toLowerCase().includes('événement') || inputValue.toLowerCase().includes('manifestation')) {
         dispatch({ type: 'ADD_CONTEXT', payload: 'SECURITE_EVENEMENTIELLE' });
+      } else if (inputValue.toLowerCase().includes('incendie') || inputValue.toLowerCase().includes('feu')) {
+        dispatch({ type: 'ADD_CONTEXT', payload: 'INCENDIE' });
+      } else if (inputValue.toLowerCase().includes('évacuation')) {
+        dispatch({ type: 'ADD_CONTEXT', payload: 'EVACUATION' });
       }
     } catch (err) {
       console.error('Erreur lors du traitement du message:', err);
@@ -73,27 +97,8 @@ const Chatbot = () => {
   };
   
   const handleQuickReply = async (reply) => {
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      sender: 'user', // Now properly typed as 'user' literal
-      text: reply.text,
-      timestamp: new Date()
-    };
-    
-    dispatch({ type: 'ADD_BOT_MESSAGE', payload: userMessage });
-    dispatch({ type: 'SET_TYPING', payload: true });
-    
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: `bot-${Date.now()}`,
-        sender: 'bot', // Now properly typed as 'bot' literal
-        text: reply.answer,
-        timestamp: new Date()
-      };
-      
-      dispatch({ type: 'ADD_BOT_MESSAGE', payload: botResponse });
-      dispatch({ type: 'SET_TYPING', payload: false });
-    }, 1000);
+    dispatch({ type: 'SET_INPUT_VALUE', payload: reply.text });
+    sendMessage();
   };
   
   const redirectToContact = () => {
@@ -112,8 +117,14 @@ const Chatbot = () => {
     
     // Réafficher le message d'accueil
     setTimeout(() => {
-      dispatch({ type: 'TOGGLE_CHAT' });
-      dispatch({ type: 'TOGGLE_CHAT' });
+      const welcomeMessage = {
+        id: `bot-welcome-${Date.now()}`,
+        sender: 'bot',
+        text: 'Bonjour, je suis votre assistant spécialisé en réglementation de sécurité. Comment puis-je vous aider aujourd\'hui?',
+        timestamp: new Date()
+      };
+      
+      dispatch({ type: 'ADD_BOT_MESSAGE', payload: welcomeMessage });
     }, 300);
   };
 
@@ -128,7 +139,7 @@ const Chatbot = () => {
       </button>
       
       <div
-        className={`fixed bottom-20 right-6 w-80 md:w-96 bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 ease-in-out z-50 ${
+        className={`fixed bottom-20 right-6 w-80 md:w-96 bg-dark-light rounded-lg shadow-xl overflow-hidden transition-all duration-300 ease-in-out z-50 ${
           isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={{ maxHeight: '70vh' }}
@@ -158,6 +169,7 @@ const Chatbot = () => {
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
           onSend={sendMessage}
+          isTyping={isTyping}
         />
 
         <ChatFooter />

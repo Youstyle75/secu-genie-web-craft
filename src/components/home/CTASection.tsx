@@ -10,7 +10,7 @@ const CTASection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-dark-foreground">
             Prêt à simplifier votre gestion de la sécurité?
           </h2>
-          <p className="text-xl text-dark-secondary mb-8">
+          <p className="text-xl text-dark-foreground mb-8">
             Essayez SecuGenie gratuitement pendant 14 jours
           </p>
           <Link

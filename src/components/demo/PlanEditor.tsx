@@ -105,6 +105,7 @@ const PlanEditor = () => {
       left: x,
       top: y,
       fontSize: 30,
+      fill: '#FFFFFF', // Changé à blanc pour meilleure visibilité
       selectable: true,
       data: { id, type }
     });
@@ -344,7 +345,8 @@ const PlanEditor = () => {
       left: 100,
       top: 100,
       fontFamily: 'Arial',
-      fontSize: 20
+      fontSize: 20,
+      fill: '#FFFFFF', // Changé à blanc pour meilleure visibilité
     });
     
     canvas.add(text);
@@ -359,35 +361,35 @@ const PlanEditor = () => {
   };
   
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 relative">
-      <h3 className="text-xl font-bold mb-4">Éditeur de Plan Avancé</h3>
+    <div className="bg-dark-light rounded-lg shadow-md p-4 md:p-6 relative">
+      <h3 className="text-xl font-bold mb-4 text-dark-foreground">Éditeur de Plan Avancé</h3>
       
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Element Library */}
         <div className="lg:w-1/4">
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="bg-dark-medium p-4 rounded-lg border border-dark-light">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as IconCategory)}>
-              <TabsList className="w-full mb-4 flex overflow-x-auto">
-                <TabsTrigger value="security" className="flex-shrink-0 text-xs whitespace-nowrap">Sécurité</TabsTrigger>
-                <TabsTrigger value="event" className="flex-shrink-0 text-xs whitespace-nowrap">Événement</TabsTrigger>
-                <TabsTrigger value="furniture" className="flex-shrink-0 text-xs whitespace-nowrap">Mobilier</TabsTrigger>
-                <TabsTrigger value="signs" className="flex-shrink-0 text-xs whitespace-nowrap">Signalétique</TabsTrigger>
-                <TabsTrigger value="emergency" className="flex-shrink-0 text-xs whitespace-nowrap">Urgence</TabsTrigger>
+              <TabsList className="w-full mb-4 flex overflow-x-auto bg-dark-light">
+                <TabsTrigger value="security" className="flex-shrink-0 text-xs whitespace-nowrap text-dark-foreground data-[state=active]:bg-dark-medium data-[state=active]:text-accent">Sécurité</TabsTrigger>
+                <TabsTrigger value="event" className="flex-shrink-0 text-xs whitespace-nowrap text-dark-foreground data-[state=active]:bg-dark-medium data-[state=active]:text-accent">Événement</TabsTrigger>
+                <TabsTrigger value="furniture" className="flex-shrink-0 text-xs whitespace-nowrap text-dark-foreground data-[state=active]:bg-dark-medium data-[state=active]:text-accent">Mobilier</TabsTrigger>
+                <TabsTrigger value="signs" className="flex-shrink-0 text-xs whitespace-nowrap text-dark-foreground data-[state=active]:bg-dark-medium data-[state=active]:text-accent">Signalétique</TabsTrigger>
+                <TabsTrigger value="emergency" className="flex-shrink-0 text-xs whitespace-nowrap text-dark-foreground data-[state=active]:bg-dark-medium data-[state=active]:text-accent">Urgence</TabsTrigger>
               </TabsList>
               
               <TabsContent value="security">
-                <h4 className="font-semibold mb-3">Éléments de sécurité</h4>
+                <h4 className="font-semibold mb-3 text-dark-foreground">Éléments de sécurité</h4>
                 <div className="space-y-3">
                   {securityIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
-                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      className="bg-dark-light p-3 rounded-md border border-dark-medium cursor-grab hover:shadow-md transition-shadow"
                       draggable
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
-                        <span className="text-sm truncate">{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center text-dark-foreground">{icon}</div>
+                        <span className="text-sm truncate text-dark-foreground">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -395,18 +397,18 @@ const PlanEditor = () => {
               </TabsContent>
               
               <TabsContent value="event">
-                <h4 className="font-semibold mb-3">Éléments événementiels</h4>
+                <h4 className="font-semibold mb-3 text-dark-foreground">Éléments événementiels</h4>
                 <div className="space-y-3">
                   {eventIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
-                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      className="bg-dark-light p-3 rounded-md border border-dark-medium cursor-grab hover:shadow-md transition-shadow"
                       draggable
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
-                        <span className="text-sm truncate">{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center text-dark-foreground">{icon}</div>
+                        <span className="text-sm truncate text-dark-foreground">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -414,18 +416,18 @@ const PlanEditor = () => {
               </TabsContent>
               
               <TabsContent value="furniture">
-                <h4 className="font-semibold mb-3">Mobilier et équipements</h4>
+                <h4 className="font-semibold mb-3 text-dark-foreground">Mobilier et équipements</h4>
                 <div className="space-y-3">
                   {furnitureIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
-                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      className="bg-dark-light p-3 rounded-md border border-dark-medium cursor-grab hover:shadow-md transition-shadow"
                       draggable
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
-                        <span className="text-sm truncate">{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center text-dark-foreground">{icon}</div>
+                        <span className="text-sm truncate text-dark-foreground">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -433,18 +435,18 @@ const PlanEditor = () => {
               </TabsContent>
               
               <TabsContent value="signs">
-                <h4 className="font-semibold mb-3">Signalétique</h4>
+                <h4 className="font-semibold mb-3 text-dark-foreground">Signalétique</h4>
                 <div className="space-y-3">
                   {signsIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
-                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      className="bg-dark-light p-3 rounded-md border border-dark-medium cursor-grab hover:shadow-md transition-shadow"
                       draggable
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
-                        <span className="text-sm truncate">{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center text-dark-foreground">{icon}</div>
+                        <span className="text-sm truncate text-dark-foreground">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -452,18 +454,18 @@ const PlanEditor = () => {
               </TabsContent>
               
               <TabsContent value="emergency">
-                <h4 className="font-semibold mb-3">Urgence et véhicules</h4>
+                <h4 className="font-semibold mb-3 text-dark-foreground">Urgence et véhicules</h4>
                 <div className="space-y-3">
                   {emergencyIcons.map(({ type, label, icon }) => (
                     <div
                       key={type}
-                      className="bg-white p-3 rounded-md border border-gray-200 cursor-grab hover:shadow-md transition-shadow"
+                      className="bg-dark-light p-3 rounded-md border border-dark-medium cursor-grab hover:shadow-md transition-shadow"
                       draggable
                       onDragStart={() => handleDragStart(type)}
                     >
                       <div className="flex items-center">
-                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center">{icon}</div>
-                        <span className="text-sm truncate">{label}</span>
+                        <div className="text-2xl mr-2 min-w-8 h-8 flex items-center text-dark-foreground">{icon}</div>
+                        <span className="text-sm truncate text-dark-foreground">{label}</span>
                       </div>
                     </div>
                   ))}
@@ -472,7 +474,7 @@ const PlanEditor = () => {
             </Tabs>
             
             <div className="mt-6">
-              <h4 className="font-semibold mb-3">Outils de dessin</h4>
+              <h4 className="font-semibold mb-3 text-dark-foreground">Outils de dessin</h4>
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <Button 
                   onClick={toggleDrawingMode}
@@ -547,7 +549,7 @@ const PlanEditor = () => {
               {drawingMode && (
                 <div className="mb-4">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm">Couleur du pinceau</label>
+                    <label className="text-sm text-dark-foreground">Couleur du pinceau</label>
                     <div className="flex gap-2">
                       {['#000000', '#ff0000', '#0000ff', '#008000', '#ffa500'].map(color => (
                         <div
@@ -567,7 +569,7 @@ const PlanEditor = () => {
                       />
                     </div>
                     
-                    <label className="text-sm">Taille du pinceau</label>
+                    <label className="text-sm text-dark-foreground">Taille du pinceau</label>
                     <input
                       type="range"
                       min="1"
@@ -582,7 +584,7 @@ const PlanEditor = () => {
             </div>
             
             <div className="mt-6">
-              <h4 className="font-semibold mb-3">Actions</h4>
+              <h4 className="font-semibold mb-3 text-dark-foreground">Actions</h4>
               <div className="space-y-2">
                 <Button 
                   onClick={handleImportClick}
@@ -626,7 +628,7 @@ const PlanEditor = () => {
         {/* Editor Area */}
         <div className="lg:w-3/4">
           <div
-            className="border-2 border-dashed border-gray-300 rounded-lg relative"
+            className="border-2 border-dark-light rounded-lg relative"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             style={{ height: '500px' }}
@@ -635,10 +637,10 @@ const PlanEditor = () => {
             
             {/* Toolbar for selected elements */}
             {selectedElement && canvas && (
-              <div className="absolute top-4 right-4 bg-white shadow-md rounded-md flex p-1 z-10">
+              <div className="absolute top-4 right-4 bg-dark-light shadow-md rounded-md flex p-1 z-10">
                 <button
                   onClick={handleRotate}
-                  className="p-2 hover:bg-gray-100 rounded"
+                  className="p-2 hover:bg-dark-medium rounded text-dark-foreground"
                   title="Pivoter"
                 >
                   <svg
@@ -658,7 +660,7 @@ const PlanEditor = () => {
                 </button>
                 <button
                   onClick={handleRemove}
-                  className="p-2 hover:bg-red-100 text-red-600 rounded"
+                  className="p-2 hover:bg-dark-medium text-red-400 rounded"
                   title="Supprimer"
                 >
                   <svg
@@ -680,9 +682,9 @@ const PlanEditor = () => {
             )}
           </div>
           
-          <div className="mt-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <h4 className="font-semibold mb-2">Instructions</h4>
-            <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+          <div className="mt-4 bg-dark-medium p-3 rounded-lg border border-dark-light">
+            <h4 className="font-semibold mb-2 text-dark-foreground">Instructions</h4>
+            <ul className="text-sm text-dark-secondary list-disc pl-5 space-y-1">
               <li>Glissez-déposez des éléments depuis la bibliothèque vers le plan</li>
               <li>Utilisez les outils de dessin pour créer des formes personnalisées</li>
               <li>Ajoutez du texte, des lignes, des rectangles ou des cercles</li>
@@ -692,8 +694,8 @@ const PlanEditor = () => {
               <li>Exportez votre plan une fois terminé</li>
             </ul>
             
-            <div className="mt-4 p-2 bg-primary/10 rounded-md border border-primary/20">
-              <p className="text-sm text-primary font-medium">
+            <div className="mt-4 p-2 bg-accent/10 rounded-md">
+              <p className="text-sm text-accent font-medium">
                 <span className="font-bold">Conseil de l'IA:</span> N'oubliez pas de positionner des issues de secours et des moyens d'extinction adaptés. La réglementation ERP exige généralement un extincteur tous les 200m².
               </p>
             </div>
