@@ -13,6 +13,9 @@ interface LayoutProps {
 const Layout = ({ children, showBreadcrumb = true }: LayoutProps) => {
   // Scroll revelation effect
   useEffect(() => {
+    // Add dark theme class to body
+    document.body.classList.add('dark-theme');
+    
     const revealElements = () => {
       const elements = document.querySelectorAll('.reveal');
       
@@ -32,11 +35,15 @@ const Layout = ({ children, showBreadcrumb = true }: LayoutProps) => {
     // Initial check
     revealElements();
     
-    return () => window.removeEventListener('scroll', revealElements);
+    return () => {
+      window.removeEventListener('scroll', revealElements);
+      // Remove dark theme class when component unmounts
+      document.body.classList.remove('dark-theme');
+    }
   }, []);
   
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-dark">
       <Header />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 md:px-6">

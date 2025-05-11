@@ -22,7 +22,7 @@ const HeroSection = () => {
                   new MouseEvent('click', { bubbles: true })
                 );
               }}
-              className="w-full text-left p-4 bg-dark-light rounded-lg text-dark-secondary cursor-text transition-colors hover:bg-dark-light/80"
+              className="w-full text-left p-4 bg-dark-light/70 rounded-lg text-dark-secondary cursor-text transition-colors hover:bg-dark-light/80"
             >
               Comment SecuGenie peut vous aider aujourd'hui?
             </button>
@@ -41,19 +41,19 @@ const HeroSection = () => {
         <div className="flex flex-wrap gap-3 justify-center mb-12">
           <Link
             to="/demo"
-            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
+            className="bg-dark-light hover:bg-dark-medium/80 text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
           >
             Dossier GN6
           </Link>
           <Link
             to="/demo"
-            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
+            className="bg-dark-light hover:bg-dark-medium/80 text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
           >
             Plan de Prévention
           </Link>
           <Link
             to="/demo"
-            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
+            className="bg-dark-light hover:bg-dark-medium/80 text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
           >
             Notice de Sécurité
           </Link>

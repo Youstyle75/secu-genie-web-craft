@@ -38,7 +38,7 @@
     --radius: 0.75rem;
   }
 
-  /* Dark theme overrides */
+  /* Dark theme overrides - similaire à bolt.new */
   body.dark-theme {
     background-color: #0A0A0A;
     color: #FFFFFF;
@@ -85,7 +85,7 @@
   }
 
   a {
-    @apply text-primary hover:text-primary-hover transition-colors duration-200;
+    @apply transition-colors duration-200;
   }
 
   .reveal {
@@ -100,7 +100,7 @@
 
   .breadcrumb-item::after {
     content: "/";
-    @apply mx-2 text-gray-400;
+    @apply mx-2 text-dark-secondary;
   }
 
   .breadcrumb-item:last-child::after {
@@ -142,14 +142,14 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Hover effects with new colors */
+/* Hover effects with new colors - sans bordures blanches comme bolt.new */
 .hover-card {
   @apply transition-all duration-300 transform hover:-translate-y-2 hover:shadow-lg;
 }
 
 /* Form styling for better appearance */
 input, textarea, select {
-  @apply border border-dark-light bg-dark-light rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent text-dark-foreground;
+  @apply border-0 bg-dark-light rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-accent/30 text-dark-foreground;
 }
 
 /* Button styling with new color scheme */
@@ -162,21 +162,21 @@ input, textarea, select {
 }
 
 .btn-outline {
-  @apply border border-dark-light px-4 py-2 rounded-md hover:border-accent hover:text-accent transition-colors;
+  @apply bg-transparent border border-dark-light px-4 py-2 rounded-md hover:border-accent hover:text-accent transition-colors;
 }
 
-/* Card gradients with dark theme */
+/* Card gradients with dark theme - sans bordures blanches */
 .card-gradient-primary {
-  @apply bg-gradient-to-br from-dark-light/90 to-dark-light/70;
+  @apply bg-gradient-to-br from-dark-light/90 to-dark-light/70 border-0;
 }
 
 .card-gradient-accent {
-  @apply bg-gradient-to-br from-accent/90 to-accent/70;
+  @apply bg-gradient-to-br from-accent/90 to-accent/70 border-0;
 }
 
-/* Glassmorphism effects for dark theme */
+/* Glassmorphism effects for dark theme - sans bordures blanches */
 .glass {
-  @apply backdrop-blur-xl bg-dark-medium/80 border border-dark-light/20 shadow-sm;
+  @apply backdrop-blur-xl bg-dark-medium/80 border-0 shadow-sm;
 }
 
 /* Call to action elements */
@@ -184,9 +184,9 @@ input, textarea, select {
   @apply bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-hover transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
 }
 
-/* Interface elements for dark theme */
+/* Interface elements for dark theme - sans bordures blanches */
 .dashboard-card {
-  @apply bg-dark-light rounded-xl shadow-sm border border-dark-medium p-4 hover:shadow-md transition-all duration-300;
+  @apply bg-dark-light rounded-xl shadow-sm border-0 p-4 hover:shadow-md transition-all duration-300;
 }
 
 .info-badge {
@@ -198,22 +198,22 @@ input, textarea, select {
 }
 
 .status-badge.success {
-  @apply bg-green-900/30 text-green-400;
+  @apply bg-green-900/30 text-green-400 border-0;
 }
 
 .status-badge.warning {
-  @apply bg-yellow-900/30 text-yellow-400;
+  @apply bg-yellow-900/30 text-yellow-400 border-0;
 }
 
 .status-badge.error {
-  @apply bg-red-900/30 text-red-400;
+  @apply bg-red-900/30 text-red-400 border-0;
 }
 
 .status-badge.info {
-  @apply bg-blue-900/30 text-blue-400;
+  @apply bg-blue-900/30 text-blue-400 border-0;
 }
 
-/* Style pour les pills comme sur bolt.new */
+/* Style pour les pills comme sur bolt.new - sans bordures blanches */
 .feature-pill {
-  @apply bg-dark-light rounded-full px-4 py-2 text-dark-secondary hover:bg-dark-medium transition-all;
+  @apply bg-dark-light rounded-full px-4 py-2 text-dark-secondary hover:bg-dark-medium transition-all border-0;
 }

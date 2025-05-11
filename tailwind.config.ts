@@ -66,11 +66,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Mise à jour des couleurs dark pour ressembler à bolt.new
+				// Couleurs pour matcher bolt.new
 				dark: {
-					DEFAULT: '#0A0A0A', // Presque noir comme bolt.new
+					DEFAULT: '#0A0A0A', // Noir comme bolt.new
 					light: '#222222',  // Gris foncé pour les éléments secondaires
-					medium: '#181818', // Pour les cartes et éléments interactifs
+					medium: '#111111', // Pour les cartes et éléments interactifs
 					foreground: '#FFFFFF', // Texte blanc
 					secondary: '#A0A0A0', // Texte secondaire, gris clair
 				}

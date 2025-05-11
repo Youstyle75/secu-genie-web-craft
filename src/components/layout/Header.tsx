@@ -45,11 +45,11 @@ const Header = () => {
   ];
   
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 py-4 bg-dark`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <span className="text-xl font-bold text-primary">Secu<span className="text-accent">Genie</span></span>
+          <span className="text-xl font-bold text-white">Secu<span className="text-accent">Genie</span></span>
         </Link>
         
         {/* Navigation - Desktop */}
@@ -60,8 +60,7 @@ const Header = () => {
                 <NavigationMenuItem key={link.path}>
                   <Link to={link.path}>
                     <NavigationMenuLink 
-                      className={navigationMenuTriggerStyle()}
-                      active={isActive(link.path)}
+                      className={`text-dark-secondary hover:text-white transition-colors ${isActive(link.path) ? 'text-white' : ''}`}
                     >
                       {link.name}
                     </NavigationMenuLink>
@@ -70,7 +69,7 @@ const Header = () => {
               ))}
               <NavigationMenuItem>
                 <Link to="/demo">
-                  <Button variant="default" size="sm">
+                  <Button variant="accent" size="sm">
                     Essai gratuit
                   </Button>
                 </Link>
@@ -81,7 +80,7 @@ const Header = () => {
         
         {/* Menu hamburger - Mobile */}
         <button 
-          className="md:hidden text-gray-600 hover:text-primary focus:outline-none"
+          className="md:hidden text-white hover:text-accent focus:outline-none"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
@@ -91,20 +90,20 @@ const Header = () => {
       
       {/* Menu mobile déplié */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
+        <div className="md:hidden bg-dark-medium">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col space-y-4">
               {navigationLinks.map(link => (
                 <Link 
                   key={link.path} 
                   to={link.path} 
-                  className={`${isActive(link.path) ? 'text-primary font-medium' : 'text-gray-700'} hover:text-primary px-2 py-1`}
+                  className={`${isActive(link.path) ? 'text-white font-medium' : 'text-dark-secondary'} hover:text-white px-2 py-1`}
                 >
                   {link.name}
                 </Link>
               ))}
               <Link to="/demo" className="mt-2">
-                <Button variant="default" className="w-full">
+                <Button variant="accent" className="w-full">
                   Essai gratuit
                 </Button>
               </Link>

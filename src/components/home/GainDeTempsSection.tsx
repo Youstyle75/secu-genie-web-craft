@@ -3,7 +3,8 @@ const GainDeTempsSection = () => {
   return (
     <section className="relative py-32 overflow-hidden bg-dark">
       <div className="container mx-auto px-4 relative z-10">
-        <h2 className="text-[120px] md:text-[180px] font-bold text-dark-light opacity-10 absolute -top-10 md:-top-20 left-0 w-full text-center">
+        {/* Grand texte en arrière-plan semi-transparent comme dans bolt.new */}
+        <h2 className="text-[120px] md:text-[180px] font-bold text-dark-light opacity-5 absolute -top-10 md:-top-20 left-0 w-full text-center">
           secugenie
         </h2>
         <div className="text-center relative z-20 mt-10">
