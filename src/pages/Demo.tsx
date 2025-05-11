@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
-import PlanEditor from '@/components/demo/PlanEditor';
+import PlanEditorContainer from '@/components/editor/PlanEditorContainer';
 import DemoDashboard from '@/components/demo/DemoDashboard';
 
 const Demo = () => {
@@ -79,7 +79,7 @@ const Demo = () => {
           </div>
 
           <div className="reveal">
-            {activeTab === 'editor' && <PlanEditor />}
+            {activeTab === 'editor' && <PlanEditorContainer />}
             {activeTab === 'dashboard' && <DemoDashboard />}
           </div>
 

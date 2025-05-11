@@ -8,10 +8,10 @@ const GainDeTempsSection = () => {
           secugenie
         </h2>
         <div className="text-center relative z-20 mt-10">
-          <h3 className="text-4xl md:text-6xl font-bold text-dark-foreground mb-4">
+          <h3 className="text-4xl md:text-6xl font-bold text-white mb-4">
             gain de temps <span className="text-accent">remarquable</span>
           </h3>
-          <p className="text-xl text-dark-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Réduisez de 80% le temps passé à créer vos documents de sécurité grâce à notre assistant IA spécialisé
           </p>
         </div>
