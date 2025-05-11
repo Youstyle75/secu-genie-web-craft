@@ -1,34 +1,61 @@
 
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
   return (
-    <section className="py-24 px-4 text-center bg-dark">
+    <section className="py-32 px-4 text-center bg-dark">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-7xl md:text-8xl font-bold mb-8 leading-tight">
-          <span className="text-dark-foreground">Secu<span className="text-accent">Genie</span></span>
+        <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
+          <span className="text-dark-foreground">Que voulez-vous créer?</span>
         </h1>
-        <h2 className="text-4xl md:text-5xl font-bold mb-8 text-dark-foreground">
-          Documents de sécurité <br className="hidden md:block" />
-          <span className="text-accent">générés par IA</span>
+        <h2 className="text-xl md:text-2xl mb-10 text-dark-secondary">
+          Générez, modifiez et déployez des documents de sécurité professionnels <span className="text-accent">en quelques minutes</span>
         </h2>
-        <p className="text-xl text-dark-secondary mb-12 max-w-2xl mx-auto">
-          Créez des documents de sécurité réglementaires en quelques minutes, pas en jours
-        </p>
-        <div className="flex flex-wrap gap-4 justify-center">
+        
+        <div className="bg-dark-medium rounded-xl p-6 mb-10 max-w-2xl mx-auto">
+          <div className="relative">
+            <button 
+              onClick={() => {
+                document.querySelector('button[aria-label="Ouvrir le chat"]')?.dispatchEvent(
+                  new MouseEvent('click', { bubbles: true })
+                );
+              }}
+              className="w-full text-left p-4 bg-dark-light rounded-lg text-dark-secondary cursor-text transition-colors hover:bg-dark-light/80"
+            >
+              Comment SecuGenie peut vous aider aujourd'hui?
+            </button>
+            <div className="absolute bottom-3 right-3 flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-dark-medium flex items-center justify-center text-dark-secondary">
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-dark-secondary mb-8">
+          ou commencez avec
+        </div>
+        
+        <div className="flex flex-wrap gap-3 justify-center mb-12">
           <Link
             to="/demo"
-            className="bg-primary hover:bg-primary-hover text-dark-foreground px-8 py-4 rounded-lg font-medium transition-all flex items-center"
+            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
           >
-            Démarrer un essai gratuit
-            <ArrowRight className="ml-2 h-5 w-5" />
+            Dossier GN6
           </Link>
           <Link
-            to="/contact"
-            className="border border-dark-medium hover:border-primary px-8 py-4 rounded-lg font-medium transition-all text-dark-secondary hover:text-primary bg-dark-medium"
+            to="/demo"
+            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
           >
-            Demander une démo
+            Plan de Prévention
+          </Link>
+          <Link
+            to="/demo"
+            className="bg-dark-light hover:bg-dark-medium text-dark-secondary px-5 py-3 rounded-full font-medium transition-all text-sm"
+          >
+            Notice de Sécurité
           </Link>
         </div>
       </div>

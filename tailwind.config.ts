@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -65,13 +66,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// New dark theme colors
+				// Mise à jour des couleurs dark pour ressembler à bolt.new
 				dark: {
-					DEFAULT: '#1A1A1A',
-					light: '#333333',
-					medium: '#2D2D2D',
-					foreground: '#FAFAFA',
-					secondary: '#A0A0A0',
+					DEFAULT: '#0A0A0A', // Presque noir comme bolt.new
+					light: '#222222',  // Gris foncé pour les éléments secondaires
+					medium: '#181818', // Pour les cartes et éléments interactifs
+					foreground: '#FFFFFF', // Texte blanc
+					secondary: '#A0A0A0', // Texte secondaire, gris clair
 				}
 			},
 			borderRadius: {

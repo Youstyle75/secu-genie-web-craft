@@ -44,9 +44,7 @@ const Home = () => {
   return (
     <Layout showBreadcrumb={false}>
       <HeroSection />
-      <SolutionCards />
       <GainDeTempsSection />
-      <FeatureBlock />
       <AIAssistantSection />
       <ModulesSection />
       <CTASection />
