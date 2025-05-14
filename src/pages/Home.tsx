@@ -45,6 +45,7 @@ const Home = () => {
     <Layout showBreadcrumb={false}>
       <HeroSection />
       <GainDeTempsSection />
+      <SolutionCards />
       <AIAssistantSection />
       <ModulesSection />
       <CTASection />

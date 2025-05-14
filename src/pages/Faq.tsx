@@ -140,11 +140,11 @@ const Faq = () => {
   
   return (
     <Layout>
-      <section className="py-12">
+      <section className="py-12 text-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 reveal">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Questions Fréquentes</h1>
-            <p className="text-lg text-gray-700">
+            <p className="text-lg text-gray-300">
               Tout ce que vous devez savoir sur SecuGenie et nos services.
             </p>
           </div>
@@ -159,22 +159,22 @@ const Faq = () => {
                 placeholder="Rechercher une question ou un mot-clé..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="pl-10 pr-4 py-2 w-full border-0 rounded-md focus:outline-none focus:ring-2 focus:ring-accent bg-dark-light text-white"
               />
             </div>
           </div>
           
           <div className="mb-8 flex flex-wrap gap-2 reveal">
             <div className="flex items-center mr-2">
-              <Filter className="h-4 w-4 text-gray-500 mr-1" />
-              <span className="text-sm text-gray-600">Filtrer par:</span>
+              <Filter className="h-4 w-4 text-gray-400 mr-1" />
+              <span className="text-sm text-gray-300">Filtrer par:</span>
             </div>
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-2 rounded-full text-sm transition-colors ${
                 !selectedCategory
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-accent text-white'
+                  : 'bg-dark-light text-gray-300 hover:bg-dark-medium'
               }`}
             >
               Toutes
@@ -185,8 +185,8 @@ const Faq = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full text-sm transition-colors ${
                   selectedCategory === category
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-accent text-white'
+                    : 'bg-dark-light text-gray-300 hover:bg-dark-medium'
                 }`}
               >
                 {category}
@@ -199,17 +199,17 @@ const Faq = () => {
               filteredFaqItems.map((item, index) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg overflow-hidden"
+                  className="border-0 border-gray-800 rounded-lg overflow-hidden bg-dark-light"
                 >
                   <button
                     onClick={() => toggleAccordion(index)}
-                    className="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-50 transition-colors"
+                    className="flex justify-between items-center w-full p-4 text-left bg-dark-light hover:bg-dark-medium transition-colors"
                   >
-                    <span className="font-montserrat font-medium">{item.question}</span>
+                    <span className="font-montserrat font-medium text-white">{item.question}</span>
                     {activeIndex === index ? (
-                      <ChevronUp className="h-5 w-5 text-primary" />
+                      <ChevronUp className="h-5 w-5 text-accent" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-500" />
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
                     )}
                   </button>
                   
@@ -218,15 +218,15 @@ const Faq = () => {
                       activeIndex === index ? 'max-h-96' : 'max-h-0'
                     }`}
                   >
-                    <div className="p-4 border-t border-gray-200 bg-gray-50">
-                      <p className="text-gray-700">{item.answer}</p>
+                    <div className="p-4 border-t border-gray-800 bg-dark-medium">
+                      <p className="text-gray-300">{item.answer}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-1 rounded">
+                        <span className="inline-flex items-center bg-accent/20 text-accent text-xs px-2 py-1 rounded">
                           <FileText className="h-3 w-3 mr-1" />
                           {item.category}
                         </span>
                         {item.tags?.map(tag => (
-                          <span key={tag} className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                          <span key={tag} className="inline-block bg-dark-light text-gray-300 text-xs px-2 py-1 rounded">
                             #{tag}
                           </span>
                         ))}
@@ -236,12 +236,12 @@ const Faq = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-gray-500 mb-2">Aucun résultat ne correspond à votre recherche.</p>
-                <p className="text-gray-600">Essayez avec d'autres mots-clés ou consultez toutes nos questions.</p>
+              <div className="text-center py-12 bg-dark-light rounded-lg border-0 border-gray-800">
+                <p className="text-gray-400 mb-2">Aucun résultat ne correspond à votre recherche.</p>
+                <p className="text-gray-300">Essayez avec d'autres mots-clés ou consultez toutes nos questions.</p>
                 <button 
                   onClick={() => {setSearchQuery(''); setSelectedCategory(null);}}
-                  className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 transition-colors"
+                  className="mt-4 px-4 py-2 bg-dark-medium hover:bg-dark-light/80 rounded-md text-gray-300 transition-colors"
                 >
                   Réinitialiser la recherche
                 </button>
@@ -251,10 +251,10 @@ const Faq = () => {
           
           <div className="mt-12 text-center reveal">
             <h3 className="text-xl font-bold mb-4">Vous ne trouvez pas de réponse à votre question ?</h3>
-            <p className="text-gray-700 mb-6">
+            <p className="text-gray-300 mb-6">
               N'hésitez pas à nous contacter directement et notre équipe vous répondra dans les plus brefs délais.
             </p>
-            <Link to="/contact" className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-md font-medium transition-colors">
+            <Link to="/contact" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-md font-medium transition-colors">
               Nous Contacter
             </Link>
           </div>

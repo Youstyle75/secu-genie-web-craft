@@ -7,10 +7,10 @@ const CTASection = () => {
     <section className="py-24 bg-dark">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-dark-foreground">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
             Prêt à simplifier votre gestion de la sécurité?
           </h2>
-          <p className="text-xl text-dark-foreground mb-8">
+          <p className="text-xl text-white/90 mb-8">
             Essayez SecuGenie gratuitement pendant 14 jours
           </p>
           <Link
@@ -20,7 +20,7 @@ const CTASection = () => {
             Démarrer maintenant
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-          <div className="mt-8 text-dark-secondary text-sm">
+          <div className="mt-8 text-gray-400 text-sm">
             Aucune carte de crédit requise
           </div>
         </div>

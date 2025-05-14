@@ -1,38 +1,34 @@
 
-export type Message = {
+export type MessageSender = 'user' | 'bot' | 'system';
+
+export interface Message {
   id: string;
-  sender: 'bot' | 'user';
+  sender: MessageSender;
   text: string;
   timestamp: Date;
-  references?: ReglementaryReference[];
-};
+  references?: {
+    type: string;
+    title: string;
+    content: string;
+  }[];
+}
 
-export type QuickReply = {
-  id: string;
-  text: string;
-  answer: string;
-};
-
-export type ReglementaryReference = {
-  id: string;
-  title: string;
-  url: string;
-  type: 'article' | 'arrete' | 'decret' | 'loi' | 'code';
-};
-
-export type ChatbotState = {
-  isOpen: boolean;
+export interface ChatbotState {
   messages: Message[];
-  inputValue: string;
   isTyping: boolean;
-  context: string[];
-};
+  inputMessage: string;
+  error: string | null;
+}
 
-export type ChatbotAction = 
-  | { type: 'TOGGLE_CHAT' }
-  | { type: 'SET_INPUT_VALUE'; payload: string }
-  | { type: 'ADD_USER_MESSAGE'; payload: string }
-  | { type: 'ADD_BOT_MESSAGE'; payload: Message }
-  | { type: 'SET_TYPING'; payload: boolean }
-  | { type: 'CLEAR_MESSAGES' }
-  | { type: 'ADD_CONTEXT'; payload: string };
+export interface ChatInputProps {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyPress: (e: React.KeyboardEvent) => void;
+  onSend: () => Promise<void>;
+  isTyping?: boolean;
+}
+
+export interface ChatAction {
+  type: string;
+  payload?: any;
+}

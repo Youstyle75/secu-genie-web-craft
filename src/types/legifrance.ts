@@ -1,3 +1,4 @@
+export type ReglementaryType = 'code' | 'article' | 'arrete' | 'decret' | 'loi' | 'norme' | 'referentiel';
 
 export type ReglementaryText = {
   id: string;
