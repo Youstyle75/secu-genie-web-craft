@@ -14,6 +14,8 @@ import Demo from "./pages/Demo";
 import Faq from "./pages/Faq";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
+import NoticeSecuriteCreate from "./pages/documents/notices/NoticeSecuriteCreate";
+import PlanPreventionCreate from "./pages/documents/plans/PlanPreventionCreate";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +39,8 @@ const App = () => {
             <Route path="/demo" element={<Demo />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/documents/notice-securite/creer" element={<NoticeSecuriteCreate />} />
+            <Route path="/documents/plan-prevention/creer" element={<PlanPreventionCreate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

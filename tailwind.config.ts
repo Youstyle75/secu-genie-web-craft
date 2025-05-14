@@ -56,6 +56,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+                // Nouvelles couleurs personnalisées
+                textPrincipal: '#2D3748',
+                backgroundPrincipal: '#FFFFFF',
+                accentBleu: '#3182CE',
+                accentRouge: '#E53E3E',
+                formBorder: '#E2E8F0',
+                formBackground: '#F7FAFC',
+                alertBackground: '#FEEBC8',
+                alertText: '#B7791F',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -119,6 +128,18 @@ export default {
 				montserrat: ['Montserrat', 'sans-serif'],
 				opensans: ['Open Sans', 'sans-serif'],
 			},
+            fontSize: {
+                base: '16px', // Définir la taille de police minimale à 16px
+            },
+            boxShadow: {
+                'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                'modal': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            },
+            spacing: {
+                // Réduction de 30% des espacements verticaux par défaut
+                'reduced': 'calc(var(--space-y) * 0.7)',
+            },
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

@@ -1,34 +1,38 @@
 
-export type MessageSender = 'user' | 'bot' | 'system';
-
 export interface Message {
   id: string;
-  sender: MessageSender;
+  sender: 'user' | 'bot';
   text: string;
   timestamp: Date;
-  references?: {
-    type: string;
-    title: string;
-    content: string;
-  }[];
+  references?: ReglementaryReference[];
 }
 
 export interface ChatbotState {
+  isOpen: boolean;
   messages: Message[];
+  inputValue: string;
   isTyping: boolean;
-  inputMessage: string;
-  error: string | null;
+  context: string[];
 }
 
-export interface ChatInputProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyPress: (e: React.KeyboardEvent) => void;
-  onSend: () => Promise<void>;
-  isTyping?: boolean;
+export type ChatAction = 
+  | { type: 'TOGGLE_CHAT' }
+  | { type: 'ADD_USER_MESSAGE', payload: Message }
+  | { type: 'ADD_BOT_MESSAGE', payload: Message }
+  | { type: 'SET_INPUT_VALUE', payload: string }
+  | { type: 'SET_TYPING', payload: boolean }
+  | { type: 'CLEAR_MESSAGES' }
+  | { type: 'ADD_CONTEXT', payload: string };
+
+export interface QuickReply {
+  id: string;
+  text: string;
+  action?: string;
 }
 
-export interface ChatAction {
-  type: string;
-  payload?: any;
+export interface ReglementaryReference {
+  id: string;
+  type: 'code' | 'article' | 'arrete' | 'decret';
+  title: string;
+  url?: string;
 }
