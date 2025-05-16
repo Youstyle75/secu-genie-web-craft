@@ -1,5 +1,6 @@
 
-import { ChatbotState, ChatbotAction, Message } from './types';
+import { ChatbotState, ChatbotAction, Message } from './types'; 
+// Et partout où vous utilisez ChatbotAction dans ce fichier, utilisez ChatAction
 
 const initialMessage: Message = {
   id: 'welcome',
