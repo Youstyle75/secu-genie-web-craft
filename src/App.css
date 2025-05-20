@@ -2,7 +2,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
 }
 
@@ -13,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #1A2A6Caa); /* Updated to primary color */
+  filter: drop-shadow(0 0 2em #1032CE90); /* Relume blue */
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #D81B60aa); /* Updated to accent color */
+  filter: drop-shadow(0 0 2em #1032CE90); /* Relume blue */
 }
 
 @keyframes logo-spin {
@@ -36,35 +36,35 @@
 
 .card {
   padding: 2em;
-  border-radius: 0.75rem; /* Matching our new border radius */
+  border-radius: 0.5rem; /* Relume-style border radius */
   transition: all 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
 }
 
 .read-the-docs {
-  color: #4A00E0; /* Updated to secondary color */
+  color: #1032CE; /* Relume blue */
 }
 
-/* Ajout de classes pour des éléments modernes */
+/* Éléments modernes */
 .glass-card {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 1.5rem;
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, #1A2A6C, #4A00E0);
-  color: white;
+  background: linear-gradient(135deg, #F5F5F5, #FFFFFF);
+  color: #0D0D0D;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #1A2A6C, #D81B60);
+  background: linear-gradient(135deg, #0D0D0D, #1032CE);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -14,7 +14,7 @@ const Home = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // Initialize the observer to add reveal animations
+    // Observer pour les animations au scroll
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -26,7 +26,7 @@ const Home = () => {
       { threshold: 0.1 }
     );
 
-    // Observe all elements with reveal class
+    // Observer tous les éléments avec la classe reveal
     document.querySelectorAll('.reveal').forEach((el) => {
       observerRef.current?.observe(el);
     });

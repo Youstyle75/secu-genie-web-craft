@@ -1,101 +1,146 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import PlanEditorContainer from '@/components/editor/PlanEditorContainer';
 import DemoDashboard from '@/components/demo/DemoDashboard';
+import { CheckCircle } from 'lucide-react';
+import { RelumeButton } from '@/components/ui/relume-button';
+import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from '@/components/ui/relume-card';
 
 const Demo = () => {
-  const [activeTab, setActiveTab] = useState<'editor' | 'dashboard'>('editor');
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    
+    // Simuler l'envoi d'un email et affichage du dashboard
+    setTimeout(() => {
+      navigate('/demo/dashboard');
+    }, 1000);
+  };
   
   return (
     <Layout>
       <div className="py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 reveal">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-textPrincipal">Démonstration</h1>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              Découvrez les fonctionnalités de SecuGenie à travers cette démonstration interactive.
-            </p>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold mb-6 text-center text-primary">
+            Découvrez SecuGenie <span className="text-accent">gratuitement</span>
+          </h1>
+          <p className="text-lg text-center mb-12 text-primary/70">
+            Essayez notre solution pendant 14 jours sans engagement et sans carte de crédit
+          </p>
+          
+          {!submitted ? (
+            <RelumeCard className="mb-12">
+              <RelumeCardHeader>
+                <RelumeCardTitle>Commencer votre essai gratuit</RelumeCardTitle>
+              </RelumeCardHeader>
+              <RelumeCardContent>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-6">
+                    <label htmlFor="email" className="block text-sm font-medium mb-2 text-primary">
+                      Email professionnel
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      className="border border-[#EAEAEA] bg-white rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-accent/30"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="votre@email.com"
+                      required
+                    />
+                  </div>
+                  
+                  <RelumeButton type="submit" variant="accent" fullWidth={true}>
+                    Démarrer l'essai gratuit
+                  </RelumeButton>
+                  
+                  <p className="mt-4 text-sm text-primary/60 text-center">
+                    En vous inscrivant, vous acceptez nos <a href="#" className="text-accent hover:underline">Conditions d'utilisation</a> et notre <a href="#" className="text-accent hover:underline">Politique de confidentialité</a>.
+                  </p>
+                </form>
+              </RelumeCardContent>
+            </RelumeCard>
+          ) : (
+            <RelumeCard className="mb-12 text-center py-12">
+              <CheckCircle className="h-16 w-16 text-accent mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2 text-primary">Merci pour votre inscription!</h2>
+              <p className="text-primary/70 mb-6">
+                Nous vous avons envoyé un email avec les instructions pour continuer.
+              </p>
+              <div className="text-center">
+                <RelumeButton 
+                  variant="accent"
+                  onClick={() => navigate('/demo/dashboard')}
+                >
+                  Accéder au tableau de bord
+                </RelumeButton>
+              </div>
+            </RelumeCard>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                <span className="text-accent font-semibold">1</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-primary">Créez un compte</h3>
+              <p className="text-primary/70">Inscrivez-vous en quelques secondes avec votre email professionnel</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                <span className="text-accent font-semibold">2</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-primary">Explorez les fonctionnalités</h3>
+              <p className="text-primary/70">Découvrez toutes les fonctionnalités de SecuGenie pendant 14 jours</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                <span className="text-accent font-semibold">3</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-primary">Passez au premium</h3>
+              <p className="text-primary/70">Choisissez l'abonnement qui correspond à vos besoins</p>
+            </div>
           </div>
-
-          <div className="mb-10 reveal">
-            <div className="flex flex-col sm:flex-row justify-between gap-6 md:gap-12 bg-primary/5 rounded-lg p-6">
-              <div>
-                <h2 className="text-2xl font-bold mb-3 text-textPrincipal">
-                  Essayez SecuGenie gratuitement
-                </h2>
-                <p className="text-gray-700 mb-4">
-                  Cette démo vous permet d'explorer nos principales fonctionnalités. Pour une expérience complète, créez un compte gratuit.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <CheckCircle className="text-primary h-5 w-5 mr-2 mt-0.5" />
-                    <span className="text-gray-700">Accès à l'éditeur de plan complet</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="text-primary h-5 w-5 mr-2 mt-0.5" />
-                    <span className="text-gray-700">Génération de 3 documents gratuits</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="text-primary h-5 w-5 mr-2 mt-0.5" />
-                    <span className="text-gray-700">Assistance par chat incluse</span>
-                  </div>
+          
+          {/* Témoignages */}
+          <h2 className="text-2xl font-bold text-center mb-8 text-primary">Ce que nos clients disent</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <RelumeCard variant="flat">
+              <blockquote className="italic text-primary/80">
+                "Grâce à SecuGenie, notre temps de préparation des notices de sécurité a été divisé par 4. Un gain de temps considérable pour notre équipe."
+              </blockquote>
+              <div className="mt-4 flex items-center">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-3">
+                  <span className="font-bold text-accent">JP</span>
+                </div>
+                <div>
+                  <p className="font-medium text-primary">Jean Petit</p>
+                  <p className="text-sm text-primary/60">Responsable Sécurité, Événements du Sud</p>
                 </div>
               </div>
-              <div className="flex flex-col justify-center">
-                <a href="#" className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-md font-medium inline-flex items-center justify-center transition-colors">
-                  Créer un compte gratuit
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </a>
+            </RelumeCard>
+            
+            <RelumeCard variant="flat">
+              <blockquote className="italic text-primary/80">
+                "L'assistant IA de SecuGenie nous a permis d'avoir des réponses immédiates à nos questions réglementaires. Un vrai plus pour notre équipe."
+              </blockquote>
+              <div className="mt-4 flex items-center">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-3">
+                  <span className="font-bold text-accent">ML</span>
+                </div>
+                <div>
+                  <p className="font-medium text-primary">Marie Leroy</p>
+                  <p className="text-sm text-primary/60">Directrice ERP, Centre commercial Les Arcades</p>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div className="mb-8 border-b border-gray-200 reveal">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setActiveTab('editor')}
-                className={`px-4 py-2 font-medium text-sm rounded-t-md transition-colors ${
-                  activeTab === 'editor'
-                    ? 'bg-white border border-gray-200 border-b-white text-primary'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Éditeur de Plan
-              </button>
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 font-medium text-sm rounded-t-md transition-colors ${
-                  activeTab === 'dashboard'
-                    ? 'bg-white border border-gray-200 border-b-white text-primary'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Tableau de bord
-              </button>
-            </div>
-          </div>
-
-          <div className="reveal">
-            {activeTab === 'editor' && <PlanEditorContainer />}
-            {activeTab === 'dashboard' && <DemoDashboard />}
-          </div>
-
-          <div className="mt-12 text-center reveal">
-            <h3 className="text-2xl font-bold mb-4 text-textPrincipal">Vous avez besoin de plus d'informations ?</h3>
-            <p className="text-gray-700 mb-6 max-w-3xl mx-auto">
-              N'hésitez pas à nous contacter pour en savoir plus sur nos solutions ou pour organiser une démonstration personnalisée avec l'un de nos experts.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/contact" className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-md font-medium transition-colors">
-                Nous Contacter
-              </Link>
-              <Link to="/faq" className="border border-gray-300 hover:border-primary text-gray-700 hover:text-primary px-6 py-3 rounded-md font-medium transition-colors">
-                Consulter la FAQ
-              </Link>
-            </div>
+            </RelumeCard>
           </div>
         </div>
       </div>
