@@ -10,11 +10,16 @@ import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from
 import { NoticeSecuriteContent } from '@/types/securityDocument';
 import securityDocumentService from '@/services/securityDocumentService';
 
-// Define FormData type explicitly to match what the form is using
+// Define FormData type explicitly to match required fields
 type FormData = {
   title: string;
   establishmentId: string;
-  content: NoticeSecuriteContent;
+  content: {
+    descriptionEtablissement: string;
+    moyensSecours: string;
+    consignesEvacuation: string;
+    preventionIncendie?: string;
+  };
 };
 
 // Schéma de validation correctement typé

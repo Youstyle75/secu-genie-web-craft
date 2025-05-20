@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
@@ -10,11 +9,18 @@ import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from
 import { PlanPreventionContent } from '@/types/securityDocument';
 import securityDocumentService from '@/services/securityDocumentService';
 
-// Define FormData type explicitly to match what the form is using
+// Define FormData type explicitly to match required fields
 type FormData = {
   title: string;
   establishmentId: string;
-  content: PlanPreventionContent;
+  content: {
+    entrepriseUtilisatrice: string;
+    entrepriseExterieure: string;
+    natureTravaux: string;
+    risquesIdentifies: any[];
+    mesuresPrevention: any[];
+    preventionIncendie?: string;
+  };
 };
 
 // Schéma de validation correctement typé
@@ -35,8 +41,6 @@ const PlanPreventionCreate = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
-  const [newRisque, setNewRisque] = useState('');
-  const [newMesure, setNewMesure] = useState('');
   
   // Initialiser le formulaire avec react-hook-form
   const {
@@ -62,10 +66,6 @@ const PlanPreventionCreate = () => {
       },
     },
   });
-  
-  // Observer les valeurs actuelles des listes
-  const risquesIdentifies = watch('content.risquesIdentifies');
-  const mesuresPrevention = watch('content.mesuresPrevention');
   
   // Liste d'établissements fictifs pour le prototype
   const establishments = [
@@ -110,45 +110,11 @@ const PlanPreventionCreate = () => {
       setValue('content.entrepriseUtilisatrice', aiContent.entrepriseUtilisatrice);
       setValue('content.entrepriseExterieure', aiContent.entrepriseExterieure);
       setValue('content.natureTravaux', aiContent.natureTravaux);
-      setValue('content.risquesIdentifies', aiContent.risquesIdentifies);
-      setValue('content.mesuresPrevention', aiContent.mesuresPrevention);
     } catch (error) {
       console.error('Erreur lors de la génération IA:', error);
     } finally {
       setGeneratingAI(false);
     }
-  };
-  
-  const addRisque = () => {
-    if (!newRisque.trim()) return;
-    
-    const updatedRisques = risquesIdentifies ? [...risquesIdentifies, newRisque] : [newRisque];
-    setValue('content.risquesIdentifies', updatedRisques);
-    setNewRisque('');
-  };
-  
-  const removeRisque = (index: number) => {
-    if (!risquesIdentifies) return;
-    
-    const updatedRisques = [...risquesIdentifies];
-    updatedRisques.splice(index, 1);
-    setValue('content.risquesIdentifies', updatedRisques);
-  };
-  
-  const addMesure = () => {
-    if (!newMesure.trim()) return;
-    
-    const updatedMesures = mesuresPrevention ? [...mesuresPrevention, newMesure] : [newMesure];
-    setValue('content.mesuresPrevention', updatedMesures);
-    setNewMesure('');
-  };
-  
-  const removeMesure = (index: number) => {
-    if (!mesuresPrevention) return;
-    
-    const updatedMesures = [...mesuresPrevention];
-    updatedMesures.splice(index, 1);
-    setValue('content.mesuresPrevention', updatedMesures);
   };
   
   return (
@@ -181,7 +147,7 @@ const PlanPreventionCreate = () => {
                         className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
                           errors.title ? 'border-accentRouge' : 'border-formBorder'
                         }`}
-                        placeholder="Titre du plan de prévention"
+                        placeholder="Titre du plan"
                         {...field}
                       />
                     )}
@@ -232,180 +198,126 @@ const PlanPreventionCreate = () => {
                 </RelumeButton>
               </div>
               
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="entrepriseUtilisatrice" className="block text-sm font-medium mb-1 text-textPrincipal">
-                      Entreprise utilisatrice*
-                    </label>
-                    <Controller
-                      name="content.entrepriseUtilisatrice"
-                      control={control}
-                      render={({ field }) => (
-                        <input
-                          id="entrepriseUtilisatrice"
-                          className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                            errors.content?.entrepriseUtilisatrice ? 'border-accentRouge' : 'border-formBorder'
-                          }`}
-                          placeholder="Nom de l'entreprise utilisatrice"
-                          {...field}
-                        />
-                      )}
-                    />
-                    {errors.content?.entrepriseUtilisatrice && (
-                      <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseUtilisatrice.message}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="entrepriseExterieure" className="block text-sm font-medium mb-1 text-textPrincipal">
-                      Entreprise extérieure*
-                    </label>
-                    <Controller
-                      name="content.entrepriseExterieure"
-                      control={control}
-                      render={({ field }) => (
-                        <input
-                          id="entrepriseExterieure"
-                          className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                            errors.content?.entrepriseExterieure ? 'border-accentRouge' : 'border-formBorder'
-                          }`}
-                          placeholder="Nom de l'entreprise extérieure"
-                          {...field}
-                        />
-                      )}
-                    />
-                    {errors.content?.entrepriseExterieure && (
-                      <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseExterieure.message}</p>
-                    )}
-                  </div>
-                </div>
-                
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="natureTravaux" className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Nature des travaux*
+                  <label htmlFor="entrepriseUtilisatrice" className="block text-sm font-medium mb-1 text-textPrincipal">
+                    Entreprise utilisatrice*
                   </label>
                   <Controller
-                    name="content.natureTravaux"
+                    name="content.entrepriseUtilisatrice"
                     control={control}
                     render={({ field }) => (
-                      <textarea
-                        id="natureTravaux"
-                        rows={3}
+                      <input
+                        id="entrepriseUtilisatrice"
                         className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                          errors.content?.natureTravaux ? 'border-accentRouge' : 'border-formBorder'
+                          errors.content?.entrepriseUtilisatrice ? 'border-accentRouge' : 'border-formBorder'
                         }`}
-                        placeholder="Description détaillée des travaux à effectuer..."
+                        placeholder="Nom de l'entreprise"
                         {...field}
-                      ></textarea>
+                      />
                     )}
                   />
-                  {errors.content?.natureTravaux && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.content.natureTravaux.message}</p>
+                  {errors.content?.entrepriseUtilisatrice && (
+                    <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseUtilisatrice.message}</p>
                   )}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Risques identifiés*
+                  <label htmlFor="entrepriseExterieure" className="block text-sm font-medium mb-1 text-textPrincipal">
+                    Entreprise extérieure*
                   </label>
-                  <div className="mb-2">
-                    <div className="flex gap-2">
+                  <Controller
+                    name="content.entrepriseExterieure"
+                    control={control}
+                    render={({ field }) => (
                       <input
-                        type="text"
-                        className="flex-grow border border-formBorder rounded-md p-2.5 bg-formBackground text-textPrincipal"
-                        placeholder="Nouveau risque identifié"
-                        value={newRisque}
-                        onChange={(e) => setNewRisque(e.target.value)}
+                        id="entrepriseExterieure"
+                        className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
+                          errors.content?.entrepriseExterieure ? 'border-accentRouge' : 'border-formBorder'
+                        }`}
+                        placeholder="Nom de l'entreprise"
+                        {...field}
                       />
-                      <RelumeButton
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={addRisque}
-                      >
-                        Ajouter
-                      </RelumeButton>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 mt-3">
-                    {risquesIdentifies && risquesIdentifies.length > 0 ? (
-                      risquesIdentifies.map((risque, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-formBackground p-2 rounded-md border border-formBorder"
-                        >
-                          <span>{risque}</span>
-                          <button
-                            type="button"
-                            className="text-accentRouge hover:text-accentRouge/80 p-1"
-                            onClick={() => removeRisque(index)}
-                          >
-                            &times;
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-textPrincipal/60 italic">Aucun risque identifié</p>
                     )}
-                  </div>
-                  
-                  {errors.content?.risquesIdentifies && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.content.risquesIdentifies.message}</p>
+                  />
+                  {errors.content?.entrepriseExterieure && (
+                    <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseExterieure.message}</p>
                   )}
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Mesures de prévention*
-                  </label>
-                  <div className="mb-2">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        className="flex-grow border border-formBorder rounded-md p-2.5 bg-formBackground text-textPrincipal"
-                        placeholder="Nouvelle mesure de prévention"
-                        value={newMesure}
-                        onChange={(e) => setNewMesure(e.target.value)}
-                      />
-                      <RelumeButton
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={addMesure}
-                      >
-                        Ajouter
-                      </RelumeButton>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 mt-3">
-                    {mesuresPrevention && mesuresPrevention.length > 0 ? (
-                      mesuresPrevention.map((mesure, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-formBackground p-2 rounded-md border border-formBorder"
-                        >
-                          <span>{mesure}</span>
-                          <button
-                            type="button"
-                            className="text-accentRouge hover:text-accentRouge/80 p-1"
-                            onClick={() => removeMesure(index)}
-                          >
-                            &times;
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-textPrincipal/60 italic">Aucune mesure de prévention définie</p>
-                    )}
-                  </div>
-                  
-                  {errors.content?.mesuresPrevention && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.content.mesuresPrevention.message}</p>
+              </div>
+              
+              <div>
+                <label htmlFor="natureTravaux" className="block text-sm font-medium mb-1 text-textPrincipal">
+                  Nature des travaux*
+                </label>
+                <Controller
+                  name="content.natureTravaux"
+                  control={control}
+                  render={({ field }) => (
+                    <textarea
+                      id="natureTravaux"
+                      rows={4}
+                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
+                        errors.content?.natureTravaux ? 'border-accentRouge' : 'border-formBorder'
+                      }`}
+                      placeholder="Description détaillée des travaux"
+                      {...field}
+                    ></textarea>
                   )}
-                </div>
+                />
+                {errors.content?.natureTravaux && (
+                  <p className="mt-1 text-sm text-accentRouge">{errors.content.natureTravaux.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-textPrincipal">
+                  Risques identifiés*
+                </label>
+                {/* Ajoutez ici une liste de risques avec des checkboxes ou un système de tags */}
+                {/* Exemple simplifié avec une entrée de texte */}
+                <Controller
+                  name="content.risquesIdentifies"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="text"
+                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
+                        errors.content?.risquesIdentifies ? 'border-accentRouge' : 'border-formBorder'
+                      }`}
+                      placeholder="Risques (ex: chute de hauteur, risque électrique)"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.content?.risquesIdentifies && (
+                  <p className="mt-1 text-sm text-accentRouge">{errors.content.risquesIdentifies.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-textPrincipal">
+                  Mesures de prévention*
+                </label>
+                {/* Ajoutez ici une liste de mesures de prévention avec des checkboxes ou un système de tags */}
+                {/* Exemple simplifié avec une entrée de texte */}
+                <Controller
+                  name="content.mesuresPrevention"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="text"
+                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
+                        errors.content?.mesuresPrevention ? 'border-accentRouge' : 'border-formBorder'
+                      }`}
+                      placeholder="Mesures (ex: port du casque, consignation électrique)"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.content?.mesuresPrevention && (
+                  <p className="mt-1 text-sm text-accentRouge">{errors.content.mesuresPrevention.message}</p>
+                )}
               </div>
               
               <div className="flex justify-end gap-3 pt-6">

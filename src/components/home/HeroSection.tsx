@@ -1,5 +1,5 @@
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FireExtinguisher } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -7,9 +7,13 @@ const HeroSection = () => {
   return (
     <section className="py-32 px-4 text-center bg-dark">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
-          <span className="text-dark-foreground">Que voulez-vous créer?</span>
-        </h1>
+        <div className="flex items-center justify-center mb-6">
+          <FireExtinguisher className="h-8 w-8 text-accent mr-3" aria-hidden="true" />
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+            <span className="text-dark-foreground">Secu<span className="text-accent">Genie</span></span>
+          </h1>
+        </div>
+        
         <h2 className="text-xl md:text-2xl mb-10 text-dark-secondary">
           Générez, modifiez et déployez des documents de sécurité professionnels <span className="text-accent">en quelques minutes</span>
         </h2>
