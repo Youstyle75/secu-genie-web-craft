@@ -1,115 +1,210 @@
+
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { SecurityDocument, documentContentToHTML } from '@/types/securityDocument';
+import { RelumeButton } from '@/components/ui/relume-button';
+import { RelumeCard, RelumeCardContent, RelumeCardHeader, RelumeCardTitle } from '@/components/ui/relume-card';
 import Layout from '@/components/layout/Layout';
-import { SecurityDocument } from '@/types/securityDocument';
-import { toast } from 'sonner';
+
+// Import service
+import securityDocumentService from '@/services/securityDocumentService';
 
 const DocumentExport = () => {
-  const { id } = useParams<{ id: string }>();
   const [document, setDocument] = useState<SecurityDocument | null>(null);
-
+  const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  
   useEffect(() => {
-    if (!id) {
-      console.error("Document ID is missing.");
-      return;
+    if (id) {
+      // Récupérer le document à partir du service
+      const doc = securityDocumentService.getDocumentById(id);
+      if (doc) {
+        setDocument(doc);
+      }
+      setLoading(false);
     }
-
-    // Mock fetch function to simulate API call
-    const fetchDocument = async (documentId: string): Promise<SecurityDocument> => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Mock data for demonstration
-          const mockDocument: SecurityDocument = {
-            id: documentId,
-            title: 'Mock Document Title',
-            documentType: 'NoticeSecurite',
-            status: 'brouillon',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            userId: 'mockUserId',
-            establishmentId: 'mockEstablishmentId',
-            content: {
-              descriptionEtablissement: 'This is a mock establishment description.',
-              moyensSecours: 'Mock emergency resources',
-              consignesEvacuation: 'Mock evacuation instructions',
-            },
-            createElement: (tag: string) => document.createElement(tag),
-            getElementById: (elementId: string) => document.getElementById(elementId),
-            body: document.body,
-          };
-          resolve(mockDocument);
-        }, 500);
-      });
-    };
-
-    fetchDocument(id)
-      .then(setDocument)
-      .catch((error) => {
-        console.error("Failed to fetch document:", error);
-        toast.error("Failed to load document");
-      });
   }, [id]);
-
-  const exportDocumentToPdf = async () => {
-    if (!document) {
-      toast.error("Document not loaded yet.");
-      return;
-    }
-
+  
+  const handleExportPDF = async () => {
+    if (!document) return;
+    
+    setExporting(true);
+    
     try {
-      const container = document.createElement ? document.createElement('div') : document.content;
-      if (document.body) document.body.appendChild(container);
-      container.innerHTML = `
-        <div style="padding: 20px; font-family: 'Arial', sans-serif;">
-          <h1 style="font-size: 24px; color: #333; margin-bottom: 20px;">${document.title}</h1>
-          <p style="font-size: 16px; color: #666;">${document.content.descriptionEtablissement}</p>
-          <h2 style="font-size: 20px; color: #333; margin-top: 30px; margin-bottom: 10px;">Emergency Resources</h2>
-          <p style="font-size: 16px; color: #666;">${document.content.moyensSecours}</p>
-          <h2 style="font-size: 20px; color: #333; margin-top: 30px; margin-bottom: 10px;">Evacuation Instructions</h2>
-          <p style="font-size: 16px; color: #666;">${document.content.consignesEvacuation}</p>
-        </div>
-      `;
-
+      // Créer un conteneur temporaire pour le rendu du document
+      const container = document.createElement('div');
+      container.className = 'document-export-container';
+      container.style.width = '210mm'; // Format A4
+      container.style.padding = '15mm';
+      container.style.backgroundColor = 'white';
+      container.style.boxSizing = 'border-box';
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      
+      document.body.appendChild(container);
+      
+      // Rendre le contenu du document dans le conteneur
+      const htmlContent = documentContentToHTML(document);
+      container.appendChild(htmlContent);
+      
+      // Convertir en canvas puis PDF
       const canvas = await html2canvas(container, {
         scale: 2,
+        logging: false,
         useCORS: true,
       });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${document.title}.pdf`);
-
-      if (document.body) document.body.removeChild(container);
-      toast.success("Document exported successfully!");
+      
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      
+      // Télécharger le PDF
+      const filename = `${document.title.replace(/\s+/g, '_')}.pdf`;
+      pdf.save(filename);
+      
+      // Nettoyer
+      document.body.removeChild(container);
+      
     } catch (error) {
-      console.error("Error exporting document:", error);
-      toast.error("Failed to export document.");
+      console.error('Erreur lors de l'exportation PDF:', error);
+    } finally {
+      setExporting(false);
     }
   };
-
+  
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-spin h-12 w-12 border-4 border-accentBleu border-t-transparent rounded-full"></div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (!document) {
+    return (
+      <Layout>
+        <RelumeCard variant="flat" className="max-w-2xl mx-auto mt-8">
+          <RelumeCardHeader>
+            <RelumeCardTitle>Document non trouvé</RelumeCardTitle>
+          </RelumeCardHeader>
+          <RelumeCardContent>
+            <p className="mb-4">Le document demandé n'existe pas ou a été supprimé.</p>
+            <RelumeButton variant="default" onClick={() => navigate(-1)}>
+              Retour
+            </RelumeButton>
+          </RelumeCardContent>
+        </RelumeCard>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-4">Export Document</h1>
-        {document ? (
-          <div>
-            <h2 className="text-xl mb-2">{document.title}</h2>
-            <button
-              onClick={exportDocumentToPdf}
-              className="bg-accentBleu hover:bg-accentBleu/80 text-white font-bold py-2 px-4 rounded"
+      <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-textPrincipal">Exporter le document</h1>
+          <div className="flex gap-4">
+            <RelumeButton 
+              variant="secondary" 
+              onClick={() => navigate(`/documents/${id}`)}
             >
-              Export to PDF
-            </button>
+              Retour au document
+            </RelumeButton>
+            <RelumeButton 
+              variant="default" 
+              onClick={handleExportPDF} 
+              disabled={exporting}
+            >
+              {exporting ? 'Export en cours...' : 'Exporter en PDF'}
+            </RelumeButton>
           </div>
-        ) : (
-          <p>Loading document...</p>
-        )}
+        </div>
+        
+        <RelumeCard variant="default" className="mb-8 p-8 shadow-relume-medium">
+          <div className="document-preview">
+            <h1 className="text-3xl font-bold mb-6 text-center border-b pb-4">{document.title}</h1>
+            
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-textPrincipal/70 mb-2">
+                <span>Créé le: {new Date(document.createdAt).toLocaleDateString()}</span>
+                <span>Type: {document.documentType}</span>
+              </div>
+              <div className="flex justify-between text-sm text-textPrincipal/70">
+                <span>Statut: {document.status}</span>
+                <span>Version: {document.version || "1.0"}</span>
+              </div>
+            </div>
+            
+            <div className="document-content space-y-8">
+              {document.documentType === 'NoticeSecurite' && (
+                <>
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Description de l'établissement</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.descriptionEtablissement || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Moyens de secours</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.moyensSecours || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Consignes d'évacuation</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.consignesEvacuation || 'Non spécifié'}
+                    </div>
+                  </section>
+                </>
+              )}
+              
+              {/* Autres types de documents... */}
+            </div>
+            
+            {document.status === 'signe' && (
+              <div className="mt-12 border-t pt-6">
+                <h3 className="text-lg font-medium mb-4">Document signé</h3>
+                <div className="flex justify-end">
+                  <div className="signature-placeholder w-64 h-24 border border-dashed border-accentBleu rounded-md flex items-center justify-center">
+                    <p className="text-sm text-accentBleu">Signature électronique</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </RelumeCard>
+        
+        <div className="flex justify-center gap-4">
+          <RelumeButton 
+            variant="outline" 
+            onClick={() => navigate(-1)}
+          >
+            Annuler
+          </RelumeButton>
+          <RelumeButton 
+            variant="default" 
+            onClick={handleExportPDF} 
+            disabled={exporting}
+          >
+            {exporting ? 'Export en cours...' : 'Exporter en PDF'}
+          </RelumeButton>
+        </div>
       </div>
     </Layout>
   );
