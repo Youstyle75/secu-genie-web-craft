@@ -5,10 +5,19 @@ import Layout from '@/components/layout/Layout';
 import { RelumeButton } from '@/components/ui/relume-button';
 import { RelumeCard, RelumeCardContent, RelumeCardHeader, RelumeCardTitle } from '@/components/ui/relume-card';
 import SignaturePad from '@/components/documents/SignaturePad';
-import { SecurityDocument } from '@/types/securityDocument';
+import { SecurityDocument, NoticeSecuriteContent, PlanPreventionContent, GN6Content } from '@/types/securityDocument';
 
 // Import service
 import securityDocumentService from '@/services/securityDocumentService';
+
+// Type guards for content types
+const isNoticeSecurite = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is NoticeSecuriteContent => {
+  return 'descriptionEtablissement' in content && 'moyensSecours' in content && 'consignesEvacuation' in content;
+};
+
+const isPlanPrevention = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is PlanPreventionContent => {
+  return 'entrepriseUtilisatrice' in content && 'entrepriseExterieure' in content && 'natureTravaux' in content;
+};
 
 const DocumentSign = () => {
   const [document, setDocument] = useState<SecurityDocument | null>(null);
@@ -30,7 +39,7 @@ const DocumentSign = () => {
     }
   }, [id]);
   
-  const handleSignatureChange = (dataUrl: string) => {
+  const handleSignatureCapture = (dataUrl: string) => {
     setSignatureImage(dataUrl);
   };
   
@@ -105,7 +114,7 @@ const DocumentSign = () => {
               <h3 className="text-lg font-medium mb-3 text-accentBleu">Résumé du document</h3>
               
               <div className="bg-formBackground p-4 rounded-lg border border-formBorder mb-4">
-                {document.documentType === 'NoticeSecurite' && (
+                {document.documentType === 'NoticeSecurite' && isNoticeSecurite(document.content) && (
                   <>
                     <div className="mb-2">
                       <span className="font-medium">Type de document:</span> Notice de Sécurité
@@ -118,6 +127,20 @@ const DocumentSign = () => {
                         <span className="font-medium">Prévention incendie:</span> {document.content.preventionIncendie?.substring(0, 100)}...
                       </div>
                     )}
+                  </>
+                )}
+                
+                {document.documentType === 'PlanPrevention' && isPlanPrevention(document.content) && (
+                  <>
+                    <div className="mb-2">
+                      <span className="font-medium">Type de document:</span> Plan de Prévention
+                    </div>
+                    <div className="mb-2">
+                      <span className="font-medium">Entreprise utilisatrice:</span> {document.content.entrepriseUtilisatrice}
+                    </div>
+                    <div className="mb-2">
+                      <span className="font-medium">Nature des travaux:</span> {document.content.natureTravaux?.substring(0, 100)}...
+                    </div>
                   </>
                 )}
                 
@@ -148,7 +171,7 @@ const DocumentSign = () => {
               </div>
               
               <div className="signature-pad-container border border-formBorder rounded-lg overflow-hidden">
-                <SignaturePad onSignatureChange={handleSignatureChange} />
+                <SignaturePad onSignatureCapture={handleSignatureCapture} />
               </div>
               
               <div className="flex justify-end gap-3">

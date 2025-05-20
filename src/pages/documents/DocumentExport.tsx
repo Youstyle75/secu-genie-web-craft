@@ -3,13 +3,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { SecurityDocument, documentContentToHTML } from '@/types/securityDocument';
+import { SecurityDocument, documentContentToHTML, NoticeSecuriteContent, PlanPreventionContent, GN6Content } from '@/types/securityDocument';
 import { RelumeButton } from '@/components/ui/relume-button';
 import { RelumeCard, RelumeCardContent, RelumeCardHeader, RelumeCardTitle } from '@/components/ui/relume-card';
 import Layout from '@/components/layout/Layout';
 
 // Import service
 import securityDocumentService from '@/services/securityDocumentService';
+
+// Type guards for content types
+const isNoticeSecurite = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is NoticeSecuriteContent => {
+  return 'descriptionEtablissement' in content && 'moyensSecours' in content && 'consignesEvacuation' in content;
+};
+
+const isPlanPrevention = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is PlanPreventionContent => {
+  return 'entrepriseUtilisatrice' in content && 'entrepriseExterieure' in content && 'natureTravaux' in content;
+};
 
 const DocumentExport = () => {
   const [document, setDocument] = useState<SecurityDocument | null>(null);
@@ -149,7 +158,7 @@ const DocumentExport = () => {
             </div>
             
             <div className="document-content space-y-8">
-              {document.documentType === 'NoticeSecurite' && (
+              {document.documentType === 'NoticeSecurite' && isNoticeSecurite(document.content) && (
                 <>
                   <section>
                     <h2 className="text-xl font-semibold mb-2 text-accentBleu">Description de l'établissement</h2>
@@ -174,7 +183,30 @@ const DocumentExport = () => {
                 </>
               )}
               
-              {/* Autres types de documents... */}
+              {document.documentType === 'PlanPrevention' && isPlanPrevention(document.content) && (
+                <>
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Entreprise utilisatrice</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.entrepriseUtilisatrice || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Entreprise extérieure</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.entrepriseExterieure || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Nature des travaux</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.natureTravaux || 'Non spécifié'}
+                    </div>
+                  </section>
+                </>
+              )}
             </div>
             
             {document.status === 'signe' && (

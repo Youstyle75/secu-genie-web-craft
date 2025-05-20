@@ -1,13 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { RelumeButton } from '@/components/ui/relume-button';
 import { RelumeCard, RelumeCardContent, RelumeCardHeader, RelumeCardTitle } from '@/components/ui/relume-card';
-import { SecurityDocument, Comment } from '@/types/securityDocument';
+import { SecurityDocument, Comment, NoticeSecuriteContent, PlanPreventionContent, GN6Content } from '@/types/securityDocument';
 
 // Import service
 import securityDocumentService from '@/services/securityDocumentService';
+
+// Type guards for content types
+const isNoticeSecurite = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is NoticeSecuriteContent => {
+  return 'descriptionEtablissement' in content && 'moyensSecours' in content && 'consignesEvacuation' in content;
+};
+
+const isPlanPrevention = (content: NoticeSecuriteContent | PlanPreventionContent | GN6Content): content is PlanPreventionContent => {
+  return 'entrepriseUtilisatrice' in content && 'entrepriseExterieure' in content && 'natureTravaux' in content;
+};
 
 const DocumentReview = () => {
   const [document, setDocument] = useState<SecurityDocument | null>(null);
@@ -179,7 +187,7 @@ const DocumentReview = () => {
         {activeTab === 'content' && (
           <RelumeCard variant="default" className="mb-8">
             <div className="document-content p-6 space-y-8">
-              {document.documentType === 'NoticeSecurite' && (
+              {document.documentType === 'NoticeSecurite' && isNoticeSecurite(document.content) && (
                 <>
                   <section>
                     <h2 className="text-xl font-semibold mb-2 text-accentBleu">Description de l'établissement</h2>
@@ -210,6 +218,44 @@ const DocumentReview = () => {
                       </div>
                     </section>
                   )}
+                </>
+              )}
+              
+              {document.documentType === 'PlanPrevention' && isPlanPrevention(document.content) && (
+                <>
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Entreprise utilisatrice</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.entrepriseUtilisatrice || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Entreprise extérieure</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.entrepriseExterieure || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Nature des travaux</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      {document.content.natureTravaux || 'Non spécifié'}
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 className="text-xl font-semibold mb-2 text-accentBleu">Risques identifiés</h2>
+                    <div className="bg-formBackground p-4 rounded-lg border border-formBorder">
+                      <ul className="list-disc list-inside">
+                        {document.content.risquesIdentifies && document.content.risquesIdentifies.length > 0 ? 
+                          document.content.risquesIdentifies.map((risque, index) => (
+                            <li key={index} className="mb-1">{risque}</li>
+                          )) : 'Aucun risque identifié'
+                        }
+                      </ul>
+                    </div>
+                  </section>
                 </>
               )}
               

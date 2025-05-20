@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
@@ -9,6 +8,12 @@ import { RelumeButton } from '@/components/ui/relume-button';
 import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from '@/components/ui/relume-card';
 import { NoticeSecuriteContent } from '@/types/securityDocument';
 import securityDocumentService from '@/services/securityDocumentService';
+
+type FormData = {
+  title: string;
+  establishmentId: string;
+  content: NoticeSecuriteContent;
+};
 
 // Schéma de validation
 const validationSchema = yup.object({
@@ -34,12 +39,8 @@ const NoticeSecuriteCreate = () => {
     setValue,
     getValues,
     reset,
-  } = useForm<{
-    title: string;
-    establishmentId: string;
-    content: NoticeSecuriteContent;
-  }>({
-    resolver: yupResolver(validationSchema),
+  } = useForm<FormData>({
+    resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
@@ -47,6 +48,7 @@ const NoticeSecuriteCreate = () => {
         descriptionEtablissement: '',
         moyensSecours: '',
         consignesEvacuation: '',
+        preventionIncendie: '',
       },
     },
   });
@@ -58,7 +60,7 @@ const NoticeSecuriteCreate = () => {
     { id: 'estab-3', name: 'Restaurant La Bonne Table' },
   ];
   
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: FormData) => {
     setLoading(true);
     
     // Créer un nouveau document via le service
