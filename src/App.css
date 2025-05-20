@@ -1,6 +1,6 @@
 
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0;
   text-align: center;
@@ -13,7 +13,7 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 0 2em rgba(49, 130, 206, 0.2));
 }
 
 @keyframes logo-spin {

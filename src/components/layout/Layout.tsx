@@ -50,8 +50,8 @@ const Layout = ({ children, showBreadcrumb = true, useDarkTheme = false }: Layou
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
-      <main className="flex-grow pt-20">
-        <div className="container mx-auto px-4 md:px-6">
+      <main className="flex-grow pt-24 md:pt-28">
+        <div className="container-large mx-auto">
           {showBreadcrumb && <Breadcrumb />}
           {children}
         </div>

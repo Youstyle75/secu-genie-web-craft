@@ -37,45 +37,45 @@ const Header = () => {
   
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white shadow-md py-2' : 'bg-white py-4'
+      isScrolled ? 'bg-white shadow-sm-relume py-3' : 'bg-white py-5'
     }`}>
-      <div className="container mx-auto px-4">
+      <div className="container-large mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo with Shield icon instead of image */}
           <Link to="/" className="flex items-center">
-            <Shield className="h-8 w-8 text-blue-500 mr-2" aria-hidden="true" />
-            <span className="text-xl font-bold">Secu<span className="text-blue-500">Genie</span></span>
+            <Shield className="h-8 w-8 text-accent mr-2" aria-hidden="true" />
+            <span className="text-xl font-bold">Secu<span className="text-accent">Genie</span></span>
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-10">
             <Link 
               to="/" 
-              className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-accent' : 'text-textPrincipal hover:text-accent'}`}
             >
               Accueil
             </Link>
             <Link 
               to="/solutions" 
-              className={`text-sm font-medium transition-colors ${isActive('/solutions') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/solutions') ? 'text-accent' : 'text-textPrincipal hover:text-accent'}`}
             >
               Solutions
             </Link>
             <Link 
               to="/about" 
-              className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-accent' : 'text-textPrincipal hover:text-accent'}`}
             >
               À propos
             </Link>
             <Link 
               to="/contact" 
-              className={`text-sm font-medium transition-colors ${isActive('/contact') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/contact') ? 'text-accent' : 'text-textPrincipal hover:text-accent'}`}
             >
               Contact
             </Link>
             <Link 
               to="/faq" 
-              className={`text-sm font-medium transition-colors ${isActive('/faq') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/faq') ? 'text-accent' : 'text-textPrincipal hover:text-accent'}`}
             >
               FAQ
             </Link>
@@ -84,15 +84,15 @@ const Header = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/demo">
-              <Button variant="default" size="sm" className="bg-blue-500 text-white hover:bg-blue-600">
-                Démo
+              <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent/5 font-medium">
+                Essayer la démo
               </Button>
             </Link>
           </div>
           
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-gray-800 p-2"
+            className="md:hidden text-textPrincipal p-2"
             onClick={toggleMenu}
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation menu"
@@ -107,8 +107,8 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
+                className={`text-sm font-medium px-3 py-2 rounded-relume transition-colors ${
+                  isActive('/') ? 'bg-secondary text-accent' : 'text-textPrincipal hover:bg-secondary hover:text-accent'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -116,8 +116,8 @@ const Header = () => {
               </Link>
               <Link 
                 to="/solutions" 
-                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/solutions') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
+                className={`text-sm font-medium px-3 py-2 rounded-relume transition-colors ${
+                  isActive('/solutions') ? 'bg-secondary text-accent' : 'text-textPrincipal hover:bg-secondary hover:text-accent'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -125,8 +125,8 @@ const Header = () => {
               </Link>
               <Link 
                 to="/about" 
-                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/about') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
+                className={`text-sm font-medium px-3 py-2 rounded-relume transition-colors ${
+                  isActive('/about') ? 'bg-secondary text-accent' : 'text-textPrincipal hover:bg-secondary hover:text-accent'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -134,8 +134,8 @@ const Header = () => {
               </Link>
               <Link 
                 to="/contact" 
-                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/contact') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
+                className={`text-sm font-medium px-3 py-2 rounded-relume transition-colors ${
+                  isActive('/contact') ? 'bg-secondary text-accent' : 'text-textPrincipal hover:bg-secondary hover:text-accent'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -143,8 +143,8 @@ const Header = () => {
               </Link>
               <Link 
                 to="/faq" 
-                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/faq') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
+                className={`text-sm font-medium px-3 py-2 rounded-relume transition-colors ${
+                  isActive('/faq') ? 'bg-secondary text-accent' : 'text-textPrincipal hover:bg-secondary hover:text-accent'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -152,10 +152,10 @@ const Header = () => {
               </Link>
               <Link 
                 to="/demo"
-                className="bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
+                className="bg-accent text-white px-3 py-2 rounded-relume text-sm font-medium hover:bg-accent-hover shadow-sm-relume"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Démo
+                Essayer la démo
               </Link>
             </nav>
           </div>
