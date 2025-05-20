@@ -56,7 +56,7 @@ const DocumentExport = () => {
       const canvas = await html2canvas(container, {
         scale: 2,
         logging: false,
-        useCORS: true,
+        useCORS: true
       });
       
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
@@ -64,7 +64,7 @@ const DocumentExport = () => {
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4',
+        format: 'a4'
       });
       
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
@@ -77,7 +77,7 @@ const DocumentExport = () => {
       document.body.removeChild(container);
       
     } catch (error) {
-      console.error('Erreur lors de l'exportation PDF:', error);
+      console.error('Erreur lors de l\'exportation PDF:', error);
     } finally {
       setExporting(false);
     }
