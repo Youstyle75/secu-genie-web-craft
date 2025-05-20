@@ -1,52 +1,43 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import Home from './pages/Home';
+import Solutions from './pages/Solutions';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Faq from './pages/Faq';
+import Demo from './pages/Demo';
+import NotFound from './pages/NotFound';
+import NoticeSecuriteCreate from './pages/documents/notices/NoticeSecuriteCreate';
+import PlanPreventionCreate from './pages/documents/plans/PlanPreventionCreate';
+import DocumentReview from './pages/documents/DocumentReview';
+import DocumentSign from './pages/documents/DocumentSign';
+import DocumentExport from './pages/documents/DocumentExport';
 
-import Home from "./pages/Home";
-import Solutions from "./pages/Solutions";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Demo from "./pages/Demo";
-import Faq from "./pages/Faq";
-import NotFound from "./pages/NotFound";
-import Pricing from "./pages/Pricing";
-import NoticeSecuriteCreate from "./pages/documents/notices/NoticeSecuriteCreate";
-import PlanPreventionCreate from "./pages/documents/plans/PlanPreventionCreate";
-
-const queryClient = new QueryClient();
-
-const App = () => {
-  // Handle scroll to top on route change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/solutions" element={<Solutions />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/faq" element={<Faq />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/documents/notice-securite/creer" element={<NoticeSecuriteCreate />} />
-            <Route path="/documents/plan-prevention/creer" element={<PlanPreventionCreate />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/solutions" element={<Solutions />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/demo" element={<Demo />} />
+        
+        {/* Routes pour les documents */}
+        <Route path="/documents/notice-securite/creer" element={<NoticeSecuriteCreate />} />
+        <Route path="/documents/plan-prevention/creer" element={<PlanPreventionCreate />} />
+        <Route path="/documents/:id/relecture" element={<DocumentReview />} />
+        <Route path="/documents/:id/signer" element={<DocumentSign />} />
+        <Route path="/documents/:id/exporter" element={<DocumentExport />} />
+        
+        {/* Route 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Toaster position="top-right" richColors />
+    </Router>
   );
-};
+}
 
 export default App;

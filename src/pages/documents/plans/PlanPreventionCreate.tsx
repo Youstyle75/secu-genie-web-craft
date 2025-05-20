@@ -4,238 +4,278 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Form, 
-  FormControl, 
-  FormDescription, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { CalendarIcon, PlusCircle, AlertCircle, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Calendar as CalendarIcon, Trash2, PlusCircle, Wand2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 import Layout from '@/components/layout/Layout';
+import apiConfig from '@/config/apiEndpoints';
+import { EstablishmentEvent } from '@/types/establishment';
 
-// Schema pour les risques identifiés
-const risqueSchema = z.object({
-  id: z.string().optional(),
-  description: z.string().min(3, { message: 'La description est requise' }),
-  niveau: z.enum(['faible', 'moyen', 'eleve', 'critique'], {
-    required_error: 'Veuillez sélectionner un niveau de risque',
-  }),
-  zone: z.string().min(1, { message: 'La zone est requise' }),
-});
-
-// Schema pour les mesures de prévention
-const mesureSchema = z.object({
-  id: z.string().optional(),
-  risqueId: z.string().optional(),
-  description: z.string().min(3, { message: 'La description est requise' }),
-  responsable: z.enum(['entrepriseUtilisatrice', 'entrepriseExterieure', 'les deux'], {
-    required_error: 'Veuillez sélectionner un responsable',
-  }),
-  dateRealisation: z.date().optional(),
-  statut: z.enum(['planifiee', 'en cours', 'realisee'], {
-    required_error: 'Veuillez sélectionner un statut',
-  }),
-});
-
-// Schema pour le personnel autorisé
-const personnelSchema = z.object({
-  id: z.string().optional(),
-  nom: z.string().min(1, { message: 'Le nom est requis' }),
-  prenom: z.string().min(1, { message: 'Le prénom est requis' }),
-  fonction: z.string().min(1, { message: 'La fonction est requise' }),
-  entreprise: z.enum(['utilisatrice', 'exterieure'], {
-    required_error: 'Veuillez sélectionner une entreprise',
-  }),
-  autorisation: z.array(z.string()).min(1, { message: 'Au moins une autorisation est requise' }),
-});
-
-// Schema de validation pour le formulaire de Plan de Prévention
+// Schéma de validation pour le formulaire Plan de Prévention
 const planPreventionSchema = z.object({
-  title: z.string().min(3, { message: 'Le titre doit contenir au moins 3 caractères' }),
-  entrepriseUtilisatrice: z.string().min(3, { message: 'Le nom de l\'entreprise utilisatrice est requis' }),
-  entrepriseExterieure: z.string().min(3, { message: 'Le nom de l\'entreprise extérieure est requis' }),
-  natureTravaux: z.string().min(10, { message: 'Veuillez décrire la nature des travaux' }),
-  dateDebutTravaux: z.date({ required_error: 'La date de début est requise' }),
-  dateFinTravaux: z.date({ required_error: 'La date de fin est requise' }),
-  lieuIntervention: z.string().min(3, { message: 'Le lieu d\'intervention est requis' }),
-  risquesIdentifies: z.array(risqueSchema).min(1, { message: 'Au moins un risque doit être identifié' }),
-  mesuresPrevention: z.array(mesureSchema).min(1, { message: 'Au moins une mesure de prévention est requise' }),
-  personnelAutorise: z.array(personnelSchema).optional().default([]),
-  materielsUtilises: z.string().optional(),
-  consignesParticulieres: z.string().optional(),
+  title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères" }),
+  establishmentId: z.string().min(1, { message: "Veuillez sélectionner un établissement" }),
+  entrepriseUtilisatrice: z.string().min(3, { message: "Veuillez indiquer le nom de l'entreprise utilisatrice" }),
+  entrepriseExterieure: z.string().min(3, { message: "Veuillez indiquer le nom de l'entreprise extérieure" }),
+  natureTravaux: z.string().min(10, { message: "La nature des travaux doit être détaillée (min. 10 caractères)" }),
+  dateDebutTravaux: z.date({ required_error: "La date de début est requise" }),
+  dateFinTravaux: z.date({ required_error: "La date de fin est requise" }),
+  lieuIntervention: z.string().min(5, { message: "Veuillez préciser le lieu d'intervention" }),
+  risquesIdentifies: z.array(z.object({
+    id: z.string(),
+    description: z.string().min(5, { message: "La description du risque est requise" }),
+    niveau: z.enum(['faible', 'moyen', 'eleve', 'critique']),
+    zone: z.string()
+  })).min(1, { message: "Au moins un risque doit être identifié" }),
+  mesuresPrevention: z.array(z.object({
+    id: z.string(),
+    risqueId: z.string(),
+    description: z.string().min(5, { message: "La description de la mesure est requise" }),
+    responsable: z.enum(['entrepriseUtilisatrice', 'entrepriseExterieure', 'les deux']),
+    statut: z.enum(['planifiee', 'en cours', 'realisee'])
+  })),
+  personnelAutorise: z.array(z.object({
+    id: z.string(),
+    nom: z.string().min(2, { message: "Le nom est requis" }),
+    prenom: z.string().min(2, { message: "Le prénom est requis" }),
+    fonction: z.string().min(2, { message: "La fonction est requise" }),
+    entreprise: z.enum(['utilisatrice', 'exterieure']),
+    autorisation: z.array(z.string())
+  })),
+  materielsUtilises: z.string(),
+  consignesParticulieres: z.string()
 });
 
-type PlanPreventionForm = z.infer<typeof planPreventionSchema>;
+type PlanPreventionFormValues = z.infer<typeof planPreventionSchema>;
+
+// Générer un ID unique
+const generateId = () => `id_${Math.random().toString(36).substring(2, 11)}`;
 
 const PlanPreventionCreate = () => {
-  const [currentTab, setCurrentTab] = useState('informations');
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [currentTab, setCurrentTab] = useState("informations");
+  const [establishments, setEstablishments] = useState<EstablishmentEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
+  const [currentField, setCurrentField] = useState<string | null>(null);
   
-  // Options pour les autorisations du personnel
-  const autorisationOptions = [
-    { id: 'electricite', label: 'Habilitation électrique' },
-    { id: 'hauteur', label: 'Travail en hauteur' },
-    { id: 'espaces_confines', label: 'Espaces confinés' },
-    { id: 'levage', label: 'Conduite d\'engins de levage' },
-    { id: 'produits_chimiques', label: 'Manipulation de produits chimiques' },
-  ];
-  
-  const form = useForm<PlanPreventionForm>({
+  // Initialiser le formulaire
+  const form = useForm<PlanPreventionFormValues>({
     resolver: zodResolver(planPreventionSchema),
     defaultValues: {
-      title: '',
-      entrepriseUtilisatrice: '',
-      entrepriseExterieure: '',
-      natureTravaux: '',
-      lieuIntervention: '',
-      risquesIdentifies: [{ description: '', niveau: 'moyen', zone: '' }],
-      mesuresPrevention: [{ description: '', responsable: 'les deux', statut: 'planifiee' }],
-      personnelAutorise: [],
-      materielsUtilises: '',
-      consignesParticulieres: '',
+      title: "",
+      establishmentId: "",
+      entrepriseUtilisatrice: "",
+      entrepriseExterieure: "",
+      natureTravaux: "",
+      dateDebutTravaux: undefined,
+      dateFinTravaux: undefined,
+      lieuIntervention: "",
+      risquesIdentifies: [
+        {
+          id: generateId(),
+          description: "",
+          niveau: "moyen",
+          zone: ""
+        }
+      ],
+      mesuresPrevention: [],
+      personnelAutorise: [
+        {
+          id: generateId(),
+          nom: "",
+          prenom: "",
+          fonction: "",
+          entreprise: "exterieure",
+          autorisation: []
+        }
+      ],
+      materielsUtilises: "",
+      consignesParticulieres: ""
     }
   });
   
-  const { fields: risquesFields, append: appendRisque, remove: removeRisque } = useFieldArray({
+  // Gestion des tableaux de champs avec useFieldArray
+  const risquesArray = useFieldArray({
     control: form.control,
-    name: 'risquesIdentifies',
+    name: "risquesIdentifies"
   });
   
-  const { fields: mesuresFields, append: appendMesure, remove: removeMesure } = useFieldArray({
+  const mesuresArray = useFieldArray({
     control: form.control,
-    name: 'mesuresPrevention',
+    name: "mesuresPrevention"
   });
   
-  const { fields: personnelFields, append: appendPersonnel, remove: removePersonnel } = useFieldArray({
+  const personnelArray = useFieldArray({
     control: form.control,
-    name: 'personnelAutorise',
+    name: "personnelAutorise"
   });
   
-  const onSubmit = async (data: PlanPreventionForm) => {
+  // Simuler la récupération des établissements (à remplacer par un appel API réel)
+  useState(() => {
+    // Simulation d'un appel API
+    setEstablishments([
+      {
+        id: "1",
+        nom: "Usine Alpha",
+        type: "Site industriel",
+        adresse: {
+          rue: "10 Rue de l'Industrie",
+          codePostal: "69000",
+          ville: "Lyon",
+          pays: "France"
+        },
+        jauge: 200,
+        specificDetails: {
+          surface: 5000,
+          activitePrincipale: "Production industrielle",
+        },
+        userId: "user123",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "2",
+        nom: "Entrepôt Beta",
+        type: "Entrepôt logistique",
+        adresse: {
+          rue: "5 Avenue Logistique",
+          codePostal: "33000",
+          ville: "Bordeaux",
+          pays: "France"
+        },
+        jauge: 100,
+        specificDetails: {
+          surface: 8000,
+          activitePrincipale: "Stockage et logistique",
+        },
+        userId: "user123",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ]);
+  }, []);
+  
+  // Fonction pour soumettre le formulaire
+  const onSubmit = async (data: PlanPreventionFormValues) => {
     try {
-      // Simulation d'un appel API
-      console.log('Données soumises:', data);
+      setIsLoading(true);
       
-      toast({
-        title: "Plan de prévention créé",
-        description: "Votre document a été enregistré avec succès.",
-        variant: "default",
-      });
+      // Simuler un appel API
+      console.log("Données à envoyer:", data);
       
-      // Redirection vers la page de détail du document
-      navigate('/documents/plan-prevention/123'); // ID de démo
+      toast.success("Plan de prévention créé avec succès");
+      // Rediriger vers la page de relecture (simulée)
+      setTimeout(() => {
+        navigate("/documents/new-plan-id/relecture");
+      }, 1500);
+      
     } catch (error) {
-      console.error('Erreur lors de la création du plan:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la création du document.",
-        variant: "destructive",
-      });
+      console.error("Erreur lors de la création du plan de prévention:", error);
+      toast.error("Une erreur est survenue lors de la création du plan de prévention");
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const handleSuggestWithAI = async (field: keyof PlanPreventionForm | string) => {
-    setIsGeneratingAi(true);
-    
+  // Fonction pour récupérer une suggestion IA pour un champ
+  const getSuggestion = async (field: string) => {
     try {
-      // Récupérer les données pertinentes du formulaire
+      setIsSuggesting(true);
+      setCurrentField(field);
+      
+      // Collecter les données pertinentes du formulaire
       const formData = form.getValues();
       
-      // Simulation d'un appel API IA
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simuler un délai
+      // Construire le prompt en fonction du champ
+      const promptData = {
+        field,
+        establishmentData: establishments.find(e => e.id === formData.establishmentId),
+        currentValues: formData
+      };
       
-      // Exemple de réponse générée
-      let generatedText = '';
+      console.log("Données pour l'IA:", promptData);
       
-      switch (field) {
-        case 'natureTravaux':
-          generatedText = `Intervention de maintenance sur les équipements de ventilation et climatisation situés dans les locaux techniques de l'entreprise. Ces travaux comprennent le remplacement de filtres, la vérification des circuits électriques et le nettoyage des gaines de ventilation.`;
-          break;
-        case 'risque-0':
-          generatedText = `Risque de chute de hauteur lors de l'accès aux équipements de ventilation situés en hauteur.`;
-          break;
-        case 'mesure-0':
-          generatedText = `Mise en place d'un échafaudage conforme avec garde-corps et plinthes. Obligation du port du harnais de sécurité pour tout travail à plus de 3 mètres de hauteur. Balisage de la zone d'intervention.`;
-          break;
-        default:
-          generatedText = "Contenu généré par l'assistant IA. Veuillez personnaliser ce texte selon vos besoins spécifiques.";
-      }
+      // Simuler un appel API à l'IA (à remplacer par un appel réel)
+      const simulateAIResponse = () => {
+        const responses: Record<string, string> = {
+          natureTravaux: "Installation et maintenance des systèmes de ventilation dans les espaces de production. Les travaux comprennent le démontage des anciens conduits, l'installation de nouveaux équipements et le raccordement électrique des systèmes.",
+          consignesParticulieres: "Porter les EPI adaptés en permanence sur le site (casque, chaussures de sécurité, gilet haute visibilité). Respecter le plan de circulation. Signaler toute situation dangereuse au responsable de site. Une autorisation d'accès journalière est requise pour accéder aux zones restreintes.",
+          materielsUtilises: "- Échafaudages mobiles certifiés\n- Outillages électroportatifs aux normes CE\n- Appareils de mesure électrique\n- Équipements de levage (charge max 500kg)\n- Caisse à outils complète\n- Matériel de soudure"
+        };
+        
+        return responses[field] || "Suggestion IA non disponible pour ce champ.";
+      };
       
-      setAiSuggestion(generatedText);
+      setTimeout(() => {
+        const response = simulateAIResponse();
+        setSuggestion(response);
+        setIsSuggesting(false);
+      }, 1500);
       
-      toast({
-        title: "Suggestion IA disponible",
-        description: "Une suggestion a été générée par l'IA.",
-        variant: "default",
-      });
     } catch (error) {
-      console.error('Erreur lors de la génération AI:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer une suggestion IA.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingAi(false);
+      console.error("Erreur lors de la génération de suggestions:", error);
+      toast.error("Une erreur est survenue lors de la génération de suggestions");
+      setIsSuggesting(false);
     }
   };
   
-  const applySuggestion = (field: string) => {
-    if (!aiSuggestion) return;
-    
-    if (field === 'natureTravaux') {
-      form.setValue('natureTravaux', aiSuggestion);
-    } else if (field.startsWith('risque-')) {
-      const index = parseInt(field.split('-')[1]);
-      form.setValue(`risquesIdentifies.${index}.description`, aiSuggestion);
-    } else if (field.startsWith('mesure-')) {
-      const index = parseInt(field.split('-')[1]);
-      form.setValue(`mesuresPrevention.${index}.description`, aiSuggestion);
+  // Appliquer la suggestion au champ actuel
+  const applySuggestion = () => {
+    if (currentField && suggestion) {
+      form.setValue(currentField as any, suggestion, { shouldValidate: true });
+      setSuggestion("");
+      setCurrentField(null);
+      toast.success("Suggestion appliquée");
     }
+  };
+  
+  // Ajouter une mesure de prévention pour un risque
+  const addMesurePrevention = (risqueId: string) => {
+    mesuresArray.append({
+      id: generateId(),
+      risqueId: risqueId,
+      description: "",
+      responsable: "les deux",
+      statut: "planifiee"
+    });
     
-    setAiSuggestion('');
+    // Passer à l'onglet des mesures
+    setCurrentTab("mesures");
   };
   
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto my-8">
-        <h1 className="text-3xl font-bold mb-8">Créer un Plan de Prévention</h1>
+      <div className="container py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Créer un Plan de Prévention</h1>
+          <p className="text-gray-600">
+            Ce document permet de coordonner les mesures de prévention lors de l'intervention d'entreprises extérieures.
+          </p>
+        </div>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Tabs value={currentTab} onValueChange={setCurrentTab}>
-              <TabsList className="grid grid-cols-4 mb-8">
-                <TabsTrigger value="informations">Informations générales</TabsTrigger>
-                <TabsTrigger value="risques">Risques & Mesures</TabsTrigger>
-                <TabsTrigger value="personnel">Personnel autorisé</TabsTrigger>
-                <TabsTrigger value="consignes">Consignes & Matériels</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="informations" className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations générales</CardTitle>
+                <CardDescription>
+                  Détails de base pour votre Plan de Prévention.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
                   name="title"
@@ -243,460 +283,506 @@ const PlanPreventionCreate = () => {
                     <FormItem>
                       <FormLabel>Titre du document</FormLabel>
                       <FormControl>
-                        <Input placeholder="Entrez un titre" {...field} />
+                        <Input placeholder="Plan de Prévention - [Nature des travaux]" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="entrepriseUtilisatrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Entreprise utilisatrice</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nom de l'entreprise utilisatrice" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Entreprise qui accueille l'intervention
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="entrepriseExterieure"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Entreprise extérieure</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nom de l'entreprise extérieure" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Entreprise qui réalise l'intervention
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
                 <FormField
                   control={form.control}
-                  name="natureTravaux"
+                  name="establishmentId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nature des travaux</FormLabel>
-                      <div className="flex items-start gap-2">
-                        <FormControl className="flex-grow">
-                          <Textarea 
-                            placeholder="Décrivez la nature des travaux" 
-                            className="min-h-[120px]" 
-                            {...field} 
-                          />
+                      <FormLabel>Site d'intervention</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionnez un site" />
+                          </SelectTrigger>
                         </FormControl>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          className="mt-0"
-                          onClick={() => handleSuggestWithAI('natureTravaux')}
-                          disabled={isGeneratingAi}
-                        >
-                          {isGeneratingAi ? 'Génération...' : 'Suggérer'}
-                        </Button>
-                      </div>
+                        <SelectContent>
+                          {establishments.map((establishment) => (
+                            <SelectItem key={establishment.id} value={establishment.id}>
+                              {establishment.nom} ({establishment.adresse.ville})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                {aiSuggestion && (
-                  <Card className="bg-alertBackground border-alertText">
-                    <CardContent className="pt-4 pb-2">
-                      <p className="text-alertText font-medium flex items-center gap-2 mb-2">
-                        <AlertCircle className="h-4 w-4" />
-                        Suggestion de l'IA
-                      </p>
-                      <p className="text-alertText mb-2">{aiSuggestion}</p>
-                      <div className="flex justify-end">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => applySuggestion('natureTravaux')}
-                          className="text-alertText hover:text-accentBleu hover:border-accentBleu"
-                        >
-                          Appliquer
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                <FormField
-                  control={form.control}
-                  name="lieuIntervention"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Lieu d'intervention</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Précisez le lieu d'intervention" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="dateDebutTravaux"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Date de début des travaux</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
+              </CardContent>
+            </Card>
+            
+            <Tabs value={currentTab} onValueChange={setCurrentTab}>
+              <TabsList className="grid grid-cols-4 mb-8">
+                <TabsTrigger value="informations">Entreprises</TabsTrigger>
+                <TabsTrigger value="risques">Risques</TabsTrigger>
+                <TabsTrigger value="mesures">Mesures</TabsTrigger>
+                <TabsTrigger value="personnel">Personnel</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="informations" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations des entreprises</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="entrepriseUtilisatrice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Entreprise utilisatrice</FormLabel>
                             <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'P', { locale: fr })
-                                ) : (
-                                  <span>Sélectionner une date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
+                              <Input placeholder="Nom de l'entreprise utilisatrice" {...field} />
                             </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date < new Date(new Date().setHours(0, 0, 0, 0))
-                              }
-                              initialFocus
-                              className="rounded-md border p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="dateFinTravaux"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Date de fin des travaux</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
+                            <FormDescription>
+                              Entreprise qui accueille les travaux sur son site.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="entrepriseExterieure"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Entreprise extérieure</FormLabel>
                             <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'P', { locale: fr })
-                                ) : (
-                                  <span>Sélectionner une date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
+                              <Input placeholder="Nom de l'entreprise extérieure" {...field} />
                             </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => {
-                                const dateDebut = form.getValues('dateDebutTravaux');
-                                if (!dateDebut) return date < new Date(new Date().setHours(0, 0, 0, 0));
-                                return date < dateDebut;
-                              }}
-                              initialFocus
-                              className="rounded-md border p-3 pointer-events-auto"
+                            <FormDescription>
+                              Entreprise qui intervient sur le site.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="lieuIntervention"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Lieu précis d'intervention</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Bâtiment, étage, zone..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="dateDebutTravaux"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Date de début des travaux</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "P", { locale: fr })
+                                    ) : (
+                                      <span>Sélectionner une date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                  className="pointer-events-auto"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="dateFinTravaux"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Date de fin des travaux</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "P", { locale: fr })
+                                    ) : (
+                                      <span>Sélectionner une date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                  className="pointer-events-auto"
+                                  disabled={(date) => {
+                                    const debut = form.getValues("dateDebutTravaux");
+                                    return debut ? date < debut : false;
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="natureTravaux"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Nature des travaux</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("natureTravaux")}
+                              disabled={isSuggesting}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Description détaillée des travaux à réaliser..." 
+                              className="min-h-[120px]" 
+                              {...field} 
                             />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
               
               <TabsContent value="risques" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-xl">Risques identifiés</CardTitle>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Risques identifiés</CardTitle>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          risquesArray.append({
+                            id: generateId(),
+                            description: "",
+                            niveau: "moyen",
+                            zone: ""
+                          });
+                        }}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter un risque
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Identifiez les risques liés à l'intervention.
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    {risquesFields.map((field, index) => (
-                      <div key={field.id} className="mb-6 p-4 border border-formBorder rounded-md">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-lg font-medium">Risque #{index + 1}</h4>
-                          {index > 0 && (
-                            <Button 
-                              type="button" 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => removeRisque(index)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        
-                        <FormField
-                          control={form.control}
-                          name={`risquesIdentifies.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description du risque</FormLabel>
-                              <div className="flex items-start gap-2">
-                                <FormControl className="flex-grow">
-                                  <Textarea 
-                                    placeholder="Décrivez le risque" 
-                                    className="min-h-[80px]" 
-                                    {...field} 
-                                  />
-                                </FormControl>
+                  <CardContent className="space-y-6">
+                    {risquesArray.fields.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Aucun risque identifié. Cliquez sur "Ajouter un risque".</p>
+                      </div>
+                    ) : (
+                      risquesArray.fields.map((risque, index) => (
+                        <Card key={risque.id} className="border-l-4 border-l-amber-500">
+                          <CardContent className="pt-6">
+                            <div className="grid md:grid-cols-2 gap-6 mb-4">
+                              <FormField
+                                control={form.control}
+                                name={`risquesIdentifies.${index}.description`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Description du risque</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="Description du risque" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name={`risquesIdentifies.${index}.zone`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Zone concernée</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="Zone ou lieu du risque" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="flex items-end justify-between gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`risquesIdentifies.${index}.niveau`}
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormLabel>Niveau de risque</FormLabel>
+                                    <Select 
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Niveau" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="faible">Faible</SelectItem>
+                                        <SelectItem value="moyen">Moyen</SelectItem>
+                                        <SelectItem value="eleve">Élevé</SelectItem>
+                                        <SelectItem value="critique">Critique</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <div className="flex gap-2">
                                 <Button 
                                   type="button" 
-                                  variant="outline" 
-                                  className="mt-0"
-                                  onClick={() => handleSuggestWithAI(`risque-${index}`)}
-                                  disabled={isGeneratingAi}
+                                  variant="outline"
+                                  onClick={() => addMesurePrevention(risque.id)}
                                 >
-                                  {isGeneratingAi ? '...' : 'Suggérer'}
+                                  Ajouter une mesure
                                 </Button>
+                                
+                                {index > 0 && (
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => risquesArray.remove(index)}
+                                    size="icon"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
                               </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`risquesIdentifies.${index}.niveau`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Niveau de risque</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Sélectionnez un niveau" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="faible">Faible</SelectItem>
-                                    <SelectItem value="moyen">Moyen</SelectItem>
-                                    <SelectItem value="eleve">Élevé</SelectItem>
-                                    <SelectItem value="critique">Critique</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={form.control}
-                            name={`risquesIdentifies.${index}.zone`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Zone concernée</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Zone ou lieu du risque" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => appendRisque({ description: '', niveau: 'moyen', zone: '' })}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Ajouter un risque
-                    </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
                   </CardContent>
                 </Card>
-                
+              </TabsContent>
+              
+              <TabsContent value="mesures" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-xl">Mesures de prévention</CardTitle>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Mesures de prévention</CardTitle>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const risques = form.getValues("risquesIdentifies");
+                          if (risques.length > 0) {
+                            mesuresArray.append({
+                              id: generateId(),
+                              risqueId: risques[0].id,
+                              description: "",
+                              responsable: "les deux",
+                              statut: "planifiee"
+                            });
+                          } else {
+                            toast.error("Veuillez d'abord ajouter un risque");
+                            setCurrentTab("risques");
+                          }
+                        }}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une mesure
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Définissez les mesures pour prévenir chaque risque identifié.
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    {mesuresFields.map((field, index) => (
-                      <div key={field.id} className="mb-6 p-4 border border-formBorder rounded-md">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-lg font-medium">Mesure #{index + 1}</h4>
-                          {index > 0 && (
-                            <Button 
-                              type="button" 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => removeMesure(index)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        
-                        <FormField
-                          control={form.control}
-                          name={`mesuresPrevention.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description de la mesure</FormLabel>
-                              <div className="flex items-start gap-2">
-                                <FormControl className="flex-grow">
-                                  <Textarea 
-                                    placeholder="Décrivez la mesure de prévention" 
-                                    className="min-h-[80px]" 
-                                    {...field} 
-                                  />
-                                </FormControl>
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  className="mt-0"
-                                  onClick={() => handleSuggestWithAI(`mesure-${index}`)}
-                                  disabled={isGeneratingAi}
-                                >
-                                  {isGeneratingAi ? '...' : 'Suggérer'}
-                                </Button>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`mesuresPrevention.${index}.responsable`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Responsable</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Sélectionnez un responsable" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="entrepriseUtilisatrice">Entreprise utilisatrice</SelectItem>
-                                    <SelectItem value="entrepriseExterieure">Entreprise extérieure</SelectItem>
-                                    <SelectItem value="les deux">Les deux entreprises</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={form.control}
-                            name={`mesuresPrevention.${index}.statut`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Statut</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Sélectionnez un statut" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="planifiee">Planifiée</SelectItem>
-                                    <SelectItem value="en cours">En cours</SelectItem>
-                                    <SelectItem value="realisee">Réalisée</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        
-                        <FormField
-                          control={form.control}
-                          name={`mesuresPrevention.${index}.dateRealisation`}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col mt-4">
-                              <FormLabel>Date de réalisation (optionnelle)</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "w-full md:w-[240px] pl-3 text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        format(field.value, 'P', { locale: fr })
-                                      ) : (
-                                        <span>Sélectionner une date</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                    className="rounded-md border p-3 pointer-events-auto"
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                  <CardContent className="space-y-6">
+                    {mesuresArray.fields.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Aucune mesure de prévention définie. Cliquez sur "Ajouter une mesure".</p>
                       </div>
-                    ))}
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => appendMesure({ description: '', responsable: 'les deux', statut: 'planifiee' })}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Ajouter une mesure
-                    </Button>
+                    ) : (
+                      mesuresArray.fields.map((mesure, index) => (
+                        <Card key={mesure.id} className="border-l-4 border-l-green-500">
+                          <CardContent className="pt-6">
+                            <div className="mb-4">
+                              <FormField
+                                control={form.control}
+                                name={`mesuresPrevention.${index}.risqueId`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Risque concerné</FormLabel>
+                                    <Select 
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Sélectionner un risque" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        {form.getValues("risquesIdentifies").map((risque) => (
+                                          <SelectItem key={risque.id} value={risque.id}>
+                                            {risque.description || "Risque sans description"}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="mb-4">
+                              <FormField
+                                control={form.control}
+                                name={`mesuresPrevention.${index}.description`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Description de la mesure</FormLabel>
+                                    <FormControl>
+                                      <Textarea 
+                                        placeholder="Détaillez la mesure de prévention..." 
+                                        className="min-h-[100px]" 
+                                        {...field} 
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                              <FormField
+                                control={form.control}
+                                name={`mesuresPrevention.${index}.responsable`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Responsable</FormLabel>
+                                    <Select 
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Sélectionner un responsable" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="entrepriseUtilisatrice">Entreprise utilisatrice</SelectItem>
+                                        <SelectItem value="entrepriseExterieure">Entreprise extérieure</SelectItem>
+                                        <SelectItem value="les deux">Les deux entreprises</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name={`mesuresPrevention.${index}.statut`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Statut</FormLabel>
+                                    <Select 
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Sélectionner un statut" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="planifiee">Planifiée</SelectItem>
+                                        <SelectItem value="en cours">En cours</SelectItem>
+                                        <SelectItem value="realisee">Réalisée</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="flex justify-end mt-4">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() => mesuresArray.remove(index)}
+                                size="icon"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -704,193 +790,257 @@ const PlanPreventionCreate = () => {
               <TabsContent value="personnel" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-xl">Personnel autorisé</CardTitle>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Personnel autorisé</CardTitle>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          personnelArray.append({
+                            id: generateId(),
+                            nom: "",
+                            prenom: "",
+                            fonction: "",
+                            entreprise: "exterieure",
+                            autorisation: []
+                          });
+                        }}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une personne
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Identifiez le personnel autorisé à intervenir.
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    {personnelFields.map((field, index) => (
-                      <div key={field.id} className="mb-6 p-4 border border-formBorder rounded-md">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-lg font-medium">Personne #{index + 1}</h4>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => removePersonnel(index)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <FormField
-                            control={form.control}
-                            name={`personnelAutorise.${index}.nom`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Nom</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Nom" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={form.control}
-                            name={`personnelAutorise.${index}.prenom`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Prénom</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Prénom" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <FormField
-                            control={form.control}
-                            name={`personnelAutorise.${index}.fonction`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Fonction</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Fonction ou poste" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={form.control}
-                            name={`personnelAutorise.${index}.entreprise`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Entreprise</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <CardContent className="space-y-6">
+                    {personnelArray.fields.map((personne, index) => (
+                      <Card key={personne.id}>
+                        <CardContent className="pt-6">
+                          <div className="grid md:grid-cols-3 gap-4 mb-4">
+                            <FormField
+                              control={form.control}
+                              name={`personnelAutorise.${index}.nom`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Nom</FormLabel>
                                   <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Sélectionnez l'entreprise" />
-                                    </SelectTrigger>
+                                    <Input placeholder="Nom" {...field} />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="utilisatrice">Entreprise utilisatrice</SelectItem>
-                                    <SelectItem value="exterieure">Entreprise extérieure</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`personnelAutorise.${index}.prenom`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Prénom</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Prénom" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`personnelAutorise.${index}.fonction`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Fonction</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Fonction" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="mb-4">
+                            <FormField
+                              control={form.control}
+                              name={`personnelAutorise.${index}.entreprise`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Entreprise</FormLabel>
+                                  <Select 
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Sélectionner une entreprise" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="utilisatrice">Entreprise utilisatrice</SelectItem>
+                                      <SelectItem value="exterieure">Entreprise extérieure</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            {index > 0 && (
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() => personnelArray.remove(index)}
+                                size="icon"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             )}
-                          />
-                        </div>
-                        
-                        {/* Les autorisations seraient normalement gérées avec Checkbox, mais pour simplifier, on utilise select multiple */}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    
+                    {/* Matériels et consignes */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Matériels et consignes</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
                         <FormField
                           control={form.control}
-                          name={`personnelAutorise.${index}.autorisation`}
+                          name="materielsUtilises"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Autorisations</FormLabel>
-                              <FormControl>
-                                <Select 
-                                  onValueChange={(value) => field.onChange([...field.value || [], value])}
-                                  value={field.value ? field.value[field.value.length - 1] : undefined}
+                              <div className="flex justify-between items-center">
+                                <FormLabel>Matériels utilisés</FormLabel>
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => getSuggestion("materielsUtilises")}
+                                  disabled={isSuggesting}
                                 >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Ajouter une autorisation" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {autorisationOptions.map(option => (
-                                      <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                  <Wand2 className="mr-2 h-4 w-4" />
+                                  Suggérer
+                                </Button>
+                              </div>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Liste des matériels et équipements utilisés..." 
+                                  className="min-h-[100px]" 
+                                  {...field} 
+                                />
                               </FormControl>
-                              <FormDescription>
-                                Autorisations sélectionnées: {field.value?.map(id => {
-                                  const option = autorisationOptions.find(o => o.id === id);
-                                  return option ? option.label : id;
-                                }).join(', ')}
-                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
-                    ))}
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => appendPersonnel({ 
-                        nom: '', 
-                        prenom: '', 
-                        fonction: '', 
-                        entreprise: 'exterieure', 
-                        autorisation: [] 
-                      })}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Ajouter une personne
-                    </Button>
+                        
+                        <FormField
+                          control={form.control}
+                          name="consignesParticulieres"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex justify-between items-center">
+                                <FormLabel>Consignes particulières</FormLabel>
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => getSuggestion("consignesParticulieres")}
+                                  disabled={isSuggesting}
+                                >
+                                  <Wand2 className="mr-2 h-4 w-4" />
+                                  Suggérer
+                                </Button>
+                              </div>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Consignes particulières à respecter..." 
+                                  className="min-h-[100px]" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
                   </CardContent>
                 </Card>
               </TabsContent>
-              
-              <TabsContent value="consignes" className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="materielsUtilises"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Matériels utilisés</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez les matériels utilisés pour l'intervention" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="consignesParticulieres"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Consignes particulières</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Précisez les consignes particulières à respecter" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
             </Tabs>
             
-            <div className="flex justify-between mt-8">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+            {/* Panneau de suggestion IA */}
+            {suggestion && (
+              <Card className="border-accentBleu">
+                <CardHeader className="bg-accentBleu/10">
+                  <CardTitle className="text-accentBleu text-lg">Suggestion IA</CardTitle>
+                  <CardDescription>
+                    Voici une suggestion pour le champ sélectionné. Vous pouvez l'utiliser ou la modifier.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="bg-formBackground p-4 rounded-md border border-formBorder">
+                    {suggestion}
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end space-x-2">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setSuggestion("");
+                      setCurrentField(null);
+                    }}
+                  >
+                    Ignorer
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={applySuggestion}
+                  >
+                    Appliquer la suggestion
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
+            
+            <div className="flex justify-between pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(-1)}
+              >
                 Annuler
               </Button>
-              <div className="flex gap-4">
-                <Button type="button" variant="secondary">
-                  Enregistrer comme brouillon
+              
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    form.handleSubmit((data) => {
+                      // Enregistrer en brouillon
+                      console.log("Enregistrer en brouillon:", data);
+                      toast.success("Document enregistré en brouillon");
+                    })();
+                  }}
+                >
+                  Enregistrer en brouillon
                 </Button>
-                <Button type="submit">
-                  Créer le plan
+                
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Création en cours..." : "Créer le Plan de Prévention"}
                 </Button>
               </div>
             </div>

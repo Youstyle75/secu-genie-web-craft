@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, FireExtinguisher } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -43,8 +43,12 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <FireExtinguisher className="h-6 w-6 text-accent mr-2" aria-hidden="true" />
-            <span className="text-xl font-bold text-white">SecuGenie</span>
+            <img 
+              src="/logo-secugenie.svg" 
+              alt="SecuGenie" 
+              className="h-8 md:h-10 w-auto mr-2" 
+              aria-hidden="true" 
+            />
           </Link>
           
           {/* Desktop Navigation */}

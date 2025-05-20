@@ -4,160 +4,216 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Form, 
-  FormControl, 
-  FormDescription, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { NoticeSecuriteContent } from '@/types/securityDocument';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wand2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
-import { AlertCircle } from 'lucide-react';
+import apiConfig from '@/config/apiEndpoints';
+import { EstablishmentEvent } from '@/types/establishment';
 
-// Schema de validation pour le formulaire de Notice de Sécurité
+// Schéma de validation pour le formulaire Notice de Sécurité
 const noticeSecuriteSchema = z.object({
-  title: z.string().min(3, { message: 'Le titre doit contenir au moins 3 caractères' }),
-  establishmentId: z.string().optional(),
-  descriptionEtablissement: z.string().min(10, { message: 'La description doit contenir au moins 10 caractères' }),
-  classementType: z.string().min(1, { message: 'Veuillez sélectionner un type de classement' }),
-  effectifMaximum: z.coerce.number().positive({ message: 'L\'effectif doit être un nombre positif' }),
-  moyensSecours: z.string().min(10, { message: 'Veuillez décrire les moyens de secours' }),
-  consignesEvacuation: z.string().min(10, { message: 'Veuillez décrire les consignes d\'évacuation' }),
-  preventionIncendie: z.string().min(10, { message: 'Veuillez décrire les mesures de prévention incendie' }),
-  accessibiliteSecours: z.string().min(10, { message: 'Veuillez décrire l\'accessibilité pour les secours' }),
-  dispositionsParticulieres: z.string().optional(),
-  amenagements: z.string().optional(),
-  installationsTechniques: z.string().optional(),
+  title: z.string().min(3, { message: "Le titre doit contenir au moins 3 caractères" }),
+  establishmentId: z.string().min(1, { message: "Veuillez sélectionner un établissement" }),
+  descriptionEtablissement: z.string().min(10, { message: "La description doit contenir au moins 10 caractères" }),
+  moyensSecours: z.string().min(10, { message: "Ce champ doit contenir au moins 10 caractères" }),
+  consignesEvacuation: z.string().min(10, { message: "Ce champ doit contenir au moins 10 caractères" }),
+  preventionIncendie: z.string().min(10, { message: "Ce champ doit contenir au moins 10 caractères" }),
+  accessibiliteSecours: z.string().min(10, { message: "Ce champ doit contenir au moins 10 caractères" }),
+  classementType: z.string().min(1, { message: "Veuillez indiquer le classement de l'établissement" }),
+  effectifMaximum: z.coerce.number().min(1, { message: "L'effectif doit être d'au moins 1 personne" }),
+  dispositionsParticulieres: z.string(),
+  amenagements: z.string(),
+  installationsTechniques: z.string()
 });
 
-type NoticeSecuriteForm = z.infer<typeof noticeSecuriteSchema>;
+type NoticeSecuriteFormValues = z.infer<typeof noticeSecuriteSchema>;
 
 const NoticeSecuriteCreate = () => {
-  const [currentTab, setCurrentTab] = useState('informations');
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [currentTab, setCurrentTab] = useState("informations");
+  const [establishments, setEstablishments] = useState<EstablishmentEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
+  const [currentField, setCurrentField] = useState<keyof NoticeSecuriteFormValues | null>(null);
   
-  const form = useForm<NoticeSecuriteForm>({
+  // Initialiser le formulaire
+  const form = useForm<NoticeSecuriteFormValues>({
     resolver: zodResolver(noticeSecuriteSchema),
     defaultValues: {
-      title: '',
-      descriptionEtablissement: '',
-      classementType: '',
+      title: "",
+      establishmentId: "",
+      descriptionEtablissement: "",
+      moyensSecours: "",
+      consignesEvacuation: "",
+      preventionIncendie: "",
+      accessibiliteSecours: "",
+      classementType: "",
       effectifMaximum: 0,
-      moyensSecours: '',
-      consignesEvacuation: '',
-      preventionIncendie: '',
-      accessibiliteSecours: '',
-      dispositionsParticulieres: '',
-      amenagements: '',
-      installationsTechniques: '',
+      dispositionsParticulieres: "",
+      amenagements: "",
+      installationsTechniques: ""
     }
   });
   
-  const onSubmit = async (data: NoticeSecuriteForm) => {
+  // Simuler la récupération des établissements (à remplacer par un appel API réel)
+  useState(() => {
+    // Simulation d'un appel API
+    setEstablishments([
+      {
+        id: "1",
+        nom: "Salle des fêtes de Paris",
+        type: "ERP Type L",
+        adresse: {
+          rue: "1 Rue de Paris",
+          codePostal: "75001",
+          ville: "Paris",
+          pays: "France"
+        },
+        jauge: 500,
+        specificDetails: {
+          typeERP: "L",
+          categorieERP: "3",
+        },
+        userId: "user123",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: "2",
+        nom: "Théâtre Municipal",
+        type: "ERP Type L",
+        adresse: {
+          rue: "5 Avenue des Arts",
+          codePostal: "69000",
+          ville: "Lyon",
+          pays: "France"
+        },
+        jauge: 300,
+        specificDetails: {
+          typeERP: "L",
+          categorieERP: "3",
+        },
+        userId: "user123",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ]);
+  }, []);
+  
+  // Fonction pour soumettre le formulaire
+  const onSubmit = async (data: NoticeSecuriteFormValues) => {
     try {
-      // Simulation d'un appel API
-      console.log('Données soumises:', data);
+      setIsLoading(true);
       
-      toast({
-        title: "Notice de sécurité créée",
-        description: "Votre document a été enregistré avec succès.",
-        variant: "default",
-      });
+      // Simuler un appel API
+      console.log("Données à envoyer:", data);
       
-      // Redirection vers la page de détail du document
-      navigate('/documents/notice-securite/123'); // ID de démo
+      toast.success("Document créé avec succès");
+      // Rediriger vers la page de relecture (simulée)
+      setTimeout(() => {
+        navigate("/documents/new-id/relecture");
+      }, 1500);
+      
     } catch (error) {
-      console.error('Erreur lors de la création de la notice:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la création du document.",
-        variant: "destructive",
-      });
+      console.error("Erreur lors de la création du document:", error);
+      toast.error("Une erreur est survenue lors de la création du document");
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const handleSuggestWithAI = async (field: keyof NoticeSecuriteForm) => {
-    setIsGeneratingAi(true);
-    
+  // Fonction pour récupérer une suggestion IA pour un champ
+  const getSuggestion = async (field: keyof NoticeSecuriteFormValues) => {
     try {
-      // Récupérer les données pertinentes du formulaire
+      setIsSuggesting(true);
+      setCurrentField(field);
+      
+      // Collecter les données pertinentes du formulaire
       const formData = form.getValues();
       
-      // Simulation d'un appel API IA
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simuler un délai
+      // Construire le prompt en fonction du champ
+      const promptData = {
+        field,
+        establishmentData: establishments.find(e => e.id === formData.establishmentId),
+        currentValues: formData
+      };
       
-      // Exemple de réponse générée
-      let generatedText = '';
+      console.log("Données pour l'IA:", promptData);
       
-      switch (field) {
-        case 'descriptionEtablissement':
-          generatedText = `Établissement de type ${formData.classementType || '[type]'} avec un effectif maximum de ${formData.effectifMaximum || '[effectif]'} personnes. L'établissement comprend [description des espaces]. Il est situé [emplacement] et dispose de [nombre] accès principaux.`;
-          break;
-        case 'moyensSecours':
-          generatedText = `L'établissement est équipé de systèmes de détection incendie conformes à la norme NF S 61-970. Des extincteurs appropriés aux risques sont disposés à chaque niveau, à proximité des sorties et dans les zones à risques spécifiques. Un système d'alarme de type 3 est installé et permet d'alerter l'ensemble des occupants.`;
-          break;
-        case 'consignesEvacuation':
-          generatedText = `En cas d'incendie, l'évacuation s'effectuera par les issues de secours signalées. Le point de rassemblement est situé [emplacement]. Les consignes d'évacuation sont affichées à chaque niveau et des exercices d'évacuation sont réalisés deux fois par an.`;
-          break;
-        default:
-          generatedText = "Contenu généré par l'assistant IA. Veuillez personnaliser ce texte selon vos besoins spécifiques.";
-      }
+      // Simuler un appel API à l'IA (à remplacer par un appel réel)
+      const simulateAIResponse = () => {
+        const responses: Record<string, string> = {
+          descriptionEtablissement: "Établissement recevant du public de type L (salle de spectacle) de 3ème catégorie permettant l'accueil jusqu'à 500 personnes. Bâtiment principal sur deux niveaux avec accès direct sur la voie publique par 3 issues de secours principales.",
+          moyensSecours: "Conformément à la réglementation pour les ERP de type L de 3ème catégorie, l'établissement est équipé d'un système d'alarme de type 3, d'extincteurs appropriés aux risques à tous les niveaux, d'un éclairage de sécurité, et d'un système de désenfumage mécanique.",
+          consignesEvacuation: "En cas d'incendie ou d'alarme, l'évacuation se fait par les issues de secours signalées. Le personnel est formé pour guider les visiteurs vers les sorties et les points de rassemblement situés à l'extérieur du bâtiment. Des plans d'évacuation sont affichés à chaque étage.",
+          preventionIncendie: "Vérification annuelle des installations électriques. Formation du personnel aux consignes de sécurité et à la manipulation des extincteurs. Exercices d'évacuation semestriels. Maintien des issues de secours dégagées en permanence.",
+          accessibiliteSecours: "L'établissement est accessible aux véhicules de secours par l'entrée principale et l'accès de service à l'arrière du bâtiment. Une voie pompiers est maintenue libre en permanence autour du bâtiment. Des poteaux incendie sont situés à moins de 100m."
+        };
+        
+        return responses[field] || "Suggestion IA non disponible pour ce champ.";
+      };
       
-      setAiSuggestion(generatedText);
+      setTimeout(() => {
+        const response = simulateAIResponse();
+        setSuggestion(response);
+        setIsSuggesting(false);
+      }, 1500);
       
-      toast({
-        title: "Suggestion IA disponible",
-        description: "Une suggestion a été générée par l'IA.",
-        variant: "default",
-      });
     } catch (error) {
-      console.error('Erreur lors de la génération AI:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer une suggestion IA.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingAi(false);
+      console.error("Erreur lors de la génération de suggestions:", error);
+      toast.error("Une erreur est survenue lors de la génération de suggestions");
+      setIsSuggesting(false);
     }
   };
   
-  const applySuggestion = (field: keyof NoticeSecuriteForm) => {
-    if (aiSuggestion) {
-      form.setValue(field, aiSuggestion);
-      setAiSuggestion('');
+  // Appliquer la suggestion au champ actuel
+  const applySuggestion = () => {
+    if (currentField && suggestion) {
+      form.setValue(currentField, suggestion, { shouldValidate: true });
+      setSuggestion("");
+      setCurrentField(null);
+      toast.success("Suggestion appliquée");
+    }
+  };
+  
+  // Gestion du changement d'établissement
+  const handleEstablishmentChange = (value: string) => {
+    const selectedEstablishment = establishments.find(e => e.id === value);
+    if (selectedEstablishment) {
+      // Pré-remplir certains champs avec les informations de l'établissement
+      form.setValue("classementType", `Type ${selectedEstablishment.specificDetails.typeERP || ''} - Catégorie ${selectedEstablishment.specificDetails.categorieERP || ''}`);
+      form.setValue("effectifMaximum", selectedEstablishment.jauge);
     }
   };
   
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto my-8">
-        <h1 className="text-3xl font-bold mb-8">Créer une Notice de Sécurité</h1>
+      <div className="container py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Créer une Notice de Sécurité</h1>
+          <p className="text-gray-600">
+            Remplissez les informations requises pour générer votre Notice de Sécurité ERP.
+          </p>
+        </div>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Tabs value={currentTab} onValueChange={setCurrentTab}>
-              <TabsList className="grid grid-cols-4 mb-8">
-                <TabsTrigger value="informations">Informations générales</TabsTrigger>
-                <TabsTrigger value="moyens">Moyens de secours</TabsTrigger>
-                <TabsTrigger value="evacuation">Évacuation & Prévention</TabsTrigger>
-                <TabsTrigger value="amenagements">Aménagements</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="informations" className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations générales</CardTitle>
+                <CardDescription>
+                  Détails de base pour votre Notice de Sécurité.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
                   name="title"
@@ -165,7 +221,7 @@ const NoticeSecuriteCreate = () => {
                     <FormItem>
                       <FormLabel>Titre du document</FormLabel>
                       <FormControl>
-                        <Input placeholder="Entrez un titre" {...field} />
+                        <Input placeholder="Notice de Sécurité - [Nom de l'établissement]" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -178,291 +234,370 @@ const NoticeSecuriteCreate = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Établissement</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleEstablishmentChange(value);
+                        }}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez un établissement" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="1">Restaurant Le Gourmet (ERP type N)</SelectItem>
-                          <SelectItem value="2">Salle des fêtes municipale (ERP type L)</SelectItem>
-                          <SelectItem value="3">Boutique La Mode (ERP type M)</SelectItem>
+                          {establishments.map((establishment) => (
+                            <SelectItem key={establishment.id} value={establishment.id}>
+                              {establishment.nom} ({establishment.type})
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>
-                        Sélectionnez un établissement pour pré-remplir certaines informations
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="descriptionEtablissement"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description de l'établissement</FormLabel>
-                      <div className="flex items-start gap-2">
-                        <FormControl className="flex-grow">
-                          <Textarea 
-                            placeholder="Décrivez l'établissement" 
-                            className="min-h-[120px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          className="mt-0"
-                          onClick={() => handleSuggestWithAI('descriptionEtablissement')}
-                          disabled={isGeneratingAi}
-                        >
-                          {isGeneratingAi ? 'Génération...' : 'Suggérer'}
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {aiSuggestion && (
-                  <Card className="bg-alertBackground border-alertText">
-                    <CardContent className="pt-4 pb-2">
-                      <p className="text-alertText font-medium flex items-center gap-2 mb-2">
-                        <AlertCircle className="h-4 w-4" />
-                        Suggestion de l'IA
-                      </p>
-                      <p className="text-alertText mb-2">{aiSuggestion}</p>
-                      <div className="flex justify-end">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => applySuggestion('descriptionEtablissement')}
-                          className="text-alertText hover:text-accentBleu hover:border-accentBleu"
-                        >
-                          Appliquer
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="classementType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type de classement ERP</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+              </CardContent>
+            </Card>
+            
+            <Tabs value={currentTab} onValueChange={setCurrentTab}>
+              <TabsList className="grid grid-cols-3 mb-8">
+                <TabsTrigger value="informations">Informations</TabsTrigger>
+                <TabsTrigger value="securite">Sécurité</TabsTrigger>
+                <TabsTrigger value="installations">Installations</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="informations" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations de l'établissement</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="descriptionEtablissement"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Description de l'établissement</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("descriptionEtablissement")}
+                              disabled={isSuggesting || !form.getValues("establishmentId")}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez un type" />
-                            </SelectTrigger>
+                            <Textarea 
+                              placeholder="Description détaillée de l'établissement..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="type_l">Type L - Salles de spectacles</SelectItem>
-                            <SelectItem value="type_m">Type M - Magasins</SelectItem>
-                            <SelectItem value="type_n">Type N - Restaurants</SelectItem>
-                            <SelectItem value="type_o">Type O - Hôtels</SelectItem>
-                            <SelectItem value="type_p">Type P - Salles de danse</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="effectifMaximum"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Effectif maximum</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Nombre maximum de personnes admissibles
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="classementType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Classement (Type et catégorie)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: Type L - Catégorie 3" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="effectifMaximum"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Effectif maximum</FormLabel>
+                          <FormControl>
+                            <Input type="number" min="1" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
               
-              <TabsContent value="moyens" className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="moyensSecours"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Moyens de secours</FormLabel>
-                      <div className="flex items-start gap-2">
-                        <FormControl className="flex-grow">
-                          <Textarea 
-                            placeholder="Décrivez les moyens de secours disponibles" 
-                            className="min-h-[150px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => handleSuggestWithAI('moyensSecours')}
-                          disabled={isGeneratingAi}
-                        >
-                          {isGeneratingAi ? 'Génération...' : 'Suggérer'}
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="accessibiliteSecours"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Accessibilité pour les secours</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez l'accessibilité pour les services de secours" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <TabsContent value="securite" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sécurité et évacuation</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="moyensSecours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Moyens de secours</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("moyensSecours")}
+                              disabled={isSuggesting || !form.getValues("establishmentId")}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Décrivez les moyens de secours disponibles..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="consignesEvacuation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Consignes d'évacuation</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("consignesEvacuation")}
+                              disabled={isSuggesting || !form.getValues("establishmentId")}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Détaillez les consignes d'évacuation..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="preventionIncendie"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Prévention incendie</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("preventionIncendie")}
+                              disabled={isSuggesting || !form.getValues("establishmentId")}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Mesures de prévention contre les incendies..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="accessibiliteSecours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Accessibilité pour les secours</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => getSuggestion("accessibiliteSecours")}
+                              disabled={isSuggesting || !form.getValues("establishmentId")}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              Suggérer
+                            </Button>
+                          </div>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Décrivez l'accessibilité pour les véhicules de secours..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
               
-              <TabsContent value="evacuation" className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="consignesEvacuation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Consignes d'évacuation</FormLabel>
-                      <div className="flex items-start gap-2">
-                        <FormControl className="flex-grow">
-                          <Textarea 
-                            placeholder="Décrivez les consignes d'évacuation" 
-                            className="min-h-[150px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => handleSuggestWithAI('consignesEvacuation')}
-                          disabled={isGeneratingAi}
-                        >
-                          {isGeneratingAi ? 'Génération...' : 'Suggérer'}
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="preventionIncendie"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Prévention incendie</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez les mesures de prévention incendie" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="dispositionsParticulieres"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Dispositions particulières</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Précisez les dispositions particulières (facultatif)" 
-                          className="min-h-[100px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
-              
-              <TabsContent value="amenagements" className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="amenagements"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Aménagements</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez les aménagements (facultatif)" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="installationsTechniques"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Installations techniques</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez les installations techniques (facultatif)" 
-                          className="min-h-[150px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <TabsContent value="installations" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Installations et aménagements</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="dispositionsParticulieres"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Dispositions particulières</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Dispositions particulières applicables..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="amenagements"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Aménagements</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Aménagements intérieurs et extérieurs..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="installationsTechniques"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Installations techniques</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Installations techniques et équipements..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
             
-            <div className="flex justify-between mt-8">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+            {/* Panneau de suggestion IA */}
+            {suggestion && (
+              <Card className="border-accentBleu">
+                <CardHeader className="bg-accentBleu/10">
+                  <CardTitle className="text-accentBleu text-lg">Suggestion IA</CardTitle>
+                  <CardDescription>
+                    Voici une suggestion pour le champ "{currentField}". Vous pouvez l'utiliser ou la modifier.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="bg-formBackground p-4 rounded-md border border-formBorder">
+                    {suggestion}
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end space-x-2">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setSuggestion("");
+                      setCurrentField(null);
+                    }}
+                  >
+                    Ignorer
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={applySuggestion}
+                  >
+                    Appliquer la suggestion
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
+            
+            <div className="flex justify-between pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(-1)}
+              >
                 Annuler
               </Button>
-              <div className="flex gap-4">
-                <Button type="button" variant="secondary">
-                  Enregistrer comme brouillon
+              
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    form.handleSubmit((data) => {
+                      // Enregistrer en brouillon
+                      console.log("Enregistrer en brouillon:", data);
+                      toast.success("Document enregistré en brouillon");
+                    })();
+                  }}
+                >
+                  Enregistrer en brouillon
                 </Button>
-                <Button type="submit">
-                  Créer la notice
+                
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Création en cours..." : "Créer la Notice de Sécurité"}
                 </Button>
               </div>
             </div>
           </form>
         </Form>
+        
       </div>
     </Layout>
   );
