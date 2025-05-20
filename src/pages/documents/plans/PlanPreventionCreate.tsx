@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
@@ -17,10 +18,10 @@ type FormData = {
 };
 
 // Schéma de validation correctement typé
-const validationSchema = yup.object({
+const validationSchema = yup.object().shape({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object({
+  content: yup.object().shape({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
@@ -28,7 +29,7 @@ const validationSchema = yup.object({
     mesuresPrevention: yup.array().min(1, 'Au moins une mesure de prévention doit être définie').required(),
     preventionIncendie: yup.string().optional()
   }).required(),
-}).required();
+});
 
 const PlanPreventionCreate = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ const PlanPreventionCreate = () => {
     reset,
     watch,
   } = useForm<FormData>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
