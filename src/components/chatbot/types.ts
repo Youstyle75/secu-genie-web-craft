@@ -17,7 +17,7 @@ export interface ChatbotState {
 
 export type ChatAction = 
   | { type: 'TOGGLE_CHAT' }
-  | { type: 'ADD_USER_MESSAGE', payload: Message }
+  | { type: 'ADD_USER_MESSAGE', payload: string }
   | { type: 'ADD_BOT_MESSAGE', payload: Message }
   | { type: 'SET_INPUT_VALUE', payload: string }
   | { type: 'SET_TYPING', payload: boolean }
@@ -28,11 +28,12 @@ export interface QuickReply {
   id: string;
   text: string;
   action?: string;
+  answer?: string;
 }
 
 export interface ReglementaryReference {
   id: string;
-  type: 'code' | 'article' | 'arrete' | 'decret';
+  type: 'code' | 'article' | 'arrete' | 'decret' | 'norme' | 'referentiel';
   title: string;
   url?: string;
 }

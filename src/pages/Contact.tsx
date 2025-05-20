@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -56,7 +57,6 @@ const Contact = () => {
       // Show success message - correction du format pour toast
       toast("Message envoyé!", {
         description: "Nous vous répondrons dans les plus brefs délais.",
-        variant: "success",
       });
       
     } catch (err) {
@@ -65,7 +65,6 @@ const Contact = () => {
       // Show error message - correction du format pour toast
       toast("Erreur", {
         description: "Une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
-        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);

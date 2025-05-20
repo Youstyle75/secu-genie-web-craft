@@ -23,7 +23,7 @@ const Chatbot = () => {
     
     // Si c'est la première ouverture, ajouter un message d'accueil
     if (messages.length === 0) {
-      const welcomeMessage = {
+      const welcomeMessage: Message = {
         id: `bot-welcome-${Date.now()}`,
         sender: 'bot',
         text: 'Bonjour, je suis votre assistant spécialisé en réglementation de sécurité. Je peux vous renseigner sur les ERP, événements, plans d\'évacuation, et plus encore. Comment puis-je vous aider aujourd\'hui?',
@@ -63,14 +63,7 @@ const Chatbot = () => {
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
     
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      text: inputValue,
-      timestamp: new Date()
-    };
-    
-    dispatch({ type: 'ADD_USER_MESSAGE', payload: userMessage });
+    dispatch({ type: 'ADD_USER_MESSAGE', payload: inputValue });
     dispatch({ type: 'SET_INPUT_VALUE', payload: '' });
     dispatch({ type: 'SET_TYPING', payload: true });
     
@@ -96,7 +89,7 @@ const Chatbot = () => {
     }
   };
   
-  const handleQuickReply = async (reply) => {
+  const handleQuickReply = async (reply: any) => {
     dispatch({ type: 'SET_INPUT_VALUE', payload: reply.text });
     sendMessage();
   };
@@ -117,7 +110,7 @@ const Chatbot = () => {
     
     // Réafficher le message d'accueil
     setTimeout(() => {
-      const welcomeMessage = {
+      const welcomeMessage: Message = {
         id: `bot-welcome-${Date.now()}`,
         sender: 'bot',
         text: 'Bonjour, je suis votre assistant spécialisé en réglementation de sécurité. Comment puis-je vous aider aujourd\'hui?',

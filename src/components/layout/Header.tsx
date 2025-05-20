@@ -1,189 +1,165 @@
 
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, FireExtinguisher } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   
+  // Toggle menu
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  
+  // Handle scroll events
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
   
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMenuOpen(false);
-  }, [location]);
-  
+  // Check if a nav link is active
   const isActive = (path: string) => {
     return location.pathname === path;
   };
   
   return (
-    <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-dark-medium/95 backdrop-blur-sm py-2 shadow-md" : "bg-transparent py-4"
-      )}
-    >
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* Logo */}
-        <Link to="/" className="flex items-center text-white">
-          <FireExtinguisher className="h-6 w-6 text-accent mr-2" />
-          <span className="text-2xl font-bold">SecuGenie</span>
-        </Link>
+    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      isScrolled ? 'bg-dark shadow-md py-2' : 'bg-transparent py-4'
+    }`}>
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <FireExtinguisher className="h-6 w-6 text-accent mr-2" aria-hidden="true" />
+            <span className="text-xl font-bold text-white">SecuGenie</span>
+          </Link>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            <Link 
+              to="/" 
+              className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-accent' : 'text-white hover:text-accent'}`}
+            >
+              Accueil
+            </Link>
+            <Link 
+              to="/solutions" 
+              className={`text-sm font-medium transition-colors ${isActive('/solutions') ? 'text-accent' : 'text-white hover:text-accent'}`}
+            >
+              Solutions
+            </Link>
+            <Link 
+              to="/about" 
+              className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-accent' : 'text-white hover:text-accent'}`}
+            >
+              À propos
+            </Link>
+            <Link 
+              to="/contact" 
+              className={`text-sm font-medium transition-colors ${isActive('/contact') ? 'text-accent' : 'text-white hover:text-accent'}`}
+            >
+              Contact
+            </Link>
+            <Link 
+              to="/faq" 
+              className={`text-sm font-medium transition-colors ${isActive('/faq') ? 'text-accent' : 'text-white hover:text-accent'}`}
+            >
+              FAQ
+            </Link>
+          </nav>
+          
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/demo">
+              <Button variant="accent" size="sm" className="rounded-md">
+                Démo
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-white p-2"
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            {isMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
         
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link 
-            to="/" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            Accueil
-          </Link>
-          <Link 
-            to="/solutions" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/solutions') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            Solutions
-          </Link>
-          <Link 
-            to="/about" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/about') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            À propos
-          </Link>
-          <Link 
-            to="/pricing" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/pricing') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            Tarifs
-          </Link>
-          <Link 
-            to="/faq" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/faq') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            FAQ
-          </Link>
-          <Link 
-            to="/contact" 
-            className={cn(
-              "text-sm font-medium transition-colors", 
-              isActive('/contact') ? "text-accent" : "text-white hover:text-accent"
-            )}
-          >
-            Contact
-          </Link>
-          <Link 
-            to="/demo" 
-            className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg font-medium transition-all"
-          >
-            Essai gratuit
-          </Link>
-        </nav>
-        
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-      
-      {/* Mobile Navigation Drawer */}
-      <div 
-        className={cn(
-          "fixed inset-0 bg-black/95 backdrop-blur-md flex flex-col justify-center z-40 transition-transform duration-300 md:hidden",
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        {/* Mobile Navigation - Only visible when menu is open */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 animate-fade-in">
+            <nav className="flex flex-col space-y-4">
+              <Link 
+                to="/" 
+                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+                  isActive('/') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Accueil
+              </Link>
+              <Link 
+                to="/solutions" 
+                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+                  isActive('/solutions') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Solutions
+              </Link>
+              <Link 
+                to="/about" 
+                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+                  isActive('/about') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                À propos
+              </Link>
+              <Link 
+                to="/contact" 
+                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+                  isActive('/contact') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
+              </Link>
+              <Link 
+                to="/faq" 
+                className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+                  isActive('/faq') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                FAQ
+              </Link>
+              <Link 
+                to="/demo"
+                className="bg-accent text-white px-3 py-2 rounded-md text-sm font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Démo
+              </Link>
+            </nav>
+          </div>
         )}
-      >
-        <nav className="flex flex-col items-center space-y-6 p-4">
-          <Link 
-            to="/" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/') ? "text-accent" : "text-white"
-            )}
-          >
-            Accueil
-          </Link>
-          <Link 
-            to="/solutions" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/solutions') ? "text-accent" : "text-white"
-            )}
-          >
-            Solutions
-          </Link>
-          <Link 
-            to="/about" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/about') ? "text-accent" : "text-white"
-            )}
-          >
-            À propos
-          </Link>
-          <Link 
-            to="/pricing" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/pricing') ? "text-accent" : "text-white"
-            )}
-          >
-            Tarifs
-          </Link>
-          <Link 
-            to="/faq" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/faq') ? "text-accent" : "text-white"
-            )}
-          >
-            FAQ
-          </Link>
-          <Link 
-            to="/contact" 
-            className={cn(
-              "text-lg font-medium transition-colors", 
-              isActive('/contact') ? "text-accent" : "text-white"
-            )}
-          >
-            Contact
-          </Link>
-          <Link 
-            to="/demo" 
-            className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-medium transition-all mt-4"
-          >
-            Essai gratuit
-          </Link>
-        </nav>
       </div>
     </header>
   );

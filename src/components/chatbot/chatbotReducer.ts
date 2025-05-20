@@ -1,3 +1,4 @@
+
 import { ChatbotState, ChatAction, Message } from './types'; 
 // Correction: utilisation de ChatAction au lieu de ChatbotAction
 

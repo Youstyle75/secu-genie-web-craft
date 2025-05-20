@@ -56,7 +56,7 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-                // Nouvelles couleurs personnalisées
+                // Couleurs personnalisées demandées dans le cahier des charges
                 textPrincipal: '#2D3748',
                 backgroundPrincipal: '#FFFFFF',
                 accentBleu: '#3182CE',
