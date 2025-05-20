@@ -9,6 +9,50 @@ let nextId = 1;
 export const createSecurityDocument = (
   documentData: Partial<SecurityDocument>
 ): SecurityDocument => {
+  // Assurer un contenu par défaut valide selon le type de document
+  let defaultContent: NoticeSecuriteContent | PlanPreventionContent | GN6Content;
+  
+  switch(documentData.documentType) {
+    case "NoticeSecurite":
+      defaultContent = {
+        descriptionEtablissement: "",
+        moyensSecours: "",
+        consignesEvacuation: ""
+      };
+      break;
+    case "PlanPrevention":
+      defaultContent = {
+        entrepriseUtilisatrice: "",
+        entrepriseExterieure: "",
+        natureTravaux: "",
+        risquesIdentifies: [],
+        mesuresPrevention: []
+      };
+      break;
+    case "GN6":
+      defaultContent = {
+        typeEvenement: "",
+        dateDebut: new Date(),
+        dateFin: new Date(),
+        implantation: "",
+        effectif: {
+          public: 0,
+          personnel: 0,
+          total: 0
+        },
+        mesuresSecurite: [],
+        moyensSecours: []
+      };
+      break;
+    default:
+      // Fallback (ne devrait jamais arriver avec les vérifications TypeScript)
+      defaultContent = {
+        descriptionEtablissement: "",
+        moyensSecours: "",
+        consignesEvacuation: ""
+      };
+  }
+
   const newDoc: SecurityDocument = {
     id: String(nextId++),
     title: documentData.title || "Document sans titre",
@@ -18,7 +62,7 @@ export const createSecurityDocument = (
     updatedAt: new Date(),
     userId: documentData.userId || "user-1",
     establishmentId: documentData.establishmentId || "estab-1",
-    content: documentData.content || {},
+    content: documentData.content || defaultContent,
   };
 
   documents.push(newDoc);

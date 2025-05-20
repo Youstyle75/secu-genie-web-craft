@@ -9,13 +9,14 @@ import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from
 import { PlanPreventionContent } from '@/types/securityDocument';
 import securityDocumentService from '@/services/securityDocumentService';
 
+// Define FormData type explicitly to match what the form is using
 type FormData = {
   title: string;
   establishmentId: string;
   content: PlanPreventionContent;
 };
 
-// Schéma de validation
+// Schéma de validation correctement typé
 const validationSchema = yup.object({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
@@ -23,9 +24,10 @@ const validationSchema = yup.object({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
-    risquesIdentifies: yup.array().min(1, 'Au moins un risque doit être identifié'),
-    mesuresPrevention: yup.array().min(1, 'Au moins une mesure de prévention doit être définie'),
-  }),
+    risquesIdentifies: yup.array().min(1, 'Au moins un risque doit être identifié').required(),
+    mesuresPrevention: yup.array().min(1, 'Au moins une mesure de prévention doit être définie').required(),
+    preventionIncendie: yup.string().optional()
+  }).required(),
 }).required();
 
 const PlanPreventionCreate = () => {
@@ -45,7 +47,7 @@ const PlanPreventionCreate = () => {
     reset,
     watch,
   } = useForm<FormData>({
-    resolver: yupResolver<FormData>(validationSchema),
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
