@@ -42,7 +42,7 @@ const Contact = () => {
     },
   });
   
-  // Modifions la fonction handleSubmit pour corriger l'erreur sur toast.success et toast.error
+  // Correction de la fonction handleSubmit pour utiliser correctement toast
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     
@@ -53,9 +53,8 @@ const Contact = () => {
       // Reset form
       form.reset();
       
-      // Show success message
-      toast({
-        title: "Message envoyé!",
+      // Show success message - correction du format pour toast
+      toast("Message envoyé!", {
         description: "Nous vous répondrons dans les plus brefs délais.",
         variant: "success",
       });
@@ -63,9 +62,8 @@ const Contact = () => {
     } catch (err) {
       console.error("Erreur lors de l'envoi du formulaire:", err);
       
-      // Show error message
-      toast({
-        title: "Erreur",
+      // Show error message - correction du format pour toast
+      toast("Erreur", {
         description: "Une erreur s'est produite lors de l'envoi du message. Veuillez réessayer.",
         variant: "destructive",
       });

@@ -1,4 +1,6 @@
 
+import { SignatureData } from './signature';
+
 export interface SecurityDocument {
   id: string;
   title: string;

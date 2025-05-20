@@ -1,6 +1,5 @@
-
-import { ChatbotState, ChatbotAction, Message } from './types'; 
-// Et partout où vous utilisez ChatbotAction dans ce fichier, utilisez ChatAction
+import { ChatbotState, ChatAction, Message } from './types'; 
+// Correction: utilisation de ChatAction au lieu de ChatbotAction
 
 const initialMessage: Message = {
   id: 'welcome',
@@ -17,7 +16,7 @@ export const initialState: ChatbotState = {
   context: []
 };
 
-export function chatbotReducer(state: ChatbotState, action: ChatbotAction): ChatbotState {
+export function chatbotReducer(state: ChatbotState, action: ChatAction): ChatbotState {
   switch (action.type) {
     case 'TOGGLE_CHAT':
       const newIsOpen = !state.isOpen;
