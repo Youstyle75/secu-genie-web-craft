@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -383,7 +382,7 @@ const DocumentReview = () => {
                                   size="sm" 
                                   onClick={() => {
                                     const section = document.content[comment.sectionId as keyof typeof document.content];
-                                    const sectionElement = document.getElementById(comment.sectionId || '');
+                                    const sectionElement = document.getElementById?.(comment.sectionId || '');
                                     if (sectionElement) {
                                       sectionElement.scrollIntoView({ behavior: 'smooth' });
                                     }

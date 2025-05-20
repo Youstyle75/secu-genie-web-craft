@@ -1,6 +1,4 @@
 
-import { SignatureData } from './signature';
-
 export interface SecurityDocument {
   id: string;
   title: string;
@@ -11,86 +9,40 @@ export interface SecurityDocument {
   userId: string;
   establishmentId: string;
   content: NoticeSecuriteContent | PlanPreventionContent | GN6Content;
-  version: number;
-  comments?: Comment[];
-  signatures?: SignatureData[];
+  
+  // DOM-like methods for document manipulation (needed for export/preview)
+  createElement?: (tag: string) => HTMLElement;
+  getElementById?: (id: string) => HTMLElement | null;
+  body?: HTMLElement;
 }
 
 export interface NoticeSecuriteContent {
   descriptionEtablissement: string;
   moyensSecours: string;
   consignesEvacuation: string;
-  preventionIncendie: string;
-  accessibiliteSecours: string;
-  classementType: string;
-  effectifMaximum: number;
-  dispositionsParticulieres: string;
-  amenagements: string;
-  installationsTechniques: string;
+  // Additional fields as needed
 }
 
 export interface PlanPreventionContent {
   entrepriseUtilisatrice: string;
   entrepriseExterieure: string;
   natureTravaux: string;
-  dateDebutTravaux: Date;
-  dateFinTravaux: Date;
-  lieuIntervention: string;
-  risquesIdentifies: RisqueIdentifie[];
-  mesuresPrevention: MesurePrevention[];
-  personnelAutorise: Personnel[];
-  materielsUtilises: string;
-  consignesParticulieres: string;
+  risquesIdentifies: Array<string>;
+  mesuresPrevention: Array<string>;
+  // Additional fields as needed
 }
 
 export interface GN6Content {
-  nomOrganisateur: string;
-  adresseOrganisateur: string;
-  telOrganisateur: string;
-  qualiteOrganisateur: string;
-  accordExploitant: string;
-  natureManif: string;
-  dateManif: Date;
-  lieuManif: string;
-  configurationSalle: string;
-  installationsParticuli: string;
-  nombreOrganisateurs: number;
-  effectifMaximum: number;
-  mesuresComplementaires: string;
-  serviceOrdre: string;
-  serviceSecurite: string;
-}
-
-export interface RisqueIdentifie {
-  id: string;
-  description: string;
-  niveau: 'faible' | 'moyen' | 'eleve' | 'critique';
-  zone: string;
-}
-
-export interface MesurePrevention {
-  id: string;
-  risqueId: string;
-  description: string;
-  responsable: 'entrepriseUtilisatrice' | 'entrepriseExterieure' | 'les deux';
-  dateRealisation?: Date;
-  statut: 'planifiee' | 'en cours' | 'realisee';
-}
-
-export interface Personnel {
-  id: string;
-  nom: string;
-  prenom: string;
-  fonction: string;
-  entreprise: 'utilisatrice' | 'exterieure';
-  autorisation: string[];
-}
-
-export interface Comment {
-  id: string;
-  userId: string;
-  userName: string;
-  content: string;
-  timestamp: Date;
-  sectionId?: string;
+  typeEvenement: string;
+  dateDebut: Date;
+  dateFin: Date;
+  implantation: string;
+  effectif: {
+    public: number;
+    personnel: number;
+    total: number;
+  };
+  mesuresSecurite: Array<string>;
+  moyensSecours: Array<string>;
+  // Additional fields as needed
 }

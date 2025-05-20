@@ -57,14 +57,14 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
                 // Couleurs personnalisées demandées dans le cahier des charges
-                textPrincipal: '#2D3748',
-                backgroundPrincipal: '#FFFFFF',
-                accentBleu: '#3182CE',
-                accentRouge: '#E53E3E',
-                formBorder: '#E2E8F0',
-                formBackground: '#F7FAFC',
-                alertBackground: '#FEEBC8',
-                alertText: '#B7791F',
+                textPrincipal: '#2D3748', // Texte principal
+                backgroundPrincipal: '#FFFFFF', // Fond principal
+                accentBleu: '#3182CE', // Accent bleu
+                accentRouge: '#E53E3E', // Accent rouge (alerte)
+                formBorder: '#E2E8F0', // Bordure formulaire
+                formBackground: '#F7FAFC', // Fond formulaire
+                alertBackground: '#FEEBC8', // Fond alerte
+                alertText: '#B7791F', // Texte alerte
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -87,7 +87,10 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+                // Relume-style rounded corners
+                'relume-md': '0.75rem',
+                'relume-lg': '1rem',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -135,6 +138,10 @@ export default {
                 'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                 'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                 'modal': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                // Relume-style shadows
+                'relume-soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                'relume-medium': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                'relume-strong': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             },
             spacing: {
                 // Réduction de 30% des espacements verticaux par défaut

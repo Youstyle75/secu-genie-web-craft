@@ -51,6 +51,7 @@
 
   html {
     font-size: 16px; /* Taille de base à 16px */
+    font-family: 'Inter', sans-serif;
   }
 
   body {
@@ -99,7 +100,7 @@
   }
 
   a {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-200 text-accentBleu hover:text-accentBleu/80;
   }
 
   .reveal {
@@ -208,4 +209,39 @@ body.dark-theme .card {
 /* Style spécifique pour les formulaires en mode sombre */
 body.dark-theme form {
   @apply text-dark-foreground;
+}
+
+/* Style de base pour les composants type Relume */
+.relume-card {
+  @apply bg-white rounded-lg p-6 shadow-card border border-gray-100 hover:shadow-card-hover transition-all duration-300;
+}
+
+.relume-button {
+  @apply px-5 py-3 rounded-lg font-medium transition-all duration-300 inline-flex items-center justify-center;
+}
+
+.relume-input {
+  @apply border border-formBorder bg-formBackground rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-accentBleu/30 text-textPrincipal;
+}
+
+/* Styles pour textes à fort contraste */
+.high-contrast-text {
+  @apply text-textPrincipal font-medium;
+}
+
+.high-contrast-text-light {
+  @apply text-white font-medium;
+}
+
+/* Réduction des espacements verticaux */
+.space-y-reduced {
+  @apply space-y-[calc(theme(spacing.4)*0.7)];
+}
+
+.py-reduced {
+  @apply py-[calc(theme(spacing.4)*0.7)];
+}
+
+.my-reduced {
+  @apply my-[calc(theme(spacing.4)*0.7)];
 }
