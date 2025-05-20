@@ -6,104 +6,43 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 0 0% 3.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 3.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 3.9%;
 
-    --primary: 226 59% 26%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 262 100% 44%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
 
-    --accent: 338 76% 48%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 226 59% 26%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
 
-    --radius: 0.75rem;
-    
-    /* Variable pour l'espacement vertical (à 70% de la valeur originale) */
-    --space-y: 1rem;
+    --radius: 0.5rem;
   }
-
-  /* Dark theme is only for specific components, not the whole site */
-  .dark-component {
-    --component-background: #0A0A0A;
-    --component-foreground: #FFFFFF;
-    --component-border: #222222;
-  }
-
+ 
   * {
     @apply border-border;
   }
 
-  html {
-    font-size: 16px; /* Taille de base à 16px */
-    font-family: 'Inter', sans-serif;
-  }
-
   body {
-    @apply bg-white text-textPrincipal font-sans;
-    line-height: 1.5;
-    color: #2D3748; /* Force the text color to be the desired gray */
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-bold text-textPrincipal;
-    line-height: 1.2;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h1 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h2 {
-    @apply text-2xl md:text-3xl lg:text-4xl;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h3 {
-    @apply text-xl md:text-2xl lg:text-3xl;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h4 {
-    @apply text-lg md:text-xl lg:text-2xl;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h5 {
-    @apply text-base md:text-lg lg:text-xl;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  h6 {
-    @apply text-sm md:text-base lg:text-lg;
-    margin-bottom: calc(var(--space-y) * 0.7);
-  }
-
-  p {
-    @apply mb-reduced leading-relaxed text-base;
-    color: #2D3748;
-  }
-
-  a {
-    @apply transition-colors duration-200 text-accentBleu hover:text-accentBleu/80;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   .reveal {
@@ -124,30 +63,30 @@
   .breadcrumb-item:last-child::after {
     content: "";
   }
-  
-  /* Grid pattern for the plan editor */
-  .bg-grid-pattern {
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
+}
 
-  /* Animation de rebond unique pour les notifications */
-  @keyframes bounce-once {
-    0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0);
-    }
-    40% {
-      transform: translateY(-20px);
-    }
-    60% {
-      transform: translateY(-10px);
-    }
+/* Grid pattern for the plan editor */
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Animation de rebond unique pour les notifications */
+@keyframes bounce-once {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
   }
-  
-  .animate-bounce-once {
-    animation: bounce-once 2s ease forwards;
+  40% {
+    transform: translateY(-20px);
   }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 2s ease forwards;
 }
 
 /* Additional animations */
@@ -160,116 +99,7 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Form styling with new color scheme */
+/* Basic form styling */
 input, textarea, select {
-  @apply border border-formBorder bg-formBackground rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-accentBleu/30 text-textPrincipal;
-}
-
-/* Button styling with new color scheme */
-.btn-primary {
-  @apply bg-accentBleu text-white px-4 py-2 rounded-md hover:bg-accentBleu/80 transition-colors;
-}
-
-.btn-secondary {
-  @apply bg-backgroundPrincipal text-textPrincipal px-4 py-2 rounded-md border border-formBorder hover:bg-formBackground transition-colors;
-}
-
-.btn-outline {
-  @apply bg-transparent border border-formBorder px-4 py-2 rounded-md hover:border-accentBleu hover:text-accentBleu transition-colors;
-}
-
-/* Card styling with subtle shadows */
-.card {
-  @apply bg-white rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300;
-}
-
-/* Alert styling with the new color scheme */
-.alert {
-  @apply bg-alertBackground text-alertText px-4 py-3 rounded-md border-l-4 border-alertText;
-}
-
-/* Modal styling with enhanced shadows */
-.modal {
-  @apply bg-white rounded-lg shadow-modal p-6;
-}
-
-/* Dark theme overrides - ONLY FOR SPECIFIC COMPONENTS */
-.dark-theme .editor-component {
-  @apply bg-dark text-white;
-}
-
-/* Improved contrast for dark-theme components */
-.dark-theme .editor-component .label {
-  @apply text-gray-100;
-}
-
-/* Style spécifique pour les formulaires en mode sombre */
-.dark-theme .editor-component form {
-  @apply text-white;
-}
-
-/* Style de base pour les composants type Relume */
-.relume-card {
-  @apply bg-white rounded-lg p-6 shadow-card border border-gray-100 hover:shadow-card-hover transition-all duration-300;
-}
-
-.relume-button {
-  @apply px-5 py-3 rounded-lg font-medium transition-all duration-300 inline-flex items-center justify-center;
-}
-
-.relume-input {
-  @apply border border-formBorder bg-formBackground rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-accentBleu/30 text-textPrincipal;
-}
-
-/* Styles pour textes à fort contraste */
-.high-contrast-text {
-  @apply text-textPrincipal font-medium;
-}
-
-.high-contrast-text-light {
-  @apply text-white font-medium;
-}
-
-/* Réduction des espacements verticaux */
-.space-y-reduced {
-  @apply space-y-[calc(theme(spacing.4)*0.7)];
-}
-
-.py-reduced {
-  @apply py-[calc(theme(spacing.4)*0.7)];
-}
-
-.my-reduced {
-  @apply my-[calc(theme(spacing.4)*0.7)];
-}
-
-/* Ensure button text overflow handling */
-.btn-multiline {
-  @apply min-h-[2.5rem] whitespace-normal break-words;
-  line-height: 1.2;
-}
-
-.btn-ellipsis {
-  @apply overflow-hidden text-ellipsis whitespace-nowrap;
-}
-
-/* Override for dark sections that need to remain dark (like the editor) */
-.bg-dark {
-  background-color: #0A0A0A;
-}
-
-.text-dark-foreground {
-  color: #FFFFFF;
-}
-
-.text-dark-secondary {
-  color: #A0A0A0;
-}
-
-.bg-dark-light {
-  background-color: #222222;
-}
-
-.bg-dark-medium {
-  background-color: #111111;
+  @apply border border-gray-300 bg-white rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-300;
 }

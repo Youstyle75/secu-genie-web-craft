@@ -14,7 +14,7 @@ interface LayoutProps {
 const Layout = ({ children, showBreadcrumb = true, useDarkTheme = false }: LayoutProps) => {
   // Scroll revelation effect
   useEffect(() => {
-    // Only add dark theme class if it's explicitly requested
+    // Only add dark theme class if it's explicitly requested (for specialized editor components)
     if (useDarkTheme) {
       document.body.classList.add('dark-theme');
     } else {
@@ -48,7 +48,7 @@ const Layout = ({ children, showBreadcrumb = true, useDarkTheme = false }: Layou
   }, [useDarkTheme]);
   
   return (
-    <div className={`flex flex-col min-h-screen ${useDarkTheme ? 'bg-dark' : 'bg-white'}`}>
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 md:px-6">

@@ -1,14 +1,9 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Layout from '@/components/layout/Layout';
-import { RelumeButton } from '@/components/ui/relume-button';
-import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from '@/components/ui/relume-card';
-import { PlanPreventionContent } from '@/types/securityDocument';
-import securityDocumentService from '@/services/securityDocumentService';
 
 // Define FormData type explicitly to match required fields
 type FormData = {
@@ -24,19 +19,19 @@ type FormData = {
   };
 };
 
-// Schéma de validation correctement typé
-const validationSchema = yup.object({
+// Schéma de validation pour le type FormData explicite
+const validationSchema = yup.object().shape({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object({
+  content: yup.object().shape({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
-    risquesIdentifies: yup.array().min(1, 'Au moins un risque doit être identifié').required(),
-    mesuresPrevention: yup.array().min(1, 'Au moins une mesure de prévention doit être définie').required(),
+    risquesIdentifies: yup.array().required('Au moins un risque doit être identifié'),
+    mesuresPrevention: yup.array().required('Au moins une mesure de prévention doit être définie'),
     preventionIncendie: yup.string().optional()
   }).required(),
-}) as yup.ObjectSchema<FormData>;
+});
 
 const PlanPreventionCreate = () => {
   const navigate = useNavigate();
@@ -45,15 +40,14 @@ const PlanPreventionCreate = () => {
   
   // Initialiser le formulaire avec react-hook-form
   const {
-    control,
+    register,
     handleSubmit,
     formState: { errors },
     setValue,
     getValues,
-    reset,
-    watch,
+    reset
   } = useForm<FormData>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
@@ -61,58 +55,54 @@ const PlanPreventionCreate = () => {
         entrepriseUtilisatrice: '',
         entrepriseExterieure: '',
         natureTravaux: '',
-        risquesIdentifies: [''],
-        mesuresPrevention: [''],
+        risquesIdentifies: [],
+        mesuresPrevention: [],
         preventionIncendie: '',
       },
     },
   });
   
-  // Liste d'établissements fictifs pour le prototype
-  const establishments = [
-    { id: 'estab-1', name: 'Centre Commercial Les Arcades' },
-    { id: 'estab-2', name: 'Théâtre Municipal' },
-    { id: 'estab-3', name: 'Restaurant La Bonne Table' },
-  ];
-  
-  const onSubmit = (data: FormData) => {
+  // Gestion de la soumission du formulaire
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
-    
-    // Créer un nouveau document via le service
-    const newDocument = securityDocumentService.createSecurityDocument({
-      title: data.title,
-      documentType: 'PlanPrevention',
-      establishmentId: data.establishmentId,
-      content: data.content,
-      status: 'brouillon',
-    });
-    
-    // Rediriger vers la page de relecture du document
-    setTimeout(() => {
+    try {
+      // Simuler l'appel à l'API pour sauvegarder les données
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Données sauvegardées:', data);
+      reset(); // Réinitialiser le formulaire après la sauvegarde
+      navigate('/documents/plan-prevention/liste'); // Rediriger vers la liste
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      // Gérer l'erreur (afficher un message à l'utilisateur)
+    } finally {
       setLoading(false);
-      navigate(`/documents/${newDocument.id}`);
-    }, 1000);
+    }
   };
   
-  const handleGenerateAI = async () => {
-    const currentValues = getValues();
-    if (!currentValues.title || !currentValues.establishmentId) return;
-    
+  // Générer du contenu avec l'IA
+  const generateAIContent = async () => {
     setGeneratingAI(true);
-    
     try {
-      // Appeler le service pour générer du contenu avec l'IA
-      const aiContent = await securityDocumentService.generateAIContent('PlanPrevention', {
-        title: currentValues.title,
-        establishmentId: currentValues.establishmentId
-      });
+      // Simuler l'appel à l'API pour générer du contenu
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       
-      // Mettre à jour les champs du formulaire avec les suggestions de l'IA
-      setValue('content.entrepriseUtilisatrice', aiContent.entrepriseUtilisatrice);
-      setValue('content.entrepriseExterieure', aiContent.entrepriseExterieure);
-      setValue('content.natureTravaux', aiContent.natureTravaux);
+      // Simuler la réception de données générées par l'IA
+      const aiGeneratedContent = {
+        entrepriseUtilisatrice: 'Entreprise IA Utilisatrice',
+        entrepriseExterieure: 'Entreprise IA Extérieure',
+        natureTravaux: 'Travaux générés par IA',
+        risquesIdentifies: ['Risque IA 1', 'Risque IA 2'],
+        mesuresPrevention: ['Mesure IA 1', 'Mesure IA 2'],
+        preventionIncendie: 'Prévention incendie IA',
+      };
+      
+      // Mettre à jour les valeurs du formulaire avec le contenu généré par l'IA
+      Object.keys(aiGeneratedContent).forEach((key) => {
+        setValue(`content.${key}` as keyof FormData["content"], aiGeneratedContent[key]);
+      });
     } catch (error) {
-      console.error('Erreur lors de la génération IA:', error);
+      console.error('Erreur lors de la génération de contenu IA:', error);
+      // Gérer l'erreur (afficher un message à l'utilisateur)
     } finally {
       setGeneratingAI(false);
     }
@@ -120,237 +110,123 @@ const PlanPreventionCreate = () => {
   
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-textPrincipal">Créer un Plan de Prévention</h1>
-          <RelumeButton variant="outline" onClick={() => navigate(-1)}>
-            Annuler
-          </RelumeButton>
-        </div>
+      <div className="container mx-auto py-8">
+        <h1 className="text-2xl font-bold mb-4">Créer un Plan de Prévention</h1>
         
-        <RelumeCard variant="default" className="mb-8">
-          <RelumeCardHeader>
-            <RelumeCardTitle>Informations générales</RelumeCardTitle>
-          </RelumeCardHeader>
-          <RelumeCardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="title" className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Titre du document*
-                  </label>
-                  <Controller
-                    name="title"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        id="title"
-                        className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                          errors.title ? 'border-accentRouge' : 'border-formBorder'
-                        }`}
-                        placeholder="Titre du plan"
-                        {...field}
-                      />
-                    )}
-                  />
-                  {errors.title && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.title.message}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label htmlFor="establishmentId" className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Établissement concerné*
-                  </label>
-                  <Controller
-                    name="establishmentId"
-                    control={control}
-                    render={({ field }) => (
-                      <select
-                        id="establishmentId"
-                        className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                          errors.establishmentId ? 'border-accentRouge' : 'border-formBorder'
-                        }`}
-                        {...field}
-                      >
-                        <option value="">Sélectionnez un établissement</option>
-                        {establishments.map(estab => (
-                          <option key={estab.id} value={estab.id}>
-                            {estab.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  />
-                  {errors.establishmentId && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.establishmentId.message}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex justify-center my-6">
-                <RelumeButton
-                  type="button"
-                  variant="secondary"
-                  onClick={handleGenerateAI}
-                  disabled={generatingAI}
-                  textStyle="multiline"
-                >
-                  {generatingAI ? 'Génération...' : 'Générer avec IA'}
-                </RelumeButton>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="entrepriseUtilisatrice" className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Entreprise utilisatrice*
-                  </label>
-                  <Controller
-                    name="content.entrepriseUtilisatrice"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        id="entrepriseUtilisatrice"
-                        className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                          errors.content?.entrepriseUtilisatrice ? 'border-accentRouge' : 'border-formBorder'
-                        }`}
-                        placeholder="Nom de l'entreprise"
-                        {...field}
-                      />
-                    )}
-                  />
-                  {errors.content?.entrepriseUtilisatrice && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseUtilisatrice.message}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label htmlFor="entrepriseExterieure" className="block text-sm font-medium mb-1 text-textPrincipal">
-                    Entreprise extérieure*
-                  </label>
-                  <Controller
-                    name="content.entrepriseExterieure"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        id="entrepriseExterieure"
-                        className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                          errors.content?.entrepriseExterieure ? 'border-accentRouge' : 'border-formBorder'
-                        }`}
-                        placeholder="Nom de l'entreprise"
-                        {...field}
-                      />
-                    )}
-                  />
-                  {errors.content?.entrepriseExterieure && (
-                    <p className="mt-1 text-sm text-accentRouge">{errors.content.entrepriseExterieure.message}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="natureTravaux" className="block text-sm font-medium mb-1 text-textPrincipal">
-                  Nature des travaux*
-                </label>
-                <Controller
-                  name="content.natureTravaux"
-                  control={control}
-                  render={({ field }) => (
-                    <textarea
-                      id="natureTravaux"
-                      rows={4}
-                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                        errors.content?.natureTravaux ? 'border-accentRouge' : 'border-formBorder'
-                      }`}
-                      placeholder="Description détaillée des travaux"
-                      {...field}
-                    ></textarea>
-                  )}
-                />
-                {errors.content?.natureTravaux && (
-                  <p className="mt-1 text-sm text-accentRouge">{errors.content.natureTravaux.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1 text-textPrincipal">
-                  Risques identifiés*
-                </label>
-                {/* Simplified input for array */}
-                <Controller
-                  name="content.risquesIdentifies"
-                  control={control}
-                  render={({ field }) => (
-                    <input
-                      type="text"
-                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                        errors.content?.risquesIdentifies ? 'border-accentRouge' : 'border-formBorder'
-                      }`}
-                      placeholder="Risques (ex: chute de hauteur, risque électrique)"
-                      value={field.value.join(', ')}
-                      onChange={(e) => field.onChange(e.target.value.split(',').map(item => item.trim()))}
-                    />
-                  )}
-                />
-                {errors.content?.risquesIdentifies && (
-                  <p className="mt-1 text-sm text-accentRouge">
-                    {typeof errors.content.risquesIdentifies === 'string' 
-                      ? errors.content.risquesIdentifies 
-                      : 'Au moins un risque doit être identifié'}
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1 text-textPrincipal">
-                  Mesures de prévention*
-                </label>
-                {/* Simplified input for array */}
-                <Controller
-                  name="content.mesuresPrevention"
-                  control={control}
-                  render={({ field }) => (
-                    <input
-                      type="text"
-                      className={`w-full border rounded-md p-2.5 bg-formBackground text-textPrincipal ${
-                        errors.content?.mesuresPrevention ? 'border-accentRouge' : 'border-formBorder'
-                      }`}
-                      placeholder="Mesures (ex: port du casque, consignation électrique)"
-                      value={field.value.join(', ')}
-                      onChange={(e) => field.onChange(e.target.value.split(',').map(item => item.trim()))}
-                    />
-                  )}
-                />
-                {errors.content?.mesuresPrevention && (
-                  <p className="mt-1 text-sm text-accentRouge">
-                    {typeof errors.content.mesuresPrevention === 'string' 
-                      ? errors.content.mesuresPrevention 
-                      : 'Au moins une mesure de prévention doit être définie'}
-                  </p>
-                )}
-              </div>
-              
-              <div className="flex justify-end gap-3 pt-6">
-                <RelumeButton
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate(-1)}
-                  textStyle="multiline"
-                >
-                  Annuler
-                </RelumeButton>
-                <RelumeButton
-                  type="submit"
-                  variant="default"
-                  disabled={loading}
-                  textStyle="multiline"
-                >
-                  {loading ? 'Création...' : 'Créer le plan'}
-                </RelumeButton>
-              </div>
-            </form>
-          </RelumeCardContent>
-        </RelumeCard>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Titre du Plan de Prévention */}
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Titre</label>
+            <input
+              type="text"
+              id="title"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('title')}
+            />
+            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+          </div>
+          
+          {/* ID de l'établissement */}
+          <div>
+            <label htmlFor="establishmentId" className="block text-sm font-medium text-gray-700">Établissement</label>
+            <input
+              type="text"
+              id="establishmentId"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('establishmentId')}
+            />
+            {errors.establishmentId && <p className="text-red-500 text-sm">{errors.establishmentId.message}</p>}
+          </div>
+          
+          {/* Entreprise Utilisatrice */}
+          <div>
+            <label htmlFor="entrepriseUtilisatrice" className="block text-sm font-medium text-gray-700">Entreprise Utilisatrice</label>
+            <input
+              type="text"
+              id="entrepriseUtilisatrice"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.entrepriseUtilisatrice')}
+            />
+            {errors.content?.entrepriseUtilisatrice && <p className="text-red-500 text-sm">{errors.content.entrepriseUtilisatrice.message}</p>}
+          </div>
+          
+          {/* Entreprise Extérieure */}
+          <div>
+            <label htmlFor="entrepriseExterieure" className="block text-sm font-medium text-gray-700">Entreprise Extérieure</label>
+            <input
+              type="text"
+              id="entrepriseExterieure"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.entrepriseExterieure')}
+            />
+            {errors.content?.entrepriseExterieure && <p className="text-red-500 text-sm">{errors.content.entrepriseExterieure.message}</p>}
+          </div>
+          
+          {/* Nature des Travaux */}
+          <div>
+            <label htmlFor="natureTravaux" className="block text-sm font-medium text-gray-700">Nature des Travaux</label>
+            <textarea
+              id="natureTravaux"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.natureTravaux')}
+            />
+            {errors.content?.natureTravaux && <p className="text-red-500 text-sm">{errors.content.natureTravaux.message}</p>}
+          </div>
+          
+          {/* Risques Identifiés */}
+          <div>
+            <label htmlFor="risquesIdentifies" className="block text-sm font-medium text-gray-700">Risques Identifiés</label>
+            <input
+              type="text"
+              id="risquesIdentifies"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.risquesIdentifies')}
+            />
+            {errors.content?.risquesIdentifies && <p className="text-red-500 text-sm">{errors.content.risquesIdentifies.message}</p>}
+          </div>
+          
+          {/* Mesures de Prévention */}
+          <div>
+            <label htmlFor="mesuresPrevention" className="block text-sm font-medium text-gray-700">Mesures de Prévention</label>
+            <input
+              type="text"
+              id="mesuresPrevention"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.mesuresPrevention')}
+            />
+            {errors.content?.mesuresPrevention && <p className="text-red-500 text-sm">{errors.content.mesuresPrevention.message}</p>}
+          </div>
+          
+          {/* Prévention Incendie */}
+          <div>
+            <label htmlFor="preventionIncendie" className="block text-sm font-medium text-gray-700">Prévention Incendie</label>
+            <textarea
+              id="preventionIncendie"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              {...register('content.preventionIncendie')}
+            />
+            {errors.content?.preventionIncendie && <p className="text-red-500 text-sm">{errors.content.preventionIncendie.message}</p>}
+          </div>
+          
+          {/* Bouton de soumission */}
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+            disabled={loading}
+          >
+            {loading ? 'Enregistrement...' : 'Enregistrer'}
+          </button>
+          
+          {/* Bouton de génération de contenu IA */}
+          <button
+            type="button"
+            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
+            onClick={generateAIContent}
+            disabled={generatingAI}
+          >
+            {generatingAI ? 'Génération IA...' : 'Générer avec IA'}
+          </button>
+        </form>
       </div>
     </Layout>
   );

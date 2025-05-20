@@ -1,6 +1,7 @@
 
-import { Bot } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 const ChatbotHint = () => {
   const [showChatbotHint, setShowChatbotHint] = useState(false);
@@ -17,23 +18,24 @@ const ChatbotHint = () => {
   if (!showChatbotHint) return null;
 
   return (
-    <div className="fixed bottom-24 right-8 bg-dark-medium p-4 rounded-xl shadow-lg z-40 max-w-xs animate-bounce-once reveal active border border-dark-light">
+    <div className="fixed bottom-24 right-8 bg-white p-4 rounded-xl shadow-md z-40 max-w-xs animate-bounce-once reveal active border border-gray-200">
       <div className="flex items-start gap-3">
-        <Bot className="h-6 w-6 text-accent shrink-0" />
+        <MessageSquare className="h-6 w-6 text-blue-500 shrink-0" />
         <div>
-          <p className="font-medium text-dark-foreground mb-2">Une question sur la réglementation?</p>
-          <p className="text-sm text-dark-secondary mb-3">Essayez notre assistant IA spécialisé en réglementation de sécurité!</p>
-          <button 
+          <p className="font-medium text-gray-900 mb-2">Une question sur la réglementation?</p>
+          <p className="text-sm text-gray-600 mb-3">Essayez notre assistant IA spécialisé en réglementation de sécurité!</p>
+          <Button 
             onClick={() => {
               setShowChatbotHint(false);
               document.querySelector('button[aria-label="Ouvrir le chat"]')?.dispatchEvent(
                 new MouseEvent('click', { bubbles: true })
               );
             }}
-            className="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded-lg font-medium transition-all w-full"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+            size="sm"
           >
             Poser ma question
-          </button>
+          </Button>
         </div>
       </div>
     </div>

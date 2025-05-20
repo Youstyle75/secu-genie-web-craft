@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, Shield, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -37,49 +37,45 @@ const Header = () => {
   
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-dark shadow-md py-2' : 'bg-transparent py-4'
+      isScrolled ? 'bg-white shadow-md py-2' : 'bg-white py-4'
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo with Shield icon instead of image */}
           <Link to="/" className="flex items-center">
-            <img 
-              src="/logo-secugenie.svg" 
-              alt="SecuGenie" 
-              className="h-8 md:h-10 w-auto mr-2" 
-              aria-hidden="true" 
-            />
+            <Shield className="h-8 w-8 text-blue-500 mr-2" aria-hidden="true" />
+            <span className="text-xl font-bold">Secu<span className="text-blue-500">Genie</span></span>
           </Link>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link 
               to="/" 
-              className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-accent' : 'text-white hover:text-accent'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
             >
               Accueil
             </Link>
             <Link 
               to="/solutions" 
-              className={`text-sm font-medium transition-colors ${isActive('/solutions') ? 'text-accent' : 'text-white hover:text-accent'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/solutions') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
             >
               Solutions
             </Link>
             <Link 
               to="/about" 
-              className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-accent' : 'text-white hover:text-accent'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
             >
               À propos
             </Link>
             <Link 
               to="/contact" 
-              className={`text-sm font-medium transition-colors ${isActive('/contact') ? 'text-accent' : 'text-white hover:text-accent'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/contact') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
             >
               Contact
             </Link>
             <Link 
               to="/faq" 
-              className={`text-sm font-medium transition-colors ${isActive('/faq') ? 'text-accent' : 'text-white hover:text-accent'}`}
+              className={`text-sm font-medium transition-colors ${isActive('/faq') ? 'text-blue-500' : 'text-gray-800 hover:text-blue-500'}`}
             >
               FAQ
             </Link>
@@ -88,7 +84,7 @@ const Header = () => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/demo">
-              <Button variant="accent" size="sm" className="rounded-md">
+              <Button variant="default" size="sm" className="bg-blue-500 text-white hover:bg-blue-600">
                 Démo
               </Button>
             </Link>
@@ -96,7 +92,7 @@ const Header = () => {
           
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-white p-2"
+            className="md:hidden text-gray-800 p-2"
             onClick={toggleMenu}
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation menu"
@@ -112,7 +108,7 @@ const Header = () => {
               <Link 
                 to="/" 
                 className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                  isActive('/') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -121,7 +117,7 @@ const Header = () => {
               <Link 
                 to="/solutions" 
                 className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/solutions') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                  isActive('/solutions') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -130,7 +126,7 @@ const Header = () => {
               <Link 
                 to="/about" 
                 className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/about') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                  isActive('/about') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -139,7 +135,7 @@ const Header = () => {
               <Link 
                 to="/contact" 
                 className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/contact') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                  isActive('/contact') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -148,7 +144,7 @@ const Header = () => {
               <Link 
                 to="/faq" 
                 className={`text-sm font-medium px-3 py-2 rounded-md transition-colors ${
-                  isActive('/faq') ? 'bg-dark-medium text-accent' : 'text-white hover:bg-dark-medium hover:text-accent'
+                  isActive('/faq') ? 'bg-gray-100 text-blue-500' : 'text-gray-800 hover:bg-gray-100 hover:text-blue-500'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -156,7 +152,7 @@ const Header = () => {
               </Link>
               <Link 
                 to="/demo"
-                className="bg-accent text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Démo
