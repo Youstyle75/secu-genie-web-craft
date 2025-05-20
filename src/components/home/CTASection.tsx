@@ -15,7 +15,7 @@ const CTASection = () => {
           </p>
           <Link
             to="/demo"
-            className="bg-accent hover:bg-accent-hover text-white px-8 py-4 rounded-lg font-medium transition-all inline-flex items-center"
+            className="bg-accentBleu hover:bg-accentBleu/90 text-white px-8 py-4 rounded-lg font-medium transition-all inline-flex items-center shadow-lg"
           >
             Démarrer maintenant
             <ArrowRight className="ml-2 h-5 w-5" />

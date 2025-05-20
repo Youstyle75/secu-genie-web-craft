@@ -29,12 +29,18 @@ const relumeButtonVariants = cva(
         default: "rounded-relume-md",
         full: "rounded-full",
       },
+      textStyle: {
+        default: "whitespace-nowrap",
+        multiline: "whitespace-normal min-h-[2.5rem] break-words leading-tight",
+        ellipsis: "overflow-hidden text-ellipsis whitespace-nowrap",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
       rounded: "default",
       fullWidth: false,
+      textStyle: "default",
     },
   }
 );
@@ -46,10 +52,10 @@ export interface RelumeButtonProps
 }
 
 const RelumeButton = React.forwardRef<HTMLButtonElement, RelumeButtonProps>(
-  ({ className, variant, size, fullWidth, rounded, children, ...props }, ref) => {
+  ({ className, variant, size, fullWidth, rounded, textStyle, children, ...props }, ref) => {
     return (
       <button
-        className={cn(relumeButtonVariants({ variant, size, fullWidth, rounded, className }))}
+        className={cn(relumeButtonVariants({ variant, size, fullWidth, rounded, textStyle, className }))}
         ref={ref}
         {...props}
       >

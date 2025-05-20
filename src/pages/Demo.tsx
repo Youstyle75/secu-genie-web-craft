@@ -14,7 +14,7 @@ const Demo = () => {
       <div className="py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 reveal">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Démonstration</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-textPrincipal">Démonstration</h1>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto">
               Découvrez les fonctionnalités de SecuGenie à travers cette démonstration interactive.
             </p>
@@ -23,7 +23,7 @@ const Demo = () => {
           <div className="mb-10 reveal">
             <div className="flex flex-col sm:flex-row justify-between gap-6 md:gap-12 bg-primary/5 rounded-lg p-6">
               <div>
-                <h2 className="text-2xl font-bold mb-3">
+                <h2 className="text-2xl font-bold mb-3 text-textPrincipal">
                   Essayez SecuGenie gratuitement
                 </h2>
                 <p className="text-gray-700 mb-4">
@@ -84,7 +84,7 @@ const Demo = () => {
           </div>
 
           <div className="mt-12 text-center reveal">
-            <h3 className="text-2xl font-bold mb-4">Vous avez besoin de plus d'informations ?</h3>
+            <h3 className="text-2xl font-bold mb-4 text-textPrincipal">Vous avez besoin de plus d'informations ?</h3>
             <p className="text-gray-700 mb-6 max-w-3xl mx-auto">
               N'hésitez pas à nous contacter pour en savoir plus sur nos solutions ou pour organiser une démonstration personnalisée avec l'un de nos experts.
             </p>

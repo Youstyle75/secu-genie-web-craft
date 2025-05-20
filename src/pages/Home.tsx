@@ -14,9 +14,6 @@ const Home = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // Add dark theme class to body
-    document.body.classList.add('dark-theme');
-    
     // Initialize the observer to add reveal animations
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -36,8 +33,6 @@ const Home = () => {
 
     return () => {
       observerRef.current?.disconnect();
-      // Remove dark theme class when component unmounts
-      document.body.classList.remove('dark-theme');
     };
   }, []);
 

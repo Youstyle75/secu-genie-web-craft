@@ -14,7 +14,7 @@ const HeroSection = () => {
           </h1>
         </div>
         
-        <h2 className="text-xl md:text-2xl mb-10 text-dark-secondary">
+        <h2 className="text-xl md:text-2xl mb-10 text-dark-secondary leading-snug">
           Générez, modifiez et déployez des documents de sécurité professionnels <span className="text-accent">en quelques minutes</span>
         </h2>
         

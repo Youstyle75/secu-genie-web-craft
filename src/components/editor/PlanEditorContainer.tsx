@@ -18,8 +18,8 @@ const PlanEditorContainer = () => {
   const [importLoading, setImportLoading] = useState(false);
 
   return (
-    <div className="bg-dark-light rounded-lg shadow-md p-4 md:p-6 relative">
-      <h3 className="text-xl font-bold mb-4 text-dark-foreground">Éditeur de Plan Avancé</h3>
+    <div className="bg-dark-light rounded-lg shadow-md p-4 md:p-6 relative editor-component">
+      <h3 className="text-xl font-bold mb-4 text-white">Éditeur de Plan Avancé</h3>
       
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Element Library */}

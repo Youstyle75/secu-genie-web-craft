@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
@@ -24,10 +25,10 @@ type FormData = {
 };
 
 // Schéma de validation correctement typé
-const validationSchema = yup.object().shape({
+const validationSchema = yup.object({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object().shape({
+  content: yup.object({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
@@ -35,7 +36,7 @@ const validationSchema = yup.object().shape({
     mesuresPrevention: yup.array().min(1, 'Au moins une mesure de prévention doit être définie').required(),
     preventionIncendie: yup.string().optional()
   }).required(),
-});
+}) as yup.ObjectSchema<FormData>;
 
 const PlanPreventionCreate = () => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const PlanPreventionCreate = () => {
     reset,
     watch,
   } = useForm<FormData>({
-    resolver: yupResolver<FormData>(validationSchema),
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
@@ -60,8 +61,8 @@ const PlanPreventionCreate = () => {
         entrepriseUtilisatrice: '',
         entrepriseExterieure: '',
         natureTravaux: '',
-        risquesIdentifies: [],
-        mesuresPrevention: [],
+        risquesIdentifies: [''],
+        mesuresPrevention: [''],
         preventionIncendie: '',
       },
     },
@@ -193,6 +194,7 @@ const PlanPreventionCreate = () => {
                   variant="secondary"
                   onClick={handleGenerateAI}
                   disabled={generatingAI}
+                  textStyle="multiline"
                 >
                   {generatingAI ? 'Génération...' : 'Générer avec IA'}
                 </RelumeButton>
@@ -274,8 +276,7 @@ const PlanPreventionCreate = () => {
                 <label className="block text-sm font-medium mb-1 text-textPrincipal">
                   Risques identifiés*
                 </label>
-                {/* Ajoutez ici une liste de risques avec des checkboxes ou un système de tags */}
-                {/* Exemple simplifié avec une entrée de texte */}
+                {/* Simplified input for array */}
                 <Controller
                   name="content.risquesIdentifies"
                   control={control}
@@ -286,12 +287,17 @@ const PlanPreventionCreate = () => {
                         errors.content?.risquesIdentifies ? 'border-accentRouge' : 'border-formBorder'
                       }`}
                       placeholder="Risques (ex: chute de hauteur, risque électrique)"
-                      {...field}
+                      value={field.value.join(', ')}
+                      onChange={(e) => field.onChange(e.target.value.split(',').map(item => item.trim()))}
                     />
                   )}
                 />
                 {errors.content?.risquesIdentifies && (
-                  <p className="mt-1 text-sm text-accentRouge">{errors.content.risquesIdentifies.message}</p>
+                  <p className="mt-1 text-sm text-accentRouge">
+                    {typeof errors.content.risquesIdentifies === 'string' 
+                      ? errors.content.risquesIdentifies 
+                      : 'Au moins un risque doit être identifié'}
+                  </p>
                 )}
               </div>
               
@@ -299,8 +305,7 @@ const PlanPreventionCreate = () => {
                 <label className="block text-sm font-medium mb-1 text-textPrincipal">
                   Mesures de prévention*
                 </label>
-                {/* Ajoutez ici une liste de mesures de prévention avec des checkboxes ou un système de tags */}
-                {/* Exemple simplifié avec une entrée de texte */}
+                {/* Simplified input for array */}
                 <Controller
                   name="content.mesuresPrevention"
                   control={control}
@@ -311,12 +316,17 @@ const PlanPreventionCreate = () => {
                         errors.content?.mesuresPrevention ? 'border-accentRouge' : 'border-formBorder'
                       }`}
                       placeholder="Mesures (ex: port du casque, consignation électrique)"
-                      {...field}
+                      value={field.value.join(', ')}
+                      onChange={(e) => field.onChange(e.target.value.split(',').map(item => item.trim()))}
                     />
                   )}
                 />
                 {errors.content?.mesuresPrevention && (
-                  <p className="mt-1 text-sm text-accentRouge">{errors.content.mesuresPrevention.message}</p>
+                  <p className="mt-1 text-sm text-accentRouge">
+                    {typeof errors.content.mesuresPrevention === 'string' 
+                      ? errors.content.mesuresPrevention 
+                      : 'Au moins une mesure de prévention doit être définie'}
+                  </p>
                 )}
               </div>
               
@@ -325,6 +335,7 @@ const PlanPreventionCreate = () => {
                   type="button"
                   variant="outline"
                   onClick={() => navigate(-1)}
+                  textStyle="multiline"
                 >
                   Annuler
                 </RelumeButton>
@@ -332,6 +343,7 @@ const PlanPreventionCreate = () => {
                   type="submit"
                   variant="default"
                   disabled={loading}
+                  textStyle="multiline"
                 >
                   {loading ? 'Création...' : 'Créer le plan'}
                 </RelumeButton>

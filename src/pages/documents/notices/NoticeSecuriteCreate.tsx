@@ -23,16 +23,16 @@ type FormData = {
 };
 
 // Schéma de validation correctement typé
-const validationSchema = yup.object().shape({
+const validationSchema = yup.object({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object().shape({
+  content: yup.object({
     descriptionEtablissement: yup.string().required('La description est obligatoire'),
     moyensSecours: yup.string().required('Les moyens de secours sont obligatoires'),
     consignesEvacuation: yup.string().required('Les consignes d\'évacuation sont obligatoires'),
     preventionIncendie: yup.string().optional()
   }).required(),
-});
+}) as yup.ObjectSchema<FormData>;
 
 const NoticeSecuriteCreate = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const NoticeSecuriteCreate = () => {
     getValues,
     reset,
   } = useForm<FormData>({
-    resolver: yupResolver<FormData>(validationSchema),
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
