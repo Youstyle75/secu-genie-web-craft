@@ -44,6 +44,7 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          hover: "#2B6CB0",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -53,11 +54,26 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Couleurs personnalisées explicitement définies
+        textPrincipal: "#2D3748", // Gris anthracite pour le texte principal
+        formBackground: "#F7FAFC", // Fond léger pour les formulaires
+        formBorder: "#E2E8F0",    // Bordure pour les formulaires
+        accentBleu: "#3182CE",    // Bleu accent principal
+        accentRouge: "#E53E3E",   // Rouge pour les alertes
+        alertBackground: "#FEEBC8", // Fond pour les alertes
+        alertText: "#B7791F",     // Texte pour les alertes
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "relume-md": "0.5rem",
+        "relume-lg": "0.75rem",
+      },
+      boxShadow: {
+        "relume-soft": "0 2px 4px rgba(0, 0, 0, 0.05)",
+        "relume-medium": "0 4px 6px rgba(0, 0, 0, 0.07)",
+        "relume-strong": "0 10px 15px rgba(0, 0, 0, 0.1)",
       },
       keyframes: {
         "accordion-down": {

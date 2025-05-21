@@ -18,9 +18,9 @@ const ChatbotHint = () => {
   if (!showChatbotHint) return null;
 
   return (
-    <div className="fixed bottom-24 right-8 bg-white p-5 rounded-lg shadow-lg z-40 max-w-xs animate-bounce-once reveal active border border-gray-200">
+    <div className="fixed bottom-24 right-8 bg-white p-5 rounded-relume-md shadow-relume-medium z-40 max-w-xs animate-bounce-once reveal active border border-gray-200">
       <div className="flex items-start gap-4">
-        <MessageSquare className="h-6 w-6 text-accent shrink-0" />
+        <MessageSquare className="h-6 w-6 text-accentBleu shrink-0" />
         <div>
           <p className="font-medium text-textPrincipal mb-3">Une question sur la réglementation?</p>
           <p className="text-sm text-textPrincipal/70 mb-4 leading-relaxed">Essayez notre assistant IA spécialisé en réglementation de sécurité incendie!</p>
@@ -31,7 +31,7 @@ const ChatbotHint = () => {
                 new MouseEvent('click', { bubbles: true })
               );
             }}
-            className="w-full bg-accent hover:bg-accent-hover text-white font-medium shadow-sm hover:shadow-md transition-all"
+            className="w-full bg-accentBleu hover:bg-accent-hover text-white font-medium shadow-relume-soft hover:shadow-relume-medium transition-all"
             size="sm"
           >
             Poser ma question

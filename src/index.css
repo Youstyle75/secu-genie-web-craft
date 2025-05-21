@@ -165,7 +165,7 @@
 
   /* Formulaires */
   .form-input {
-    @apply w-full border border-gray-200 bg-white rounded-lg px-4 py-3 text-textPrincipal placeholder:text-textPrincipal/50
+    @apply w-full border border-formBorder bg-formBackground rounded-relume-md px-4 py-3 text-textPrincipal placeholder:text-textPrincipal/50
            focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all;
   }
   
@@ -183,11 +183,11 @@
 
   /* Boutons */
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-relume-md font-medium transition-all duration-200;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-white hover:bg-accent-hover shadow-sm hover:shadow-md;
+    @apply btn bg-accentBleu text-white hover:bg-accent-hover shadow-relume-soft hover:shadow-relume-medium;
   }
 
   .btn-secondary {
@@ -195,7 +195,7 @@
   }
 
   .btn-outline {
-    @apply btn bg-transparent border border-gray-200 text-textPrincipal hover:border-gray-300;
+    @apply btn bg-transparent border border-formBorder text-textPrincipal hover:border-gray-300;
   }
 
   .btn-ghost {
@@ -216,7 +216,7 @@
 
   /* Cartes */
   .card {
-    @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all;
+    @apply bg-white rounded-relume-md border border-formBorder shadow-relume-soft hover:shadow-relume-medium transition-all;
   }
 
   .card-body {
@@ -224,28 +224,28 @@
   }
 
   .card-header {
-    @apply pb-4 mb-4 border-b border-gray-200;
+    @apply pb-4 mb-4 border-b border-formBorder;
   }
 
   .card-footer {
-    @apply pt-4 mt-4 border-t border-gray-200;
+    @apply pt-4 mt-4 border-t border-formBorder;
   }
 
   /* Alertes */
   .alert {
-    @apply p-4 rounded-lg border-l-4;
+    @apply p-4 rounded-relume-md border-l-4;
   }
 
   .alert-info {
-    @apply alert bg-blue-50 border-accent text-accent/80;
+    @apply alert bg-blue-50 border-accentBleu text-accentBleu/80;
   }
 
   .alert-warning {
-    @apply alert bg-amber-50 border-amber-500 text-amber-700;
+    @apply alert bg-alertBackground border-alertText text-alertText;
   }
 
   .alert-danger {
-    @apply alert bg-red-50 border-destructive text-destructive/80;
+    @apply alert bg-red-50 border-accentRouge text-accentRouge/80;
   }
   
   /* Badges */
@@ -254,7 +254,7 @@
   }
   
   .badge-primary {
-    @apply badge bg-accent/10 text-accent;
+    @apply badge bg-accentBleu/10 text-accentBleu;
   }
   
   .badge-secondary {
