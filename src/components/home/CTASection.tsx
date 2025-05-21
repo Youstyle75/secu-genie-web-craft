@@ -16,7 +16,7 @@ const CTASection = () => {
           </p>
           <Button
             asChild
-            className="bg-accent hover:bg-accent-hover text-white px-8 py-6 text-lg font-medium rounded-relume shadow-relume hover:shadow-lg-relume transition-all"
+            className="bg-accent hover:bg-accent-hover text-white px-8 py-6 text-lg font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
             size="lg"
           >
             <Link to="/demo" className="inline-flex items-center">

@@ -1,17 +1,13 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Layout from '@/components/layout/Layout';
-import { RelumeButton } from '@/components/ui/relume-button';
-import { RelumeCard, RelumeCardHeader, RelumeCardTitle, RelumeCardContent } from '@/components/ui/relume-card';
-import { NoticeSecuriteContent } from '@/types/securityDocument';
 import securityDocumentService from '@/services/securityDocumentService';
 
-// Define FormData type explicitly to match required fields
-type FormData = {
+// Définition du type FormData explicitement pour le formulaire
+interface FormData {
   title: string;
   establishmentId: string;
   content: {
@@ -20,9 +16,9 @@ type FormData = {
     consignesEvacuation: string;
     preventionIncendie?: string;
   };
-};
+}
 
-// Schéma de validation correctement typé
+// Schéma de validation Yup
 const validationSchema = yup.object({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
@@ -30,9 +26,9 @@ const validationSchema = yup.object({
     descriptionEtablissement: yup.string().required('La description est obligatoire'),
     moyensSecours: yup.string().required('Les moyens de secours sont obligatoires'),
     consignesEvacuation: yup.string().required('Les consignes d\'évacuation sont obligatoires'),
-    preventionIncendie: yup.string().optional()
-  }).required(),
-}) as yup.ObjectSchema<FormData>;
+    preventionIncendie: yup.string()
+  }).required()
+});
 
 const NoticeSecuriteCreate = () => {
   const navigate = useNavigate();
@@ -48,7 +44,7 @@ const NoticeSecuriteCreate = () => {
     getValues,
     reset,
   } = useForm<FormData>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
       title: '',
       establishmentId: '',
@@ -68,7 +64,7 @@ const NoticeSecuriteCreate = () => {
     { id: 'estab-3', name: 'Restaurant La Bonne Table' },
   ];
   
-  const onSubmit = (data: FormData) => {
+  const onSubmit: SubmitHandler<FormData> = (data: FormData) => {
     setLoading(true);
     
     // Créer un nouveau document via le service

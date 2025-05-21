@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Layout from '@/components/layout/Layout';
+import securityDocumentService from '@/services/securityDocumentService';
 
-// Define FormData type explicitly to match required fields
-type FormData = {
+// Définition explicite du type FormData
+interface FormData {
   title: string;
   establishmentId: string;
   content: {
@@ -17,20 +18,20 @@ type FormData = {
     mesuresPrevention: any[];
     preventionIncendie?: string;
   };
-};
+}
 
-// Schéma de validation pour le type FormData explicite
-const validationSchema = yup.object().shape({
+// Schéma de validation correctement typé
+const validationSchema = yup.object({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object().shape({
+  content: yup.object({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
-    risquesIdentifies: yup.array().required('Au moins un risque doit être identifié'),
-    mesuresPrevention: yup.array().required('Au moins une mesure de prévention doit être définie'),
-    preventionIncendie: yup.string().optional()
-  }).required(),
+    risquesIdentifies: yup.array().required('Les risques identifiés sont obligatoires'),
+    mesuresPrevention: yup.array().required('Les mesures de prévention sont obligatoires'),
+    preventionIncendie: yup.string()
+  }).required()
 });
 
 const PlanPreventionCreate = () => {
@@ -40,12 +41,12 @@ const PlanPreventionCreate = () => {
   
   // Initialiser le formulaire avec react-hook-form
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
     setValue,
     getValues,
-    reset
+    reset,
   } = useForm<FormData>({
     resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
@@ -62,47 +63,58 @@ const PlanPreventionCreate = () => {
     },
   });
   
-  // Gestion de la soumission du formulaire
-  const onSubmit = async (data: FormData) => {
+  // Liste d'établissements fictifs pour le prototype
+  const establishments = [
+    { id: 'estab-1', name: 'Centre Commercial Les Arcades' },
+    { id: 'estab-2', name: 'Théâtre Municipal' },
+    { id: 'estab-3', name: 'Restaurant La Bonne Table' },
+  ];
+  
+  const onSubmit: SubmitHandler<FormData> = (data) => {
     setLoading(true);
-    try {
-      // Simuler l'appel à l'API pour sauvegarder les données
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Données sauvegardées:', data);
-      reset(); // Réinitialiser le formulaire après la sauvegarde
-      navigate('/documents/plan-prevention/liste'); // Rediriger vers la liste
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      // Gérer l'erreur (afficher un message à l'utilisateur)
-    } finally {
+    
+    // Créer un nouveau document via le service
+    const newDocument = securityDocumentService.createSecurityDocument({
+      title: data.title,
+      documentType: 'PlanPrevention',
+      establishmentId: data.establishmentId,
+      content: data.content,
+      status: 'brouillon',
+    });
+    
+    // Rediriger vers la page de relecture du document
+    setTimeout(() => {
       setLoading(false);
-    }
+      navigate(`/documents/${newDocument.id}/relecture`);
+    }, 1000);
   };
   
-  // Générer du contenu avec l'IA
-  const generateAIContent = async () => {
+  const handleFieldChange = (field: string, value: string) => {
+    // Nous utilisons la notation avec template literal pour les champs imbriqués
+    setValue(`content.${field}` as any, value);
+  };
+  
+  const handleGenerateAI = async () => {
+    const currentValues = getValues();
+    if (!currentValues.title || !currentValues.establishmentId) return;
+    
     setGeneratingAI(true);
+    
     try {
-      // Simuler l'appel à l'API pour générer du contenu
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // Simuler la réception de données générées par l'IA
-      const aiGeneratedContent = {
-        entrepriseUtilisatrice: 'Entreprise IA Utilisatrice',
-        entrepriseExterieure: 'Entreprise IA Extérieure',
-        natureTravaux: 'Travaux générés par IA',
-        risquesIdentifies: ['Risque IA 1', 'Risque IA 2'],
-        mesuresPrevention: ['Mesure IA 1', 'Mesure IA 2'],
-        preventionIncendie: 'Prévention incendie IA',
-      };
-      
-      // Mettre à jour les valeurs du formulaire avec le contenu généré par l'IA
-      Object.keys(aiGeneratedContent).forEach((key) => {
-        setValue(`content.${key}` as keyof FormData["content"], aiGeneratedContent[key]);
+      // Appeler le service pour générer du contenu avec l'IA
+      const aiContent = await securityDocumentService.generateAIContent('PlanPrevention', {
+        title: currentValues.title,
+        establishmentId: currentValues.establishmentId
       });
+      
+      // Mettre à jour les champs du formulaire avec les suggestions de l'IA
+      setValue('content.entrepriseUtilisatrice', aiContent.entrepriseUtilisatrice);
+      setValue('content.entrepriseExterieure', aiContent.entrepriseExterieure);
+      setValue('content.natureTravaux', aiContent.natureTravaux);
+      setValue('content.risquesIdentifies', aiContent.risquesIdentifies || []);
+      setValue('content.mesuresPrevention', aiContent.mesuresPrevention || []);
     } catch (error) {
-      console.error('Erreur lors de la génération de contenu IA:', error);
-      // Gérer l'erreur (afficher un message à l'utilisateur)
+      console.error('Erreur lors de la génération IA:', error);
     } finally {
       setGeneratingAI(false);
     }
@@ -221,7 +233,7 @@ const PlanPreventionCreate = () => {
           <button
             type="button"
             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
-            onClick={generateAIContent}
+            onClick={handleGenerateAI}
             disabled={generatingAI}
           >
             {generatingAI ? 'Génération IA...' : 'Générer avec IA'}

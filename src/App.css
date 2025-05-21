@@ -41,3 +41,68 @@
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
 }
+
+/* Relume-inspired gradient button */
+.gradient-btn {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.gradient-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(40deg, #3182CE 0%, #63B3ED 100%);
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-btn:hover::before {
+  opacity: 0.8;
+}
+
+/* Relume-inspired card hover effect */
+.hover-card {
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.hover-card:hover {
+  border-color: #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  transform: translateY(-5px);
+}
+
+/* Smooth transitions for all elements */
+*, *::before, *::after {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Container styles inspired by Relume */
+.container-small {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.container-medium {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.container-large {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}

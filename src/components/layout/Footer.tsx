@@ -9,15 +9,15 @@ const Footer = () => {
     <footer className="bg-gray-50 text-textPrincipal border-t border-gray-100">
       <div className="container-large mx-auto">
         {/* Footer main content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 py-16 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 py-20 px-4">
           {/* Company Info */}
           <div className="lg:col-span-4">
             <div className="flex items-center mb-6">
               <Shield className="h-7 w-7 text-accent mr-3" aria-hidden="true" />
               <h3 className="text-2xl font-bold">SecuGenie</h3>
             </div>
-            <p className="mb-6 text-textPrincipal/70 text-base">
-              Solutions innovantes de création de documents de sécurité pour les événements et ERP utilisant l'IA.
+            <p className="mb-8 text-textPrincipal/70 text-base leading-relaxed">
+              Solutions innovantes de création de documents de sécurité incendie pour les événements et ERP utilisant l'IA.
             </p>
             <div className="flex space-x-5">
               <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" 
@@ -41,7 +41,7 @@ const Footer = () => {
           {/* Navigation Links */}
           <div className="lg:col-span-2">
             <h3 className="text-base font-semibold mb-5">Navigation</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               <li>
                 <Link to="/" className="text-textPrincipal/70 hover:text-accent transition-colors text-sm">
                   Accueil
@@ -73,7 +73,7 @@ const Footer = () => {
           {/* Documents */}
           <div className="lg:col-span-2">
             <h3 className="text-base font-semibold mb-5">Documents</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               <li>
                 <Link to="/documents/notice-securite/creer" className="text-textPrincipal/70 hover:text-accent transition-colors text-sm">
                   Notice de Sécurité
