@@ -47,6 +47,7 @@ const PlanPreventionCreate = () => {
     setValue,
     getValues,
     reset,
+    register,
   } = useForm<FormData>({
     resolver: yupResolver<FormData>(validationSchema),
     defaultValues: {
