@@ -12,6 +12,10 @@ import Demo from './pages/Demo';
 import NotFound from './pages/NotFound';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import Dashboard from './pages/Dashboard';
+import ProjectList from './pages/projects/ProjectList';
+import ProjectCreate from './pages/projects/ProjectCreate';
+import ProjectDetail from './pages/projects/ProjectDetail';
 import NoticeSecuriteCreate from './pages/documents/notices/NoticeSecuriteCreate';
 import PlanPreventionCreate from './pages/documents/plans/PlanPreventionCreate';
 import DocumentReview from './pages/documents/DocumentReview';
@@ -33,7 +37,15 @@ function App() {
           <Route path="/auth/register" element={<Register />} />
           
           {/* Routes protégées */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
+          
+          {/* Projets */}
+          <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
+          <Route path="/projects/create" element={<ProtectedRoute><ProjectCreate /></ProtectedRoute>} />
+          <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+          
+          {/* Documents */}
           <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
           <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><PlanPreventionCreate /></ProtectedRoute>} />
           <Route path="/documents/:id/relecture" element={<ProtectedRoute><DocumentReview /></ProtectedRoute>} />

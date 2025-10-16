@@ -14,7 +14,255 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          document_id: string
+          id: string
+          metadata: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          document_id: string
+          id?: string
+          metadata?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          metadata?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          content: Json | null
+          created_at: string
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          project_id: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          metadata: Json | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          nom: string
+          organization: string | null
+          phone_number: string | null
+          prenom: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          nom: string
+          organization?: string | null
+          phone_number?: string | null
+          prenom: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          nom?: string
+          organization?: string | null
+          phone_number?: string | null
+          prenom?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          description: string | null
+          erp_type: string | null
+          id: string
+          location: string | null
+          metadata: Json | null
+          name: string
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          erp_type?: string | null
+          id?: string
+          location?: string | null
+          metadata?: Json | null
+          name: string
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          erp_type?: string | null
+          id?: string
+          location?: string | null
+          metadata?: Json | null
+          name?: string
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      signatures: {
+        Row: {
+          certificate_data: Json | null
+          created_at: string
+          document_id: string
+          id: string
+          ip_address: string | null
+          signature_data: string
+          signed_at: string
+          user_id: string
+        }
+        Insert: {
+          certificate_data?: Json | null
+          created_at?: string
+          document_id: string
+          id?: string
+          ip_address?: string | null
+          signature_data: string
+          signed_at?: string
+          user_id: string
+        }
+        Update: {
+          certificate_data?: Json | null
+          created_at?: string
+          document_id?: string
+          id?: string
+          ip_address?: string | null
+          signature_data?: string
+          signed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signatures_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

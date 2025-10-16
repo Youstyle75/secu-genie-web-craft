@@ -73,6 +73,28 @@ const Header = () => {
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
+                  <Link to="/dashboard" className={cn(
+                    "text-sm transition-colors px-3 py-2 rounded-md font-medium",
+                    isActive('/dashboard') 
+                      ? "text-accent bg-accent/5" 
+                      : "text-primary hover:text-accent hover:bg-accent/5"
+                  )}>
+                    Dashboard
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
+                  <Link to="/projects" className={cn(
+                    "text-sm transition-colors px-3 py-2 rounded-md font-medium",
+                    isActive('/projects') 
+                      ? "text-accent bg-accent/5" 
+                      : "text-primary hover:text-accent hover:bg-accent/5"
+                  )}>
+                    Projets
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
                   <NavigationMenuTrigger className={cn(
                     "text-sm transition-colors rounded-md font-medium",
                     isActive('/solutions') 
@@ -124,17 +146,6 @@ const Header = () => {
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
-                  <Link to="/about" className={cn(
-                    "text-sm transition-colors px-3 py-2 rounded-md font-medium",
-                    isActive('/about') 
-                      ? "text-accent bg-accent/5" 
-                      : "text-primary hover:text-accent hover:bg-accent/5"
-                  )}>
-                    À propos
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
                   <Link to="/contact" className={cn(
                     "text-sm transition-colors px-3 py-2 rounded-md font-medium",
                     isActive('/contact') 
@@ -142,17 +153,6 @@ const Header = () => {
                       : "text-primary hover:text-accent hover:bg-accent/5"
                   )}>
                     Contact
-                  </Link>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  <Link to="/faq" className={cn(
-                    "text-sm transition-colors px-3 py-2 rounded-md font-medium",
-                    isActive('/faq') 
-                      ? "text-accent bg-accent/5" 
-                      : "text-primary hover:text-accent hover:bg-accent/5"
-                  )}>
-                    FAQ
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
