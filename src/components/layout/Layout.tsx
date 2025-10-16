@@ -4,6 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Breadcrumb from './Breadcrumb';
 import Chatbot from '../chatbot/Chatbot';
+import { ThemeConfigurator } from '@/components/theme/ThemeConfigurator';
 
 interface LayoutProps {
   children: ReactNode;
@@ -58,6 +59,7 @@ const Layout = ({ children, showBreadcrumb = true, useDarkTheme = false }: Layou
       </main>
       <Footer />
       <Chatbot />
+      <ThemeConfigurator />
     </div>
   );
 };

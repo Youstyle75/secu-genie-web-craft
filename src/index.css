@@ -49,19 +49,30 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Focus visible for keyboard navigation (AAA accessibility) */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+
   ::selection {
     @apply bg-accent/20 text-primary;
   }
 
   html {
-    font-size: 16px;
+    font-size: 16px; /* AAA minimum */
     scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    line-height: 1.6;
+    line-height: 1.6; /* AAA readability */
     min-height: 100vh;
+  }
+
+  /* Skip to main content for screen readers */
+  .skip-to-main {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50;
+    @apply bg-primary text-white px-4 py-2 rounded-lg font-semibold;
   }
 
   h1, h2, h3, h4, h5, h6 {

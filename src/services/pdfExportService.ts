@@ -38,16 +38,21 @@ export const exportDocumentToPDF = async (
     const contentWidth = pageWidth - (2 * margin);
     let yPosition = margin;
 
-    // Add SecuGenie Logo/Header
+    // Add SecuGenie Logo/Header with gradient-like effect
     pdf.setFillColor(37, 99, 235); // Primary blue
-    pdf.rect(0, 0, pageWidth, 15, 'F');
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('SecuGenie', margin, 10);
+    pdf.rect(0, 0, pageWidth, 20, 'F');
     
-    yPosition = 25;
-    pdf.setTextColor(0, 0, 0);
+    // Add subtle accent line
+    pdf.setFillColor(228, 62, 62); // Accent red
+    pdf.rect(0, 20, pageWidth, 2, 'F');
+    
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('SecuGenie', margin, 13);
+    
+    yPosition = 30;
+    pdf.setTextColor(35, 39, 47); // Dark text for better contrast
 
     // Document Title
     pdf.setFontSize(20);
