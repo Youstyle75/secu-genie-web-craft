@@ -16,6 +16,7 @@ import NoticeERPImplantation from '@/components/notice-erp/NoticeERPImplantation
 import NoticeERPSectionsAccordion from '@/components/notice-erp/NoticeERPSectionsAccordion';
 import NoticeERPSignature from '@/components/notice-erp/NoticeERPSignature';
 import NoticeERPAnnexe from '@/components/notice-erp/NoticeERPAnnexe';
+import ExportButtons from '@/components/documents/ExportButtons';
 
 interface FormData {
   title: string;
@@ -86,11 +87,26 @@ const NoticeSecuriteCreate = () => {
           <NoticeERPSignature setValue={setValue} />
           <NoticeERPAnnexe register={register} watch={watch} />
 
-          <div className="flex gap-4 justify-end sticky bottom-4 bg-white p-4 rounded-relume-md shadow-relume-strong border border-formBorder z-10">
-            <Button type="button" variant="outline" onClick={() => navigate('/documents')}>Annuler</Button>
-            <Button type="submit" disabled={loading} className="btn-primary">
-              {loading ? 'Enregistrement...' : <><Save size={18} className="mr-2" />Enregistrer</>}
-            </Button>
+          <div className="flex gap-4 justify-between items-center sticky bottom-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-elevated border border-border z-10">
+            <ExportButtons
+              documentData={{
+                metadata: {
+                  type: 'notice-securite-erp',
+                  title: watch('title') || 'Notice de Sécurité ERP',
+                  createdAt: new Date().toISOString(),
+                  author: 'SecuGenie User',
+                  version: '1.0'
+                },
+                content: watch()
+              }}
+            />
+            
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => navigate('/documents')}>Annuler</Button>
+              <Button type="submit" disabled={loading} className="btn-primary">
+                {loading ? 'Enregistrement...' : <><Save size={18} className="mr-2" />Enregistrer</>}
+              </Button>
+            </div>
           </div>
         </form>
       </div>

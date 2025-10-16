@@ -1,114 +1,182 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
+import { generateFileName, type DocumentMetadata } from './jsonExportService';
 
-export const exportDocumentToPDF = async (document: any, signature?: any) => {
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 20;
-  let yPosition = margin;
+interface PDFDocument {
+  title: string;
+  type: string;
+  version?: string;
+  updatedAt?: string;
+  content: any;
+  metadata?: DocumentMetadata;
+}
 
-  // Header
-  pdf.setFontSize(20);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(document.title, margin, yPosition);
-  yPosition += 10;
+interface PDFSignature {
+  date: string;
+  imageData: string;
+  name?: string;
+  role?: string;
+}
 
-  // Document info
-  pdf.setFontSize(10);
-  pdf.setFont('helvetica', 'normal');
-  pdf.setTextColor(100, 100, 100);
-  pdf.text(`Type: ${document.type}`, margin, yPosition);
-  yPosition += 6;
-  pdf.text(`Version: ${document.version}`, margin, yPosition);
-  yPosition += 6;
-  pdf.text(`Date: ${new Date(document.updated_at).toLocaleDateString('fr-FR')}`, margin, yPosition);
-  yPosition += 10;
+/**
+ * Export document to professional PDF with proper formatting
+ */
+export const exportDocumentToPDF = async (
+  document: PDFDocument, 
+  signature?: PDFSignature
+): Promise<void> => {
+  try {
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
 
-  // Separator line
-  pdf.setDrawColor(200, 200, 200);
-  pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-  yPosition += 10;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    const contentWidth = pageWidth - (2 * margin);
+    let yPosition = margin;
 
-  // Content
-  pdf.setFontSize(12);
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('Contenu du document', margin, yPosition);
-  yPosition += 8;
+    // Add SecuGenie Logo/Header
+    pdf.setFillColor(37, 99, 235); // Primary blue
+    pdf.rect(0, 0, pageWidth, 15, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('SecuGenie', margin, 10);
+    
+    yPosition = 25;
+    pdf.setTextColor(0, 0, 0);
 
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
+    // Document Title
+    pdf.setFontSize(20);
+    pdf.setFont('helvetica', 'bold');
+    const titleLines = pdf.splitTextToSize(document.title, contentWidth);
+    pdf.text(titleLines, margin, yPosition);
+    yPosition += titleLines.length * 8;
 
-  // Content fields
-  const content = document.content || {};
-  Object.entries(content).forEach(([key, value]) => {
-    if (yPosition > pageHeight - 30) {
-      pdf.addPage();
-      yPosition = margin;
+    // Metadata Section
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(100, 116, 139); // Muted gray
+    
+    const metadataY = yPosition + 5;
+    pdf.text(`Type: ${document.type}`, margin, metadataY);
+    
+    if (document.version) {
+      pdf.text(`Version: ${document.version}`, margin, metadataY + 5);
+    }
+    
+    if (document.updatedAt) {
+      const formattedDate = new Date(document.updatedAt).toLocaleDateString('fr-FR');
+      pdf.text(`Date: ${formattedDate}`, margin, metadataY + (document.version ? 10 : 5));
+    }
+    
+    if (document.metadata?.author) {
+      pdf.text(`Auteur: ${document.metadata.author}`, margin, metadataY + 15);
     }
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`${key}:`, margin, yPosition);
-    yPosition += 6;
+    // Separator line
+    yPosition = metadataY + 25;
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+    
+    yPosition += 10;
+    pdf.setTextColor(0, 0, 0);
 
+    // Document Content
+    pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
-    const lines = pdf.splitTextToSize(String(value), pageWidth - 2 * margin);
-    lines.forEach((line: string) => {
-      if (yPosition > pageHeight - 30) {
+    
+    const contentText = typeof document.content === 'string' 
+      ? document.content 
+      : JSON.stringify(document.content, null, 2);
+    
+    const contentLines = pdf.splitTextToSize(contentText, contentWidth);
+    
+    for (let i = 0; i < contentLines.length; i++) {
+      if (yPosition > pageHeight - 40) {
         pdf.addPage();
         yPosition = margin;
       }
-      pdf.text(line, margin + 5, yPosition);
-      yPosition += 5;
-    });
-    yPosition += 3;
-  });
-
-  // Signature
-  if (signature) {
-    if (yPosition > pageHeight - 60) {
-      pdf.addPage();
-      yPosition = margin;
+      
+      pdf.text(contentLines[i], margin, yPosition);
+      yPosition += 6;
     }
 
-    yPosition += 10;
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 10;
+    // Signature Section
+    if (signature) {
+      if (yPosition > pageHeight - 60) {
+        pdf.addPage();
+        yPosition = margin;
+      } else {
+        yPosition += 10;
+      }
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(12);
-    pdf.text('Signature électronique', margin, yPosition);
-    yPosition += 8;
+      pdf.setDrawColor(226, 232, 240);
+      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
 
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(10);
-    pdf.text(`Date: ${new Date(signature.signed_at).toLocaleString('fr-FR')}`, margin, yPosition);
-    yPosition += 8;
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Signature', margin, yPosition);
+      yPosition += 10;
 
-    // Add signature image
-    try {
-      pdf.addImage(signature.signature_data, 'PNG', margin, yPosition, 60, 30);
-    } catch (error) {
-      console.error('Error adding signature image:', error);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      
+      if (signature.name) {
+        pdf.text(`Signataire: ${signature.name}`, margin, yPosition);
+        yPosition += 5;
+      }
+      
+      if (signature.role) {
+        pdf.text(`Fonction: ${signature.role}`, margin, yPosition);
+        yPosition += 5;
+      }
+      
+      const signatureDate = new Date(signature.date).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      pdf.text(`Date: ${signatureDate}`, margin, yPosition);
+      yPosition += 10;
+
+      try {
+        pdf.addImage(signature.imageData, 'PNG', margin, yPosition, 50, 25);
+      } catch (error) {
+        console.error('Error adding signature image:', error);
+      }
     }
-  }
 
-  // Footer on all pages
-  const totalPages = (pdf as any).internal.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    pdf.setPage(i);
-    pdf.setFontSize(8);
-    pdf.setTextColor(150, 150, 150);
-    pdf.text(
-      `Page ${i} sur ${totalPages} - Généré par Secugenie le ${new Date().toLocaleString('fr-FR')}`,
-      pageWidth / 2,
-      pageHeight - 10,
-      { align: 'center' }
-    );
-  }
+    // Footer on all pages
+    const pageCount = pdf.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.setFont('helvetica', 'normal');
+      
+      const footerText = `SecuGenie - Document généré le ${new Date().toLocaleDateString('fr-FR')}`;
+      const footerY = pageHeight - 10;
+      pdf.text(footerText, margin, footerY);
+      pdf.text(`Page ${i} sur ${pageCount}`, pageWidth - margin - 20, footerY);
+    }
 
-  // Save the PDF
-  pdf.save(`${document.title.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+    // Generate filename and save
+    const fileName = document.metadata 
+      ? generateFileName(document.metadata, 'pdf')
+      : `secugenie-${document.type}-${new Date().toISOString().split('T')[0]}.pdf`;
+
+    pdf.save(fileName);
+    toast.success('Document PDF exporté avec succès');
+    
+  } catch (error) {
+    console.error('Error exporting document to PDF:', error);
+    toast.error('Erreur lors de l\'export PDF');
+    throw error;
+  }
 };

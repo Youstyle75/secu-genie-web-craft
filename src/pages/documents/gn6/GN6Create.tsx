@@ -14,6 +14,7 @@ import GN6Header from '@/components/gn6/GN6Header';
 import GN6Mesures from '@/components/gn6/GN6Mesures';
 import GN6Checklist from '@/components/gn6/GN6Checklist';
 import GN6Signatures from '@/components/gn6/GN6Signatures';
+import ExportButtons from '@/components/documents/ExportButtons';
 
 interface FormData {
   title: string;
@@ -148,39 +149,40 @@ const GN6Create = () => {
           </Card>
 
           {/* Boutons d'action */}
-          <div className="flex gap-4 justify-end sticky bottom-4 bg-white p-4 rounded-relume-md shadow-relume-strong border border-formBorder z-10">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/documents')}
-              className="btn-outline"
-            >
-              Annuler
-            </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="btn-outline"
-              onClick={() => {
-                // TODO: Implement PDF export
-                alert('Export PDF en cours de développement');
+          <div className="flex gap-4 justify-between items-center sticky bottom-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-elevated border border-border z-10">
+            <ExportButtons
+              documentData={{
+                metadata: {
+                  type: 'dossier-gn6',
+                  title: watch('title') || 'Dossier GN6',
+                  createdAt: new Date().toISOString(),
+                  author: 'SecuGenie User',
+                  version: '1.0'
+                },
+                content: watch()
               }}
-            >
-              <Download size={18} className="mr-2" />
-              Exporter PDF
-            </Button>
+            />
+            
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/documents')}
+              >
+                Annuler
+              </Button>
 
-            <Button type="submit" disabled={loading} className="btn-primary">
-              {loading ? (
-                <>Enregistrement...</>
-              ) : (
-                <>
-                  <Save size={18} className="mr-2" />
-                  Enregistrer le dossier
-                </>
-              )}
-            </Button>
+              <Button type="submit" disabled={loading} className="btn-primary">
+                {loading ? (
+                  <>Enregistrement...</>
+                ) : (
+                  <>
+                    <Save size={18} className="mr-2" />
+                    Enregistrer
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </div>

@@ -17,6 +17,7 @@ import RisquesSection from '@/components/prevention/RisquesSection';
 import DispositionsGenerales from '@/components/prevention/DispositionsGenerales';
 import SignatureBlock from '@/components/prevention/SignatureBlock';
 import PlanDrawingEditor from '@/components/prevention/PlanDrawingEditor';
+import ExportButtons from '@/components/documents/ExportButtons';
 
 // Définition complète du type FormData
 interface FormData {
@@ -194,30 +195,62 @@ const PlanPreventionCreate = () => {
           <SignatureBlock setValue={setValue} />
 
           {/* Boutons d'action */}
-          <div className="flex gap-4 justify-end sticky bottom-4 bg-white p-4 rounded-relume-md shadow-relume-strong border border-formBorder">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/documents')}
-              className="btn-outline"
-            >
-              Annuler
-            </Button>
+          <div className="flex gap-4 justify-between items-center sticky bottom-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-elevated border border-border">
+            <ExportButtons
+              documentData={{
+                metadata: {
+                  type: 'plan-prevention',
+                  title: watch('title') || 'Plan de Prévention',
+                  createdAt: new Date().toISOString(),
+                  author: 'SecuGenie User',
+                  version: '1.0'
+                },
+                content: watch()
+              }}
+              showImageExport={true}
+              onExportImage={() => {
+                // Trigger the canvas export
+                const canvas = (window as any).editorCanvas;
+                if (canvas) {
+                  const dataURL = canvas.toDataURL({ 
+                    format: 'png',
+                    quality: 1,
+                    multiplier: 2
+                  });
+                  const link = document.createElement('a');
+                  link.download = `plan-prevention-${new Date().toISOString().split('T')[0]}.png`;
+                  link.href = dataURL;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }
+              }}
+            />
             
-            <Button
-              type="submit"
-              disabled={loading}
-              className="btn-primary"
-            >
-              {loading ? (
-                <>Enregistrement...</>
-              ) : (
-                <>
-                  <Save size={18} className="mr-2" />
-                  Enregistrer le Plan
-                </>
-              )}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/documents')}
+              >
+                Annuler
+              </Button>
+              
+              <Button
+                type="submit"
+                disabled={loading}
+                className="btn-primary"
+              >
+                {loading ? (
+                  <>Enregistrement...</>
+                ) : (
+                  <>
+                    <Save size={18} className="mr-2" />
+                    Enregistrer
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </div>
