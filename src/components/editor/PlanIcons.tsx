@@ -4,7 +4,10 @@ import {
   DoorClosed, Wind, ArrowUpDown, FireExtinguisher, 
   DoorOpen, Signpost, ArrowRight, Ambulance,
   Fence, CircleParking, CircleParkingOff, CircleArrowDown,
-  CircleArrowUp, CircleArrowRight, CircleArrowLeft, Power
+  CircleArrowUp, CircleArrowRight, CircleArrowLeft, Power,
+  Droplet, Flame, ShieldAlert, AlertTriangle, Package,
+  Warehouse, Truck, Construction, Gauge, Siren,
+  Activity, Radio, Users, MapPin, Zap
 } from 'lucide-react';
 
 export type IconCategory = 'security' | 'event' | 'furniture' | 'signs' | 'emergency';
@@ -43,8 +46,36 @@ export const planIcons: PlanIconDefinition[] = [
   { 
     type: 'firstaid', 
     label: 'Poste de Secours', 
-    icon: <Wind className="w-full h-full" />, 
+    icon: <Activity className="w-full h-full" />, 
     emoji: '🩹', 
+    category: 'security' 
+  },
+  { 
+    type: 'hydrant', 
+    label: 'Point d\'Eau / Hydrant', 
+    icon: <Droplet className="w-full h-full" />, 
+    emoji: '💧', 
+    category: 'security' 
+  },
+  { 
+    type: 'fireAlarm', 
+    label: 'Alarme Incendie', 
+    icon: <Flame className="w-full h-full" />, 
+    emoji: '🔔', 
+    category: 'security' 
+  },
+  { 
+    type: 'securityZone', 
+    label: 'Zone de Sécurité', 
+    icon: <ShieldAlert className="w-full h-full" />, 
+    emoji: '🛡️', 
+    category: 'security' 
+  },
+  { 
+    type: 'hazard', 
+    label: 'Danger / Attention', 
+    icon: <AlertTriangle className="w-full h-full" />, 
+    emoji: '⚠️', 
     category: 'security' 
   },
 
@@ -158,6 +189,41 @@ export const planIcons: PlanIconDefinition[] = [
     label: 'Groupe Électrogène', 
     icon: <Power className="w-full h-full" />, 
     emoji: '⚡', 
+    category: 'emergency' 
+  },
+  { 
+    type: 'fireStation', 
+    label: 'Poste de Pompiers', 
+    icon: <Siren className="w-full h-full" />, 
+    emoji: '🚒', 
+    category: 'emergency' 
+  },
+  { 
+    type: 'control', 
+    label: 'Poste de Contrôle', 
+    icon: <Radio className="w-full h-full" />, 
+    emoji: '📡', 
+    category: 'emergency' 
+  },
+  { 
+    type: 'electric', 
+    label: 'Installation Électrique', 
+    icon: <Zap className="w-full h-full" />, 
+    emoji: '⚡', 
+    category: 'emergency' 
+  },
+  { 
+    type: 'storage', 
+    label: 'Zone de Stockage', 
+    icon: <Package className="w-full h-full" />, 
+    emoji: '📦', 
+    category: 'emergency' 
+  },
+  { 
+    type: 'warehouse', 
+    label: 'Entrepôt', 
+    icon: <Warehouse className="w-full h-full" />, 
+    emoji: '🏭', 
     category: 'emergency' 
   },
 ];

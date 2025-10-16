@@ -22,11 +22,15 @@ export type CanvasActionsType = {
   addRectangle: () => void;
   addCircle: () => void;
   addLine: () => void;
+  addArrow: () => void;
+  addPolyline: () => void;
+  addColoredZone: () => void;
   addText: () => void;
   handleSave: () => void;
   handleClear: () => void;
   handleRemove: () => void;
   handleRotate: () => void;
   toggleDrawingMode: () => void;
+  exportSVG: () => void;
   canvas: fabric.Canvas | null;
 };

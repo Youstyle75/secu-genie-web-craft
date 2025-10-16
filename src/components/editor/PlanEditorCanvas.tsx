@@ -29,16 +29,35 @@ const PlanEditorCanvas: React.FC<PlanEditorCanvasProps> = ({
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Initialize Fabric canvas
+  // Initialize Fabric canvas with grid
   useEffect(() => {
     if (!canvasRef.current) return;
     
     const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       width: 800,
       height: 500,
-      backgroundColor: '#f9fafb',
-      isDrawingMode: false
+      backgroundColor: '#ffffff',
+      isDrawingMode: false,
+      selection: true,
+      preserveObjectStacking: true
     });
+    
+    // Add subtle grid
+    const gridSize = 20;
+    for (let i = 0; i < (800 / gridSize); i++) {
+      fabricCanvas.add(new fabric.Line([i * gridSize, 0, i * gridSize, 500], {
+        stroke: '#f1f5f9',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false
+      }));
+      fabricCanvas.add(new fabric.Line([0, i * gridSize, 800, i * gridSize], {
+        stroke: '#f1f5f9',
+        strokeWidth: 1,
+        selectable: false,
+        evented: false
+      }));
+    }
     
     fabricCanvas.on('selection:created', (e) => {
       const activeObj = e.selected?.[0];
@@ -228,19 +247,20 @@ const PlanEditorCanvas: React.FC<PlanEditorCanvasProps> = ({
   
   return (
     <div
-      className="border-2 border-dark-light rounded-lg relative"
+      className="border-2 border-gray-200 rounded-xl relative bg-white shadow-lg overflow-hidden"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       style={{ height: '500px' }}
     >
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} className="rounded-xl" />
       
       {/* Toolbar for selected elements */}
       {selectedElement && canvas && (
-        <div className="absolute top-4 right-4 bg-dark-light shadow-md rounded-md flex p-1 z-10">
+        <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm shadow-lg rounded-xl flex p-2 gap-1 z-10 border border-gray-200">
+
           <button
             onClick={handleRotate}
-            className="p-2 hover:bg-dark-medium rounded text-dark-foreground"
+            className="p-2 hover:bg-gray-100 rounded-lg text-gray-700 transition-all hover:shadow-sm"
             title="Pivoter"
           >
             <svg
@@ -260,7 +280,7 @@ const PlanEditorCanvas: React.FC<PlanEditorCanvasProps> = ({
           </button>
           <button
             onClick={handleRemove}
-            className="p-2 hover:bg-dark-medium text-red-400 rounded"
+            className="p-2 hover:bg-red-50 text-red-500 rounded-lg transition-all hover:shadow-sm"
             title="Supprimer"
           >
             <svg
