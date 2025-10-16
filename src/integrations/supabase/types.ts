@@ -187,6 +187,7 @@ export type Database = {
           location: string | null
           metadata: Json | null
           name: string
+          plan_data: Json | null
           status: string
           type: string
           updated_at: string
@@ -201,6 +202,7 @@ export type Database = {
           location?: string | null
           metadata?: Json | null
           name: string
+          plan_data?: Json | null
           status?: string
           type: string
           updated_at?: string
@@ -215,6 +217,7 @@ export type Database = {
           location?: string | null
           metadata?: Json | null
           name?: string
+          plan_data?: Json | null
           status?: string
           type?: string
           updated_at?: string

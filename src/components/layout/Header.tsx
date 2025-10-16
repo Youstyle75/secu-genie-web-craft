@@ -84,6 +84,17 @@ const Header = () => {
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
+                  <Link to="/documents" className={cn(
+                    "text-sm transition-colors px-3 py-2 rounded-md font-medium",
+                    isActive('/documents') 
+                      ? "text-accent bg-accent/5" 
+                      : "text-primary hover:text-accent hover:bg-accent/5"
+                  )}>
+                    Documents
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
                   <Link to="/projects" className={cn(
                     "text-sm transition-colors px-3 py-2 rounded-md font-medium",
                     isActive('/projects') 

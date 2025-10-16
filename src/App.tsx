@@ -17,6 +17,8 @@ import ProjectList from './pages/projects/ProjectList';
 import ProjectCreate from './pages/projects/ProjectCreate';
 import ProjectDetail from './pages/projects/ProjectDetail';
 import DocumentEditor from './pages/documents/DocumentEditor';
+import DocumentList from './pages/documents/DocumentList';
+import PlanEditor from './pages/plans/PlanEditor';
 import NoticeSecuriteCreate from './pages/documents/notices/NoticeSecuriteCreate';
 import PlanPreventionCreate from './pages/documents/plans/PlanPreventionCreate';
 import DocumentReview from './pages/documents/DocumentReview';
@@ -45,9 +47,11 @@ function App() {
           <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
           <Route path="/projects/create" element={<ProtectedRoute><ProjectCreate /></ProtectedRoute>} />
           <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+          <Route path="/documents" element={<ProtectedRoute><DocumentList /></ProtectedRoute>} />
           <Route path="/documents/:id/edit" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />
           <Route path="/documents/:id/sign" element={<ProtectedRoute><DocumentSign /></ProtectedRoute>} />
           <Route path="/documents/:id/export" element={<ProtectedRoute><DocumentExport /></ProtectedRoute>} />
+          <Route path="/plans/:id" element={<ProtectedRoute><PlanEditor /></ProtectedRoute>} />
           
           {/* Documents */}
           <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
