@@ -1,75 +1,92 @@
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import { Suspense, lazy } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from '@/components/ui/sonner';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import Home from './pages/Home';
-import Solutions from './pages/Solutions';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Faq from './pages/Faq';
-import Demo from './pages/Demo';
-import NotFound from './pages/NotFound';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import Dashboard from './pages/Dashboard';
-import ProjectList from './pages/projects/ProjectList';
-import ProjectCreate from './pages/projects/ProjectCreate';
-import ProjectDetail from './pages/projects/ProjectDetail';
-import DocumentEditor from './pages/documents/DocumentEditor';
-import DocumentList from './pages/documents/DocumentList';
-import PlanEditor from './pages/plans/PlanEditor';
-import RegulatoryUpdates from './pages/regulatory/RegulatoryUpdates';
-import SecuBot from './pages/chatbot/SecuBot';
-import NoticeSecuriteCreate from './pages/documents/notices/NoticeSecuriteCreate';
-import PlanPreventionCreate from './pages/documents/plans/PlanPreventionCreate';
-import DocumentReview from './pages/documents/DocumentReview';
-import DocumentSign from './pages/documents/DocumentSign';
-import DocumentExport from './pages/documents/DocumentExport';
+import Layout from './components/layout/Layout';
+import LoadingFallback from './components/ui/loading-fallback';
+
+// Lazy load pages for code splitting
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Solutions = lazy(() => import('./pages/Solutions'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const Faq = lazy(() => import('./pages/Faq'));
+const Demo = lazy(() => import('./pages/Demo'));
+const Login = lazy(() => import('./pages/auth/Login'));
+const Register = lazy(() => import('./pages/auth/Register'));
+const ProjectList = lazy(() => import('./pages/projects/ProjectList'));
+const ProjectCreate = lazy(() => import('./pages/projects/ProjectCreate'));
+const ProjectDetail = lazy(() => import('./pages/projects/ProjectDetail'));
+const DocumentEditor = lazy(() => import('./pages/documents/DocumentEditor'));
+const DocumentList = lazy(() => import('./pages/documents/DocumentList'));
+const PlanEditor = lazy(() => import('./pages/plans/PlanEditor'));
+const RegulatoryUpdates = lazy(() => import('./pages/regulatory/RegulatoryUpdates'));
+const SecuBot = lazy(() => import('./pages/chatbot/SecuBot'));
+const NoticeSecuriteCreate = lazy(() => import('./pages/documents/notices/NoticeSecuriteCreate'));
+const DocumentSign = lazy(() => import('./pages/documents/DocumentSign'));
+const DocumentExport = lazy(() => import('./pages/documents/DocumentExport'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Configure React Query client with optimized settings
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Routes publiques */}
-          <Route path="/" element={<Home />} />
-          <Route path="/solutions" element={<Solutions />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          
-          {/* Routes protégées */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
-          
-          {/* Projets */}
-          <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
-          <Route path="/projects/create" element={<ProtectedRoute><ProjectCreate /></ProtectedRoute>} />
-          <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-          <Route path="/documents" element={<ProtectedRoute><DocumentList /></ProtectedRoute>} />
-          <Route path="/documents/:id/edit" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />
-          <Route path="/documents/:id/sign" element={<ProtectedRoute><DocumentSign /></ProtectedRoute>} />
-          <Route path="/documents/:id/export" element={<ProtectedRoute><DocumentExport /></ProtectedRoute>} />
-          <Route path="/plans/:id" element={<ProtectedRoute><PlanEditor /></ProtectedRoute>} />
-          <Route path="/regulatory" element={<ProtectedRoute><RegulatoryUpdates /></ProtectedRoute>} />
-          <Route path="/secubot" element={<ProtectedRoute><SecuBot /></ProtectedRoute>} />
-          
-          {/* Documents */}
-          <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
-          <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><PlanPreventionCreate /></ProtectedRoute>} />
-          <Route path="/documents/:id/relecture" element={<ProtectedRoute><DocumentReview /></ProtectedRoute>} />
-          <Route path="/documents/:id/signer" element={<ProtectedRoute><DocumentSign /></ProtectedRoute>} />
-          <Route path="/documents/:id/exporter" element={<ProtectedRoute><DocumentExport /></ProtectedRoute>} />
-          
-          {/* Route 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster position="top-right" richColors />
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Layout><Home /></Layout>} />
+              <Route path="/about" element={<Layout><About /></Layout>} />
+              <Route path="/contact" element={<Layout><Contact /></Layout>} />
+              <Route path="/solutions" element={<Layout><Solutions /></Layout>} />
+              <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
+              <Route path="/faq" element={<Layout><Faq /></Layout>} />
+              <Route path="/demo" element={<Layout><Demo /></Layout>} />
+              <Route path="/auth/login" element={<Layout><Login /></Layout>} />
+              <Route path="/auth/register" element={<Layout><Register /></Layout>} />
+              
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
+              <Route path="/projects/create" element={<ProtectedRoute><ProjectCreate /></ProtectedRoute>} />
+              <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+              <Route path="/documents" element={<ProtectedRoute><DocumentList /></ProtectedRoute>} />
+              <Route path="/documents/:id/edit" element={<ProtectedRoute><DocumentEditor /></ProtectedRoute>} />
+              <Route path="/documents/:id/sign" element={<ProtectedRoute><DocumentSign /></ProtectedRoute>} />
+              <Route path="/documents/:id/export" element={<ProtectedRoute><DocumentExport /></ProtectedRoute>} />
+              <Route path="/plans/:id" element={<ProtectedRoute><PlanEditor /></ProtectedRoute>} />
+              <Route path="/regulatory" element={<ProtectedRoute><RegulatoryUpdates /></ProtectedRoute>} />
+              <Route path="/secubot" element={<ProtectedRoute><SecuBot /></ProtectedRoute>} />
+              <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
+              <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
+              
+              <Route path="*" element={<Layout><NotFound /></Layout>} />
+            </Routes>
+          </Suspense>
+          <Toaster />
+        </Router>
+      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 
