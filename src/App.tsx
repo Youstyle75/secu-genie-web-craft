@@ -30,6 +30,7 @@ const SecuBot = lazy(() => import('./pages/chatbot/SecuBot'));
 const NoticeSecuriteCreate = lazy(() => import('./pages/documents/notices/NoticeSecuriteCreate'));
 const DocumentSign = lazy(() => import('./pages/documents/DocumentSign'));
 const DocumentExport = lazy(() => import('./pages/documents/DocumentExport'));
+const Security = lazy(() => import('./pages/settings/Security'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Configure React Query client with optimized settings
@@ -78,6 +79,7 @@ function App() {
               <Route path="/secubot" element={<ProtectedRoute><SecuBot /></ProtectedRoute>} />
               <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
               <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
+              <Route path="/settings/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
               
               <Route path="*" element={<Layout><NotFound /></Layout>} />
             </Routes>

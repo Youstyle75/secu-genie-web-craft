@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -225,6 +261,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          count: number
+          created_at: string
+          id: string
+          identifier: string
+          window_start: string
+        }
+        Insert: {
+          action: string
+          count?: number
+          created_at?: string
+          id?: string
+          identifier: string
+          window_start?: string
+        }
+        Update: {
+          action?: string
+          count?: number
+          created_at?: string
+          id?: string
+          identifier?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       signatures: {
         Row: {
           certificate_data: Json | null
@@ -266,11 +329,79 @@ export type Database = {
           },
         ]
       }
+      user_consents: {
+        Row: {
+          cookie_consent: boolean
+          created_at: string
+          data_processing_consent: boolean
+          id: string
+          marketing_consent: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cookie_consent?: boolean
+          created_at?: string
+          data_processing_consent?: boolean
+          id?: string
+          marketing_consent?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cookie_consent?: boolean
+          created_at?: string
+          data_processing_consent?: boolean
+          id?: string
+          marketing_consent?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_totp_secrets: {
+        Row: {
+          backup_codes: string[]
+          created_at: string
+          id: string
+          secret: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          backup_codes?: string[]
+          created_at?: string
+          id?: string
+          secret: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string
+          id?: string
+          secret?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      export_user_data: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       gtrgm_compress: {
         Args: { "": unknown }
         Returns: unknown
