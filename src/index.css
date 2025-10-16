@@ -5,35 +5,42 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 218 24% 23%;
+    /* Relume-inspired Color System - All HSL for consistency */
+    --background: 0 0% 100%;           /* Pure white #ffffff */
+    --foreground: 215 25% 17%;         /* Dark contrast #23272f */
 
     --card: 0 0% 100%;
-    --card-foreground: 218 24% 23%;
+    --card-foreground: 215 25% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 218 24% 23%;
+    --popover-foreground: 215 25% 17%;
 
-    --primary: 218 24% 23%;
+    --primary: 217 91% 60%;            /* Relume Blue #2563eb */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 218 24% 95%;
-    --secondary-foreground: 218 24% 23%;
+    --secondary: 210 40% 98%;          /* Soft gray #f8fafc */
+    --secondary-foreground: 215 25% 17%;
 
-    --accent: 210 64% 50%;
+    --accent: 217 91% 60%;             /* Blue primary #2563eb */
     --accent-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
+    --success: 142 71% 45%;            /* Green secondary #13ce66 */
+    --success-foreground: 0 0% 100%;
+
+    --danger: 0 72% 56%;               /* Red accent #e43e3e */
+    --danger-foreground: 0 0% 100%;
+
+    --muted: 210 40% 98%;
     --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 56%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 218 24% 23%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   * {
@@ -52,12 +59,13 @@
   }
 
   body {
-    @apply bg-white text-textPrincipal font-sans;
-    line-height: 1.5;
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.6;
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-semibold text-textPrincipal;
+    @apply font-sans font-bold text-foreground tracking-tight;
     line-height: 1.2;
   }
 
@@ -86,11 +94,11 @@
   }
 
   p {
-    @apply mb-4 text-base leading-relaxed text-textPrincipal/80;
+    @apply mb-4 text-base leading-relaxed text-foreground/70;
   }
 
   a {
-    @apply text-accent transition-colors hover:text-accent-hover;
+    @apply text-primary transition-all duration-200 hover:text-primary/80;
   }
 
   /* Classes d'animations et d'effets */
@@ -148,117 +156,199 @@
   }
 }
 
-/* Classes de composants */
+/* Classes de composants - Relume Style */
 @layer components {
-  /* Style de conteneurs - inspirés de Relume */
+  /* Containers with proper spacing */
   .container-small {
-    @apply w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full max-w-3xl mx-auto px-6 sm:px-8 lg:px-12;
   }
   
   .container-medium {
-    @apply w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full max-w-5xl mx-auto px-6 sm:px-8 lg:px-12;
   }
 
   .container-large {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12;
   }
 
-  /* Formulaires */
+  /* Section Spacing - Relume style */
+  .section {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .section-sm {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Forms - Clean & Modern */
   .form-input {
-    @apply w-full border border-formBorder bg-formBackground rounded-relume-md px-4 py-3 text-textPrincipal placeholder:text-textPrincipal/50
-           focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all;
+    @apply w-full border border-input bg-background rounded-lg px-4 py-3 text-foreground text-base
+           placeholder:text-muted-foreground
+           focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .form-label {
-    @apply block text-sm font-medium text-textPrincipal mb-1;
+    @apply block text-sm font-semibold text-foreground mb-2;
   }
 
   .form-helper {
-    @apply text-xs text-textPrincipal/60 mt-1;
+    @apply text-sm text-muted-foreground mt-1.5;
   }
 
   .form-error {
-    @apply text-sm text-destructive mt-1;
+    @apply text-sm text-danger font-medium mt-1.5;
   }
 
-  /* Boutons */
+  /* Buttons - Relume Style with smooth animations */
   .btn {
-    @apply inline-flex items-center justify-center rounded-relume-md font-medium transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-lg font-semibold 
+           transition-all duration-200 ease-in-out
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-accentBleu text-white hover:bg-accent-hover shadow-relume-soft hover:shadow-relume-medium;
+    @apply btn bg-primary text-primary-foreground 
+           hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02]
+           focus:ring-primary/50
+           active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply btn bg-secondary text-textPrincipal hover:bg-gray-200;
+    @apply btn bg-secondary text-secondary-foreground border border-border
+           hover:bg-secondary/80 hover:border-border/80
+           focus:ring-secondary;
   }
 
   .btn-outline {
-    @apply btn bg-transparent border border-formBorder text-textPrincipal hover:border-gray-300;
+    @apply btn bg-transparent border-2 border-primary text-primary
+           hover:bg-primary hover:text-primary-foreground
+           focus:ring-primary/50;
   }
 
   .btn-ghost {
-    @apply btn bg-transparent hover:bg-secondary text-textPrincipal;
+    @apply btn bg-transparent hover:bg-secondary text-foreground;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-danger-foreground
+           hover:bg-danger/90 hover:shadow-lg
+           focus:ring-danger/50;
   }
 
   .btn-sm {
-    @apply text-sm px-3 py-2;
+    @apply text-sm px-4 py-2;
   }
 
   .btn-md {
-    @apply text-base px-5 py-2.5;
+    @apply text-base px-6 py-3;
   }
 
   .btn-lg {
-    @apply text-lg px-6 py-3;
+    @apply text-lg px-8 py-4;
   }
 
-  /* Cartes */
+  /* Cards - Soft shadows with smooth transitions */
   .card {
-    @apply bg-white rounded-relume-md border border-formBorder shadow-relume-soft hover:shadow-relume-medium transition-all;
+    @apply bg-card rounded-xl border border-border 
+           shadow-sm hover:shadow-md 
+           transition-all duration-300 ease-in-out;
+  }
+
+  .card-hover {
+    @apply card hover:scale-[1.02] hover:shadow-lg;
   }
 
   .card-body {
-    @apply p-6;
+    @apply p-6 md:p-8;
   }
 
   .card-header {
-    @apply pb-4 mb-4 border-b border-formBorder;
+    @apply pb-4 mb-4 border-b border-border;
   }
 
   .card-footer {
-    @apply pt-4 mt-4 border-t border-formBorder;
+    @apply pt-4 mt-4 border-t border-border;
   }
 
-  /* Alertes */
+  /* Hero Section - Relume style */
+  .hero-gradient {
+    @apply bg-gradient-to-b from-background via-secondary/30 to-background;
+  }
+
+  /* Alerts - Modern & Clean */
   .alert {
-    @apply p-4 rounded-relume-md border-l-4;
+    @apply p-4 rounded-lg border-l-4 flex items-start gap-3;
   }
 
   .alert-info {
-    @apply alert bg-blue-50 border-accentBleu text-accentBleu/80;
+    @apply alert bg-primary/5 border-primary text-primary;
   }
 
   .alert-warning {
-    @apply alert bg-alertBackground border-alertText text-alertText;
+    @apply alert bg-yellow-50 border-yellow-500 text-yellow-900;
   }
 
   .alert-danger {
-    @apply alert bg-red-50 border-accentRouge text-accentRouge/80;
+    @apply alert bg-danger/5 border-danger text-danger;
+  }
+
+  .alert-success {
+    @apply alert bg-success/5 border-success text-success;
   }
   
-  /* Badges */
+  /* Badges - Rounded & Subtle */
   .badge {
-    @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full;
+    @apply inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full;
   }
   
   .badge-primary {
-    @apply badge bg-accentBleu/10 text-accentBleu;
+    @apply badge bg-primary/10 text-primary border border-primary/20;
   }
   
   .badge-secondary {
-    @apply badge bg-secondary text-textPrincipal/70;
+    @apply badge bg-secondary text-foreground/70 border border-border;
+  }
+
+  .badge-success {
+    @apply badge bg-success/10 text-success border border-success/20;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger/10 text-danger border border-danger/20;
+  }
+
+  /* Progress Steps - Visual workflow */
+  .step {
+    @apply flex items-center justify-center w-10 h-10 rounded-full 
+           border-2 font-semibold text-sm transition-all duration-300;
+  }
+
+  .step-active {
+    @apply step bg-primary border-primary text-primary-foreground shadow-lg scale-110;
+  }
+
+  .step-completed {
+    @apply step bg-success border-success text-success-foreground;
+  }
+
+  .step-pending {
+    @apply step bg-background border-border text-muted-foreground;
+  }
+
+  /* Micro-interactions */
+  .interactive {
+    @apply transition-all duration-200 ease-in-out
+           hover:scale-[1.02] active:scale-[0.98]
+           cursor-pointer;
+  }
+
+  .interactive-subtle {
+    @apply transition-all duration-200 ease-in-out
+           hover:bg-secondary/50 
+           cursor-pointer;
   }
 }
 

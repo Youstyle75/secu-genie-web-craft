@@ -46,15 +46,20 @@ const Header = () => {
   };
   
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white shadow-sm py-3' : 'bg-white py-4'
-    }`}>
+    <header className={cn(
+      "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b",
+      isScrolled 
+        ? "bg-white/95 backdrop-blur-md shadow-sm py-3 border-border" 
+        : "bg-white py-4 border-transparent"
+    )}>
       <div className="container-large mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo with Shield icon */}
-          <Link to="/" className="flex items-center">
-            <Shield className="h-8 w-8 text-accent mr-2" aria-hidden="true" />
-            <span className="text-xl font-bold">Secu<span className="text-accent">Genie</span></span>
+          {/* Logo with Shield icon - Relume style */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <Shield className="h-8 w-8 text-primary transition-transform group-hover:scale-110" aria-hidden="true" />
+            <span className="text-xl font-bold tracking-tight">
+              Secu<span className="text-primary">Genie</span>
+            </span>
           </Link>
           
           {/* Desktop Navigation - Using Shadcn Navigation Menu */}
