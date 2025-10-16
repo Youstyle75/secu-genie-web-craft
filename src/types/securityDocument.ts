@@ -27,13 +27,24 @@ export interface NoticeSecuriteContent {
 }
 
 export interface PlanPreventionContent {
-  entrepriseUtilisatrice: string;
-  entrepriseExterieure: string;
-  natureTravaux: string;
-  risquesIdentifies: Array<string>;
-  mesuresPrevention: Array<string>;
-  preventionIncendie?: string; // Ajouté pour les erreurs de build
-  // Additional fields as needed
+  entrepriseUtilisatrice?: any;
+  entrepriseExterieure?: any;
+  natureTravaux?: string;
+  dateDebut?: string;
+  dateFin?: string;
+  horaires?: string;
+  lieuIntervention?: string;
+  effectifPrevu?: number;
+  sousTraitants?: string;
+  visitePrealable?: string;
+  moyens?: Record<string, boolean>;
+  documents?: Record<string, boolean>;
+  risques?: any;
+  dispositions?: Record<string, string>;
+  signatures?: any[];
+  risquesIdentifies?: Array<string>;
+  mesuresPrevention?: Array<string>;
+  preventionIncendie?: string;
 }
 
 export interface GN6Content {

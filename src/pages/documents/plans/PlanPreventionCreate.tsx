@@ -1,36 +1,72 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Layout from '@/components/layout/Layout';
 import securityDocumentService from '@/services/securityDocumentService';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
+import { Sparkles, Save } from 'lucide-react';
+import PlanPreventionHeader from '@/components/prevention/PlanPreventionHeader';
+import TravauxSection from '@/components/prevention/TravauxSection';
+import ChecklistSection from '@/components/prevention/ChecklistSection';
+import RisquesSection from '@/components/prevention/RisquesSection';
+import DispositionsGenerales from '@/components/prevention/DispositionsGenerales';
+import SignatureBlock from '@/components/prevention/SignatureBlock';
+import PlanDrawingEditor from '@/components/prevention/PlanDrawingEditor';
 
-// Définition explicite du type FormData
+// Définition complète du type FormData
 interface FormData {
   title: string;
   establishmentId: string;
   content: {
-    entrepriseUtilisatrice: string;
-    entrepriseExterieure: string;
+    entrepriseUtilisatrice: {
+      raisonSociale: string;
+      adresse: string;
+      correspondantNom: string;
+      correspondantFonction: string;
+      correspondantTel: string;
+      correspondantEmail: string;
+    };
+    entrepriseExterieure: {
+      raisonSociale: string;
+      adresse: string;
+      correspondantNom: string;
+      correspondantFonction: string;
+      correspondantTel: string;
+      correspondantEmail: string;
+    };
     natureTravaux: string;
-    risquesIdentifies: any[];
-    mesuresPrevention: any[];
-    preventionIncendie?: string;
+    dateDebut: string;
+    dateFin: string;
+    horaires: string;
+    lieuIntervention: string;
+    effectifPrevu: number;
+    sousTraitants: string;
+    visitePrealable: string;
+    moyens: Record<string, boolean>;
+    documents: Record<string, boolean>;
+    risques: any;
+    dispositions: Record<string, string>;
+    signatures: any[];
   };
 }
 
-// Schéma de validation correctement typé
+// Schéma de validation
 const validationSchema = yup.object().shape({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
   content: yup.object().shape({
-    entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
-    entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
+    entrepriseUtilisatrice: yup.object().shape({
+      raisonSociale: yup.string().required('Raison sociale requise'),
+    }),
+    entrepriseExterieure: yup.object().shape({
+      raisonSociale: yup.string().required('Raison sociale requise'),
+    }),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
-    risquesIdentifies: yup.array().required('Les risques identifiés sont obligatoires'),
-    mesuresPrevention: yup.array().required('Les mesures de prévention sont obligatoires'),
-    preventionIncendie: yup.string().optional()
   }).required()
 });
 
@@ -39,14 +75,11 @@ const PlanPreventionCreate = () => {
   const [loading, setLoading] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
   
-  // Initialiser le formulaire avec react-hook-form
   const {
-    control,
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
-    reset,
+    watch,
     register,
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema) as any,
@@ -54,12 +87,35 @@ const PlanPreventionCreate = () => {
       title: '',
       establishmentId: '',
       content: {
-        entrepriseUtilisatrice: '',
-        entrepriseExterieure: '',
+        entrepriseUtilisatrice: {
+          raisonSociale: '',
+          adresse: '',
+          correspondantNom: '',
+          correspondantFonction: '',
+          correspondantTel: '',
+          correspondantEmail: '',
+        },
+        entrepriseExterieure: {
+          raisonSociale: '',
+          adresse: '',
+          correspondantNom: '',
+          correspondantFonction: '',
+          correspondantTel: '',
+          correspondantEmail: '',
+        },
         natureTravaux: '',
-        risquesIdentifies: [],
-        mesuresPrevention: [],
-        preventionIncendie: '',
+        dateDebut: '',
+        dateFin: '',
+        horaires: '',
+        lieuIntervention: '',
+        effectifPrevu: 0,
+        sousTraitants: '',
+        visitePrealable: '',
+        moyens: {},
+        documents: {},
+        risques: {},
+        dispositions: {},
+        signatures: [],
       },
     },
   });
@@ -74,7 +130,6 @@ const PlanPreventionCreate = () => {
   const onSubmit: SubmitHandler<FormData> = (data) => {
     setLoading(true);
     
-    // Créer un nouveau document via le service
     const newDocument = securityDocumentService.createSecurityDocument({
       title: data.title,
       documentType: 'PlanPrevention',
@@ -83,162 +138,87 @@ const PlanPreventionCreate = () => {
       status: 'brouillon',
     });
     
-    // Rediriger vers la page de relecture du document
     setTimeout(() => {
       setLoading(false);
       navigate(`/documents/${newDocument.id}/relecture`);
     }, 1000);
   };
   
-  const handleFieldChange = (field: string, value: string) => {
-    // Nous utilisons la notation avec template literal pour les champs imbriqués
-    setValue(`content.${field}` as any, value);
-  };
-  
-  const handleGenerateAI = async () => {
-    const currentValues = getValues();
-    if (!currentValues.title || !currentValues.establishmentId) return;
-    
-    setGeneratingAI(true);
-    
-    try {
-      // Appeler le service pour générer du contenu avec l'IA
-      const aiContent = await securityDocumentService.generateAIContent('PlanPrevention', {
-        title: currentValues.title,
-        establishmentId: currentValues.establishmentId
-      });
-      
-      // Mettre à jour les champs du formulaire avec les suggestions de l'IA
-      setValue('content.entrepriseUtilisatrice', aiContent.entrepriseUtilisatrice);
-      setValue('content.entrepriseExterieure', aiContent.entrepriseExterieure);
-      setValue('content.natureTravaux', aiContent.natureTravaux);
-      setValue('content.risquesIdentifies', aiContent.risquesIdentifies || []);
-      setValue('content.mesuresPrevention', aiContent.mesuresPrevention || []);
-    } catch (error) {
-      console.error('Erreur lors de la génération IA:', error);
-    } finally {
-      setGeneratingAI(false);
-    }
-  };
-  
   return (
     <Layout>
-      <div className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-4">Créer un Plan de Prévention</h1>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Titre du Plan de Prévention */}
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Titre</label>
-            <input
-              type="text"
-              id="title"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('title')}
-            />
-            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+      <div className="container-large py-8">
+        {/* En-tête avec introduction */}
+        <Card className="p-8 mb-8 bg-gradient-to-r from-accentBleu/5 to-accentBleu/10 border-accentBleu/20">
+          <h1 className="text-4xl font-bold text-textPrincipal mb-4">Plan de Prévention</h1>
+          <div className="prose prose-sm text-textPrincipal/80">
+            <p className="mb-2">
+              <strong>Définition :</strong> Le plan de prévention est un document obligatoire établi lors de l'intervention 
+              d'entreprises extérieures dans le cadre de l'article R.4511-1 du Code du Travail.
+            </p>
+            <p>
+              <strong>Cadre réglementaire :</strong> Décret n°92-158 du 20 février 1992 fixant les prescriptions particulières 
+              d'hygiène et de sécurité applicables aux travaux effectués dans un établissement par une entreprise extérieure.
+            </p>
           </div>
+        </Card>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Informations de base */}
+          <Card className="p-6 bg-formBackground border-formBorder">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="form-label">Titre du Plan de Prévention</Label>
+                <Input {...register('title')} className="form-input" placeholder="Ex: Plan de Prévention - Travaux électriques" />
+                {errors.title && <p className="form-error">{errors.title.message}</p>}
+              </div>
+              
+              <div>
+                <Label className="form-label">Référence établissement</Label>
+                <Input {...register('establishmentId')} className="form-input" placeholder="Ex: ERP-001" />
+                {errors.establishmentId && <p className="form-error">{errors.establishmentId.message}</p>}
+              </div>
+            </div>
+          </Card>
+
+          {/* Sections principales */}
+          <PlanPreventionHeader register={register} errors={errors} />
+          <TravauxSection register={register} errors={errors} />
+          <ChecklistSection register={register} watch={watch} setValue={setValue} />
+          <RisquesSection register={register} watch={watch} />
+          <DispositionsGenerales register={register} />
           
-          {/* ID de l'établissement */}
-          <div>
-            <label htmlFor="establishmentId" className="block text-sm font-medium text-gray-700">Établissement</label>
-            <input
-              type="text"
-              id="establishmentId"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('establishmentId')}
-            />
-            {errors.establishmentId && <p className="text-red-500 text-sm">{errors.establishmentId.message}</p>}
+          {/* Éditeur de plan */}
+          <PlanDrawingEditor />
+          
+          {/* Signatures */}
+          <SignatureBlock setValue={setValue} />
+
+          {/* Boutons d'action */}
+          <div className="flex gap-4 justify-end sticky bottom-4 bg-white p-4 rounded-relume-md shadow-relume-strong border border-formBorder">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/documents')}
+              className="btn-outline"
+            >
+              Annuler
+            </Button>
+            
+            <Button
+              type="submit"
+              disabled={loading}
+              className="btn-primary"
+            >
+              {loading ? (
+                <>Enregistrement...</>
+              ) : (
+                <>
+                  <Save size={18} className="mr-2" />
+                  Enregistrer le Plan
+                </>
+              )}
+            </Button>
           </div>
-          
-          {/* Entreprise Utilisatrice */}
-          <div>
-            <label htmlFor="entrepriseUtilisatrice" className="block text-sm font-medium text-gray-700">Entreprise Utilisatrice</label>
-            <input
-              type="text"
-              id="entrepriseUtilisatrice"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.entrepriseUtilisatrice')}
-            />
-            {errors.content?.entrepriseUtilisatrice && <p className="text-red-500 text-sm">{errors.content.entrepriseUtilisatrice.message}</p>}
-          </div>
-          
-          {/* Entreprise Extérieure */}
-          <div>
-            <label htmlFor="entrepriseExterieure" className="block text-sm font-medium text-gray-700">Entreprise Extérieure</label>
-            <input
-              type="text"
-              id="entrepriseExterieure"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.entrepriseExterieure')}
-            />
-            {errors.content?.entrepriseExterieure && <p className="text-red-500 text-sm">{errors.content.entrepriseExterieure.message}</p>}
-          </div>
-          
-          {/* Nature des Travaux */}
-          <div>
-            <label htmlFor="natureTravaux" className="block text-sm font-medium text-gray-700">Nature des Travaux</label>
-            <textarea
-              id="natureTravaux"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.natureTravaux')}
-            />
-            {errors.content?.natureTravaux && <p className="text-red-500 text-sm">{errors.content.natureTravaux.message}</p>}
-          </div>
-          
-          {/* Risques Identifiés */}
-          <div>
-            <label htmlFor="risquesIdentifies" className="block text-sm font-medium text-gray-700">Risques Identifiés</label>
-            <input
-              type="text"
-              id="risquesIdentifies"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.risquesIdentifies')}
-            />
-            {errors.content?.risquesIdentifies && <p className="text-red-500 text-sm">{errors.content.risquesIdentifies.message}</p>}
-          </div>
-          
-          {/* Mesures de Prévention */}
-          <div>
-            <label htmlFor="mesuresPrevention" className="block text-sm font-medium text-gray-700">Mesures de Prévention</label>
-            <input
-              type="text"
-              id="mesuresPrevention"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.mesuresPrevention')}
-            />
-            {errors.content?.mesuresPrevention && <p className="text-red-500 text-sm">{errors.content.mesuresPrevention.message}</p>}
-          </div>
-          
-          {/* Prévention Incendie */}
-          <div>
-            <label htmlFor="preventionIncendie" className="block text-sm font-medium text-gray-700">Prévention Incendie</label>
-            <textarea
-              id="preventionIncendie"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-              {...register('content.preventionIncendie')}
-            />
-            {errors.content?.preventionIncendie && <p className="text-red-500 text-sm">{errors.content.preventionIncendie.message}</p>}
-          </div>
-          
-          {/* Bouton de soumission */}
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
-            disabled={loading}
-          >
-            {loading ? 'Enregistrement...' : 'Enregistrer'}
-          </button>
-          
-          {/* Bouton de génération de contenu IA */}
-          <button
-            type="button"
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
-            onClick={handleGenerateAI}
-            disabled={generatingAI}
-          >
-            {generatingAI ? 'Génération IA...' : 'Générer avec IA'}
-          </button>
         </form>
       </div>
     </Layout>
