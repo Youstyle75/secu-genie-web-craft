@@ -21,16 +21,16 @@ interface FormData {
 }
 
 // Schéma de validation correctement typé
-const validationSchema = yup.object({
+const validationSchema = yup.object().shape({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object({
+  content: yup.object().shape({
     entrepriseUtilisatrice: yup.string().required('L\'entreprise utilisatrice est obligatoire'),
     entrepriseExterieure: yup.string().required('L\'entreprise extérieure est obligatoire'),
     natureTravaux: yup.string().required('La nature des travaux est obligatoire'),
     risquesIdentifies: yup.array().required('Les risques identifiés sont obligatoires'),
     mesuresPrevention: yup.array().required('Les mesures de prévention sont obligatoires'),
-    preventionIncendie: yup.string()
+    preventionIncendie: yup.string().optional()
   }).required()
 });
 
@@ -49,7 +49,7 @@ const PlanPreventionCreate = () => {
     reset,
     register,
   } = useForm<FormData>({
-    resolver: yupResolver<FormData>(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       title: '',
       establishmentId: '',

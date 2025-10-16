@@ -5,6 +5,8 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Layout from '@/components/layout/Layout';
 import securityDocumentService from '@/services/securityDocumentService';
+import { RelumeButton } from '@/components/ui/relume-button';
+import { RelumeCard, RelumeCardContent, RelumeCardHeader, RelumeCardTitle } from '@/components/ui/relume-card';
 
 // Définition du type FormData explicitement pour le formulaire
 interface FormData {
@@ -19,14 +21,14 @@ interface FormData {
 }
 
 // Schéma de validation Yup
-const validationSchema = yup.object({
+const validationSchema = yup.object().shape({
   title: yup.string().required('Le titre est obligatoire'),
   establishmentId: yup.string().required('L\'établissement est obligatoire'),
-  content: yup.object({
+  content: yup.object().shape({
     descriptionEtablissement: yup.string().required('La description est obligatoire'),
     moyensSecours: yup.string().required('Les moyens de secours sont obligatoires'),
     consignesEvacuation: yup.string().required('Les consignes d\'évacuation sont obligatoires'),
-    preventionIncendie: yup.string()
+    preventionIncendie: yup.string().optional()
   }).required()
 });
 
@@ -44,7 +46,7 @@ const NoticeSecuriteCreate = () => {
     getValues,
     reset,
   } = useForm<FormData>({
-    resolver: yupResolver<FormData>(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       title: '',
       establishmentId: '',

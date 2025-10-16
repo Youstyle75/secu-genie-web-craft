@@ -161,7 +161,7 @@ const Header = () => {
           
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-3">
-            <Link to="/login">
+            <Link to="/auth/login">
               <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent/5 font-medium">
                 Connexion
               </Button>
@@ -235,7 +235,7 @@ const Header = () => {
               </Link>
               <div className="pt-2 flex flex-col space-y-2">
                 <Link 
-                  to="/login"
+                  to="/auth/login"
                   className="border border-accent text-accent hover:bg-accent/5 font-medium px-3 py-2 rounded-md text-sm text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
