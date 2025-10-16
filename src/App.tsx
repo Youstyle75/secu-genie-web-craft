@@ -33,6 +33,7 @@ const GN6Create = lazy(() => import('./pages/documents/gn6/GN6Create'));
 const DocumentSign = lazy(() => import('./pages/documents/DocumentSign'));
 const DocumentExport = lazy(() => import('./pages/documents/DocumentExport'));
 const Security = lazy(() => import('./pages/settings/Security'));
+const DemoDashboard = lazy(() => import('./components/demo/DemoDashboard'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Configure React Query client with optimized settings
@@ -65,6 +66,7 @@ function App() {
               <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
               <Route path="/faq" element={<Layout><Faq /></Layout>} />
               <Route path="/demo" element={<Layout><Demo /></Layout>} />
+              <Route path="/demo/dashboard" element={<Layout><DemoDashboard /></Layout>} />
               <Route path="/auth/login" element={<Layout><Login /></Layout>} />
               <Route path="/auth/register" element={<Layout><Register /></Layout>} />
               
