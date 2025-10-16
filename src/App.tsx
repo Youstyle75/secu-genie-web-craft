@@ -20,6 +20,7 @@ import DocumentEditor from './pages/documents/DocumentEditor';
 import DocumentList from './pages/documents/DocumentList';
 import PlanEditor from './pages/plans/PlanEditor';
 import RegulatoryUpdates from './pages/regulatory/RegulatoryUpdates';
+import SecuBot from './pages/chatbot/SecuBot';
 import NoticeSecuriteCreate from './pages/documents/notices/NoticeSecuriteCreate';
 import PlanPreventionCreate from './pages/documents/plans/PlanPreventionCreate';
 import DocumentReview from './pages/documents/DocumentReview';
@@ -54,6 +55,7 @@ function App() {
           <Route path="/documents/:id/export" element={<ProtectedRoute><DocumentExport /></ProtectedRoute>} />
           <Route path="/plans/:id" element={<ProtectedRoute><PlanEditor /></ProtectedRoute>} />
           <Route path="/regulatory" element={<ProtectedRoute><RegulatoryUpdates /></ProtectedRoute>} />
+          <Route path="/secubot" element={<ProtectedRoute><SecuBot /></ProtectedRoute>} />
           
           {/* Documents */}
           <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />

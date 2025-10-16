@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Save, FileText, Sparkles } from 'lucide-react';
 import AIAssistantWidget from '@/components/ai/AIAssistantWidget';
 import CommentsSystem from '@/components/collaboration/CommentsSystem';
+import AIGenerator from '@/components/ai/AIGenerator';
 
 const DocumentEditor = () => {
   const { id } = useParams();
@@ -117,6 +118,16 @@ const DocumentEditor = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <AIGenerator
+              documentType={document?.type as any}
+              onGenerate={(generatedContent) => {
+                setContent((prev: any) => ({
+                  ...prev,
+                  ...generatedContent,
+                }));
+                toast.success('Contenu pré-rempli par l\'IA');
+              }}
+            />
             <Button
               onClick={() => handleSave()}
               disabled={saving}
