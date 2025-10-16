@@ -28,6 +28,8 @@ const PlanEditor = lazy(() => import('./pages/plans/PlanEditor'));
 const RegulatoryUpdates = lazy(() => import('./pages/regulatory/RegulatoryUpdates'));
 const SecuBot = lazy(() => import('./pages/chatbot/SecuBot'));
 const NoticeSecuriteCreate = lazy(() => import('./pages/documents/notices/NoticeSecuriteCreate'));
+const PlanPreventionCreate = lazy(() => import('./pages/documents/plans/PlanPreventionCreate'));
+const GN6Create = lazy(() => import('./pages/documents/gn6/GN6Create'));
 const DocumentSign = lazy(() => import('./pages/documents/DocumentSign'));
 const DocumentExport = lazy(() => import('./pages/documents/DocumentExport'));
 const Security = lazy(() => import('./pages/settings/Security'));
@@ -78,7 +80,8 @@ function App() {
               <Route path="/regulatory" element={<ProtectedRoute><RegulatoryUpdates /></ProtectedRoute>} />
               <Route path="/secubot" element={<ProtectedRoute><SecuBot /></ProtectedRoute>} />
               <Route path="/documents/notice-securite/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
-              <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><NoticeSecuriteCreate /></ProtectedRoute>} />
+              <Route path="/documents/plan-prevention/creer" element={<ProtectedRoute><PlanPreventionCreate /></ProtectedRoute>} />
+              <Route path="/documents/gn6/creer" element={<ProtectedRoute><GN6Create /></ProtectedRoute>} />
               <Route path="/settings/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
               
               <Route path="*" element={<Layout><NotFound /></Layout>} />
