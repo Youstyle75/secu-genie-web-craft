@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Save, FileText, Sparkles } from 'lucide-react';
 import AIAssistantWidget from '@/components/ai/AIAssistantWidget';
+import CommentsSystem from '@/components/collaboration/CommentsSystem';
 
 const DocumentEditor = () => {
   const { id } = useParams();
@@ -271,7 +272,7 @@ const DocumentEditor = () => {
           </Card>
         )}
 
-        <div className="flex justify-between">
+        <div className="flex justify-between mb-6">
           <Button variant="outline" onClick={() => navigate(`/projects/${document?.project_id}`)}>
             Retour au projet
           </Button>
@@ -279,6 +280,9 @@ const DocumentEditor = () => {
             Passer à la signature
           </Button>
         </div>
+
+        {/* Comments Section */}
+        {id && <CommentsSystem documentId={id} />}
       </div>
 
       <AIAssistantWidget context="editeur-document" />
