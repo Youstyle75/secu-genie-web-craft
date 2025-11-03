@@ -5,42 +5,48 @@
 
 @layer base {
   :root {
-    /* Relume-inspired Color System - All HSL for consistency */
-    --background: 0 0% 100%;           /* Pure white #ffffff */
-    --foreground: 215 25% 17%;         /* Dark contrast #23272f */
+    /* SecuGenie Relume-inspired Color System - All HSL */
+    --background: 0 0% 100%;           /* Pure white #FFFFFF */
+    --foreground: 217 19% 13%;         /* Gris anthracite #1F2937 */
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 17%;
+    --card-foreground: 217 19% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 17%;
+    --popover-foreground: 217 19% 13%;
 
-    --primary: 217 91% 60%;            /* Relume Blue #2563eb */
+    --primary: 354 70% 54%;            /* Rouge vif primary #E63946 */
+    --primary-hover: 354 70% 48%;      /* Rouge hover darker */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 98%;          /* Soft gray #f8fafc */
-    --secondary-foreground: 215 25% 17%;
+    --secondary: 152 60% 53%;          /* Vert émeraude #2ECC71 */
+    --secondary-hover: 152 60% 48%;    /* Vert hover darker */
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 217 91% 60%;             /* Blue primary #2563eb */
+    --accent: 354 70% 54%;             /* Rouge vif accent */
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;            /* Green secondary #13ce66 */
+    --success: 152 60% 53%;            /* Vert émeraude success */
     --success-foreground: 0 0% 100%;
 
-    --danger: 0 72% 56%;               /* Red accent #e43e3e */
+    --danger: 354 70% 54%;             /* Rouge danger */
     --danger-foreground: 0 0% 100%;
 
-    --muted: 210 40% 98%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 17% 98%;              /* Gris très clair #F8F9FA */
+    --muted-foreground: 217 10% 45%;
 
-    --destructive: 0 72% 56%;
+    --destructive: 354 70% 54%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 218 17% 92%;
+    --input: 218 17% 92%;
+    --ring: 354 70% 54%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;                 /* 12px border radius */
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(152 60% 53%) 0%, hsl(174 60% 51%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 17% 98%) 100%);
   }
 
   * {
@@ -81,11 +87,13 @@
   }
 
   h1 {
-    @apply text-3xl sm:text-4xl md:text-5xl font-bold mb-6;
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6;
+    letter-spacing: -0.02em;
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl md:text-4xl font-bold mb-4;
+    @apply text-3xl sm:text-4xl md:text-5xl font-bold mb-4;
+    letter-spacing: -0.02em;
   }
 
   h3 {
@@ -105,23 +113,40 @@
   }
 
   p {
-    @apply mb-4 text-base leading-relaxed text-foreground/70;
+    @apply mb-4 text-base md:text-lg leading-relaxed text-foreground/80;
+    line-height: 1.7;
   }
 
   a {
     @apply text-primary transition-all duration-200 hover:text-primary/80;
   }
 
-  /* Classes d'animations et d'effets */
+  /* Scroll-triggered animations */
   .reveal {
-    @apply opacity-0 transition-all duration-700;
+    @apply opacity-0 transition-all;
     transform: translateY(20px);
+    transition-duration: 0.6s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .reveal.active {
     @apply opacity-100;
     transform: translateY(0);
   }
+  
+  /* Staggered animation for children */
+  .reveal-stagger > * {
+    @apply opacity-0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .reveal-stagger.active > *:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+  .reveal-stagger.active > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+  .reveal-stagger.active > *:nth-child(3) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+  .reveal-stagger.active > *:nth-child(4) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+  .reveal-stagger.active > *:nth-child(5) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+  .reveal-stagger.active > *:nth-child(6) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
 
   .breadcrumb-item::after {
     content: "/";
@@ -165,6 +190,30 @@
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
+  
+  /* Parallax effect */
+  .parallax {
+    transition: transform 0.3s ease-out;
+  }
+  
+  /* Hover scale micro-interaction */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Icon hover animation */
+  .icon-hover {
+    transition: transform 0.3s ease;
+  }
+  
+  .icon-hover:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
 }
 
 /* Classes de composants - Relume Style */
@@ -184,11 +233,15 @@
 
   /* Section Spacing - Relume style */
   .section {
-    @apply py-16 md:py-24 lg:py-32;
+    @apply py-20 md:py-28 lg:py-32;
   }
 
   .section-sm {
     @apply py-12 md:py-16 lg:py-20;
+  }
+  
+  .section-hero {
+    @apply py-20 md:py-32 lg:py-40;
   }
 
   /* Forms - Clean & Modern */
@@ -222,9 +275,10 @@
 
   .btn-primary {
     @apply btn bg-primary text-primary-foreground 
-           hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02]
+           hover:brightness-105 hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02]
            focus:ring-primary/50
-           active:scale-[0.98];
+           active:scale-[0.98]
+           shadow-md;
   }
 
   .btn-secondary {
@@ -258,18 +312,22 @@
   }
 
   .btn-lg {
-    @apply text-lg px-8 py-4;
+    @apply text-lg px-8 py-4 h-14;
+  }
+  
+  .btn-xl {
+    @apply text-xl px-10 py-5 h-16;
   }
 
   /* Cards - Soft shadows with smooth transitions */
   .card {
-    @apply bg-card rounded-xl border border-border 
+    @apply bg-card rounded-2xl border border-border 
            shadow-sm hover:shadow-md 
            transition-all duration-300 ease-in-out;
   }
 
   .card-hover {
-    @apply card hover:scale-[1.02] hover:shadow-lg;
+    @apply card hover:-translate-y-1 hover:shadow-xl;
   }
 
   .card-body {
@@ -286,7 +344,13 @@
 
   /* Hero Section - Relume style */
   .hero-gradient {
-    @apply bg-gradient-to-b from-background via-secondary/30 to-background;
+    background: linear-gradient(135deg, hsl(152 60% 53% / 0.08) 0%, hsl(174 60% 51% / 0.05) 50%, hsl(0 0% 100%) 100%);
+  }
+  
+  .hero-pattern {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(152 60% 53% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsl(174 60% 51% / 0.03) 0%, transparent 50%);
   }
 
   /* Alerts - Modern & Clean */
