@@ -36,12 +36,16 @@ const ExportButtons: React.FC<ExportButtonsProps> = ({
         onExportPDF();
       } else {
         await exportDocumentToPDF({
-          title: documentData.metadata.title,
-          type: documentData.metadata.type,
-          version: documentData.metadata.version,
-          updatedAt: documentData.metadata.updatedAt,
+          metadata: {
+            type: documentData.metadata.type,
+            title: documentData.metadata.title,
+            createdAt: documentData.metadata.createdAt,
+            updatedAt: documentData.metadata.updatedAt,
+            author: documentData.metadata.author,
+            version: documentData.metadata.version,
+            status: documentData.metadata.status,
+          },
           content: documentData.content,
-          metadata: documentData.metadata
         });
       }
     } catch (error) {
