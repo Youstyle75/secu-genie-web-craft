@@ -243,7 +243,7 @@ const GN6Create = () => {
               )}
 
               {currentStep === 3 && (
-                <GN6Mesures register={register} watch={watch} />
+                <GN6Mesures register={register} watch={watch} setValue={setValue} />
               )}
 
               {currentStep === 4 && (
