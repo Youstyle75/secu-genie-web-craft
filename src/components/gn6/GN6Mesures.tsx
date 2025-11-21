@@ -1,17 +1,103 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Shield, AlertTriangle, Users as UsersIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Shield, AlertTriangle, Users as UsersIcon, Sparkles, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface GN6MesuresProps {
   register: any;
   watch: any;
+  setValue?: any;
 }
 
-const GN6Mesures: React.FC<GN6MesuresProps> = ({ register, watch }) => {
+const GN6Mesures: React.FC<GN6MesuresProps> = ({ register, watch, setValue }) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleAiGeneration = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const eventType = watch('content.informations.intitule') || 'événement';
+      const capacity = parseInt(watch('content.effectifs.public') || '0');
+      const dateDebut = watch('content.informations.dateDebut');
+      const dateFin = watch('content.informations.dateFin');
+      const lieu = watch('content.lieu.configuration') || '';
+      
+      if (capacity === 0) {
+        toast.error('Veuillez d\'abord renseigner l\'effectif du public');
+        setIsGenerating(false);
+        return;
+      }
+
+      const duration = dateDebut && dateFin 
+        ? `${new Date(dateDebut).toLocaleDateString('fr-FR')} - ${new Date(dateFin).toLocaleDateString('fr-FR')}`
+        : 'À préciser';
+      
+      const isOutdoor = lieu.toLowerCase().includes('plein air') || lieu.toLowerCase().includes('extérieur');
+
+      toast.info('Génération des mesures en cours...', { duration: 2000 });
+
+      const { data, error } = await supabase.functions.invoke('ai-gn6-measures', {
+        body: { 
+          eventType,
+          capacity,
+          duration,
+          isOutdoor
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.measures) {
+        const { mesuresComplementaires, serviceSecurity, assurances } = data.measures;
+
+        // Apply generated measures
+        if (mesuresComplementaires && setValue) {
+          Object.keys(mesuresComplementaires).forEach(key => {
+            setValue(`content.mesures.${key}`, mesuresComplementaires[key]);
+          });
+        }
+
+        if (serviceSecurity && setValue) {
+          if (serviceSecurity.securitePrivee) {
+            Object.keys(serviceSecurity.securitePrivee).forEach(key => {
+              setValue(`content.securite.securitePrivee.${key}`, serviceSecurity.securitePrivee[key]);
+            });
+          }
+          if (serviceSecurity.securitePublique) {
+            Object.keys(serviceSecurity.securitePublique).forEach(key => {
+              setValue(`content.securite.securitePublique.${key}`, serviceSecurity.securitePublique[key]);
+            });
+          }
+          if (serviceSecurity.pompiers) {
+            Object.keys(serviceSecurity.pompiers).forEach(key => {
+              setValue(`content.securite.pompiers.${key}`, serviceSecurity.pompiers[key]);
+            });
+          }
+        }
+
+        if (assurances && setValue) {
+          Object.keys(assurances).forEach(key => {
+            setValue(`content.assurances.${key}`, assurances[key]);
+          });
+        }
+
+        toast.success('Mesures de sécurité générées avec succès !');
+      }
+
+    } catch (error) {
+      console.error('Error generating measures:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const mesuresComplementaires = [
     { id: 'barrieresSecurite', label: 'Barrières de sécurité et mise en place de cheminements' },
     { id: 'eclairageSecurite', label: 'Éclairage de sécurité et d\'évacuation' },
@@ -27,9 +113,36 @@ const GN6Mesures: React.FC<GN6MesuresProps> = ({ register, watch }) => {
 
   return (
     <Card className="p-6 mb-6 bg-formBackground border-formBorder">
-      <div className="flex items-center gap-3 mb-6">
-        <Shield className="text-accentBleu" size={28} />
-        <h2 className="text-2xl font-bold text-textPrincipal">Mesures de Sécurité</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Shield className="text-accentBleu" size={28} />
+          <h2 className="text-2xl font-bold text-textPrincipal">Mesures de Sécurité</h2>
+        </div>
+        <Button 
+          onClick={handleAiGeneration}
+          disabled={isGenerating}
+          className="bg-gradient-to-r from-primary to-secondary text-white shadow-md hover:shadow-lg transition-all"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Génération en cours...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Générer les mesures (IA)
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* AI Helper Info */}
+      <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          💡 <strong>Astuce :</strong> L'IA peut vous suggérer des mesures de sécurité conformes aux réglementations 
+          en fonction du type d'événement et de la capacité d'accueil. Pensez à remplir les informations de base avant de générer.
+        </p>
       </div>
 
       {/* Mesures complémentaires */}
